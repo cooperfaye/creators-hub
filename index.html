@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creator Affiliate Portal</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        body { background-color: #f4f6f9; padding: 15px; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .link-generator { background: #fff; padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .link-generator input { width: 70%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        .link-generator button { width: 25%; padding: 10px; background: #6c5ce7; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .card { background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .card p { font-size: 12px; color: #666; font-weight: bold; }
+        .card h2 { font-size: 20px; color: #2d3436; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h3>🚀 Creator Hub</h3>
+        <span>Welcome, Creator!</span>
+    </div>
+
+    <!-- Link Generator -->
+    <div class="link-generator">
+        <p style="font-size: 12px; font-weight: bold; margin-bottom: 8px; color: #555;">GENERATE AFFILIATE LINK</p>
+        <div style="display: flex; justify-content: space-between;">
+            <input type="text" id="targetUrl" placeholder="Paste Walmart URL here...">
+            <button onclick="generateLink()">Create</button>
+        </div>
+        <p id="outputLink" style="margin-top: 10px; font-weight: bold; color: #27ae60; word-break: break-all;"></p>
+    </div>
+
+    <!-- Quick Stats (Mavely Style) -->
+    <p style="font-weight: bold; margin-bottom: 10px; color: #333;">Quick Stats (MTD)</p>
+    <div class="stats-grid">
+        <div class="card">
+            <p>SALES</p>
+            <h2>$0.00</h2>
+        </div>
+        <div class="card">
+            <p>COMMISSION</p>
+            <h2>$0.00</h2>
+        </div>
+        <div class="card">
+            <p>CLICKS</p>
+            <h2>0</h2>
+        </div>
+        <div class="card">
+            <p>CONVERSION</p>
+            <h2>0.00%</h2>
+        </div>
+    </div>
+
+    <script>
+        function generateLink() {
+            var url = document.getElementById('targetUrl').value;
+            if(url) {
+                var creatorId = "user123";
+                var finalLink = "https://yourdomain.com/redirect?aff=" + encodeURIComponent(url) + "&sub_id=" + creatorId;
+                document.getElementById('outputLink').innerText = "Your Link: " + finalLink;
+            } else {
+                alert("Please enter a URL first!");
+            }
+        }
+    </script>
+
+</body>
+</html>
