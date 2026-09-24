@@ -4,192 +4,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creator Hub - Affiliate Dashboard</title>
+    <title>Creator Hub Sign Up</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-        body { background-color: #f4f4f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 15px; }
-        
-        /* Auth Styles */
-        .auth-container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
-        .auth-container h2 { color: #333; margin-bottom: 15px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
-        button { width: 100%; padding: 12px; background-color: #6c5ce7; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; transition: background 0.3s; }
-        button:hover { background-color: #5b4bc4; }
-        .switch-btn { background-color: #333; margin-top: 8px; }
-        .switch-btn:hover { background-color: #444; }
-        .forgot-btn { background: none; border: none; color: #0066cc; cursor: pointer; margin-top: 15px; font-size: 13px; text-decoration: underline; width: auto; display: inline-block; }
-        
-        /* Real Dashboard Styles (Matching your screenshot) */
-        #dashboard { display: none; width: 100%; max-width: 500px; background: #f4f4f9; min-height: 100vh; padding: 10px; }
-        .dash-header { background: white; padding: 15px 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .dash-header h2 { font-size: 20px; color: #111; display: flex; align-items: center; gap: 8px; }
-        .welcome-text { font-size: 13px; color: #555; font-weight: bold; }
-        
-        .link-generator { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        .link-generator h3 { font-size: 13px; color: #555; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .link-input-group { display: flex; gap: 10px; }
-        .link-input-group input { margin: 0; flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
-        .link-input-group button { width: auto; padding: 10px 20px; margin: 0; background-color: #6c5ce7; font-size: 14px; }
-
-        .stats-title { font-size: 15px; color: #333; font-weight: bold; margin-bottom: 10px; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-        .stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .stat-card h4 { font-size: 12px; color: #666; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .stat-card p { font-size: 22px; font-weight: bold; color: #111; }
-
-        .logout-container { text-align: center; margin-top: 20px; }
-        .logout-btn { background-color: #d9534f; width: 100%; padding: 12px; font-size: 15px; }
-        .logout-btn:hover { background-color: #c9302c; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 320px;
+            text-align: center;
+        }
+        h2 { margin-bottom: 20px; color: #333; }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn-signup { background-color: #7c3aed; color: white; }
+        .btn-login { background-color: #222; color: white; }
+        .btn-forgot { background-color: #4f46e5; color: white; }
     </style>
 </head>
 <body>
 
-    <!-- Auth Form Section (Login / Signup) -->
-    <div class="auth-container" id="auth-container">
-        <h2 id="form-title">Creator Hub Sign Up</h2>
-        <input type="email" id="email" placeholder="Email address" required>
-        <input type="password" id="password" placeholder="Password" required>
-        <button id="action-btn" onclick="handleAuth()">Sign Up</button>
-        <button class="switch-btn" id="switch-btn" onclick="toggleMode()">Already have an account? Log In</button>
-        <br>
-        <button type="button" class="forgot-btn" onclick="handleForgotPassword()">Forgot Password?</button>
+    <div class="card">
+        <h2>Creator Hub Sign Up</h2>
+        
+        <!-- Email aur Password Input Fields -->
+        <input type="email" id="email" placeholder="Email address">
+        <input type="password" id="password" placeholder="Password">
+        
+        <button class="btn-signup" onclick="handleSignUp()">Sign Up</button>
+        <button class="btn-login" onclick="window.location.href='login.html'">Already have an account? Log In</button>
+        <button class="btn-forgot" onclick="handleForgotPassword()">Forgot Password?</button>
     </div>
 
-    <!-- Affiliate Dashboard Section (Matches your exact requirement) -->
-    <div id="dashboard">
-        <div class="dash-header">
-            <h2>🚀 Creator Hub</h2>
-            <div class="welcome-text" id="user-welcome">Welcome, Creator!</div>
-        </div>
-
-        <div class="link-generator">
-            <h3>Generate Affiliate Link</h3>
-            <div class="link-input-group">
-                <input type="text" id="walmart-url" placeholder="Paste Walmart URL here...">
-                <button onclick="generateLink()">Create</button>
-            </div>
-        </div>
-
-        <div class="stats-title">Quick Stats (MTD)</div>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h4>Sales</h4>
-                <p>$0.00</p>
-            </div>
-            <div class="stat-card">
-                <h4>Commission</h4>
-                <p>$0.00</p>
-            </div>
-            <div class="stat-card">
-                <h4>Clicks</h4>
-                <p>0</p>
-            </div>
-            <div class="stat-card">
-                <h4>Conversion</h4>
-                <p>0.00%</p>
-            </div>
-        </div>
-
-        <div class="logout-container">
-            <button class="logout-btn" onclick="handleLogout()">Log Out</button>
-        </div>
-    </div>
-
-    <!-- Firebase SDK & Logic -->
+    <!-- Firebase SDK Imports -->
     <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-      import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-      import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyCyRgUFz7YOwa6mjqY9f7YF_DMVZ1U13sY",
-        authDomain: "creators-hub-2e0fd.firebaseapp.com",
-        projectId: "creators-hub-2e0fd",
-        storageBucket: "creators-hub-2e0fd.firebasestorage.app",
-        messagingSenderId: "829787471454",
-        appId: "1:829787471454:web:e5205456d4f7fc466a7ecf",
-        measurementId: "G-E4N3K3RGQP"
-      };
+        // Apne Firebase project ka configuration yahan dalein
+        const firebaseConfig = {
+            apiKey: "AzaSy... (Aapke firebase project ki key)",
+            authDomain: "creators-hub-2eOfd.firebaseapp.com",
+            projectId: "creators-hub-2eOfd",
+            storageBucket: "creators-hub-2eOfd.appspot.com",
+            messagingSenderId: "829787471454",
+            appId: "1:829787471454:web:e5205456d4f7fc466a7ecf"
+        };
 
-      const app = initializeApp(firebaseConfig);
-      const analytics = getAnalytics(app);
-      const auth = getAuth(app);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
-      let isLogin = false;
+        // Sign Up Function
+        window.handleSignUp = function() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
 
-      window.toggleMode = function() {
-          isLogin = !isLogin;
-          document.getElementById('form-title').innerText = isLogin ? "Creator Hub Log In" : "Creator Hub Sign Up";
-          document.getElementById('action-btn').innerText = isLogin ? "Log In" : "Sign Up";
-          document.getElementById('switch-btn').innerText = isLogin ? "Need an account? Sign Up" : "Already have an account? Log In";
-      }
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    alert("Account successfully created!");
+                })
+                .catch((error) => {
+                    alert("Error: " + error.message);
+                });
+        };
 
-      window.handleAuth = function() {
-          const email = document.getElementById('email').value.trim();
-          const password = document.getElementById('password').value.trim();
+        // Forgot Password Function
+        window.handleForgotPassword = function() {
+            const email = document.getElementById('email').value;
+            if (!email) {
+                alert("Please enter your email address in the email field first!");
+                return;
+            }
 
-          if (!email || !password) {
-              alert("Please fill in both email and password.");
-              return;
-          }
-
-          if (isLogin) {
-              signInWithEmailAndPassword(auth, email, password)
-                  .catch((error) => {
-                      alert("Login Error: " + error.message);
-                  });
-          } else {
-              createUserWithEmailAndPassword(auth, email, password)
-                  .catch((error) => {
-                      alert("Signup Error: " + error.message);
-                  });
-          }
-      }
-
-      window.handleForgotPassword = function() {
-          const email = document.getElementById('email').value.trim();
-          if (!email) {
-              alert("Please enter your email address in the box above first, then click 'Forgot Password?'");
-              return;
-          }
-
-          sendPasswordResetEmail(auth, email)
-              .then(() => {
-                  alert("Password reset email sent successfully! Check your inbox.");
-              })
-              .catch((error) => {
-                  alert("Reset Error: " + error.message);
-              });
-      }
-
-      window.generateLink = function() {
-          const url = document.getElementById('walmart-url').value.trim();
-          if (!url) {
-              alert("Please paste a valid Walmart URL first!");
-              return;
-          }
-          alert("Affiliate link generated successfully for: " + url);
-          document.getElementById('walmart-url').value = '';
-      }
-
-      window.handleLogout = function() {
-          signOut(auth).catch((error) => {
-              console.log("Logout Error: ", error);
-          });
-      }
-
-      onAuthStateChanged(auth, (user) => {
-          if (user) {
-              document.getElementById('auth-container').style.display = 'none';
-              document.getElementById('dashboard').style.display = 'block';
-              // Extract username from email to show in welcome text
-              const username = user.email.split('@')[0];
-              document.getElementById('user-welcome').innerText = "Welcome, " + username + "!";
-          } else {
-              document.getElementById('auth-container').style.display = 'block';
-              document.getElementById('dashboard').style.display = 'none';
-          }
-      });
+            sendPasswordResetEmail(auth, email)
+                .then(() => {
+                    alert("Password reset email sent! Check your inbox.");
+                })
+                .catch((error) => {
+                    alert("Error: " + error.message);
+                });
+        };
     </script>
 </body>
 </html>
