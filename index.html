@@ -1,13 +1,32 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creators Hub</title>
+    <title>Creators Hub - Login & Signup</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 300px; }
+        h2 { text-align: center; color: #333; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #ff4500; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        button:hover { background-color: #e03d00; }
+        .switch-btn { background-color: #333; margin-top: 5px; }
+        .switch-btn:hover { background-color: #444; }
+    </style>
 </head>
 <body>
 
-    <!-- Firebase SDK Scripts (CDN) -->
+    <div class="container" id="form-container">
+        <h2 id="form-title">Sign Up</h2>
+        <input type="email" id="email" placeholder="Email address" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button id="action-btn" onclick="handleAuth()">Sign Up</button>
+        <button class="switch-btn" id="switch-btn" onclick="toggleMode()">Already have an account? Log In</button>
+    </div>
+
+    <!-- Firebase SDK & Logic -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
       import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -28,7 +47,43 @@
       const app = initializeApp(firebaseConfig);
       const analytics = getAnalytics(app);
       const auth = getAuth(app);
+
+      let isLogin = false;
+
+      window.toggleMode = function() {
+          isLogin = !isLogin;
+          document.getElementById('form-title').innerText = isLogin ? "Log In" : "Sign Up";
+          document.getElementById('action-btn').innerText = isLogin ? "Log In" : "Sign Up";
+          document.getElementById('switch-btn').innerText = isLogin ? "Need an account? Sign Up" : "Already have an account? Log In";
+      }
+
+      window.handleAuth = function() {
+          const email = document.getElementById('email').value;
+          const password = document.getElementById('password').value;
+
+          if (!email || !password) {
+              alert("Please fill in both email and password.");
+              return;
+          }
+
+          if (isLogin) {
+              signInWithEmailAndPassword(auth, email, password)
+                  .then((userCredential) => {
+                      alert("Logged in successfully! Welcome " + userCredential.user.email);
+                  })
+                  .catch((error) => {
+                      alert("Error: " + error.message);
+                  });
+          } else {
+              createUserWithEmailAndPassword(auth, email, password)
+                  .then((userCredential) => {
+                      alert("Signed up successfully! Welcome " + userCredential.user.email);
+                  })
+                  .catch((error) => {
+                      alert("Error: " + error.message);
+                  });
+          }
+      }
     </script>
 </body>
 </html>
-
