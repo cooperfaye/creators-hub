@@ -1,21 +1,27 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creators Hub - Dashboard</title>
+    <title>Creators Hub - Dashboard & Auth</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 320px; text-align: center; }
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 100%; max-width: 400px; box-sizing: border-box; text-align: center; }
         h2 { color: #333; margin-bottom: 10px; }
         input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
         button { width: 100%; padding: 10px; background-color: #ff4500; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 10px; }
         button:hover { background-color: #e03d00; }
         .switch-btn { background-color: #333; margin-top: 5px; }
         .switch-btn:hover { background-color: #444; }
-        .logout-btn { background-color: #d9534f; }
+        .forgot-btn { background: none; border: none; color: #0066cc; cursor: pointer; margin-top: 10px; font-size: 14px; text-decoration: underline; width: auto; }
+        .forgot-btn:hover { color: #004080; background: none; }
+        .logout-btn { background-color: #d9534f; margin-top: 20px; }
         .logout-btn:hover { background-color: #c9302c; }
-        #dashboard { display: none; }
+        #dashboard { display: none; text-align: left; }
+        .stats-box { background: #f9f9f9; border: 1px solid #ddd; padding: 15px; border-radius: 6px; margin: 15px 0; }
+        .stats-box p { margin: 8px 0; font-size: 15px; color: #444; }
+        .stats-box span { font-weight: bold; color: #ff4500; }
     </style>
 </head>
 <body>
@@ -27,23 +33,30 @@
         <input type="password" id="password" placeholder="Password" required>
         <button id="action-btn" onclick="handleAuth()">Sign Up</button>
         <button class="switch-btn" id="switch-btn" onclick="toggleMode()">Already have an account? Log In</button>
+        <br>
+        <button class="forgot-btn" onclick="handleForgotPassword()">Forgot Password?</button>
     </div>
 
     <!-- Dashboard Section (Hidden by default) -->
     <div class="container" id="dashboard">
-        <h2>Welcome to Creators Hub!</h2>
-        <p>Logged in as:</p>
-        <p id="user-email" style="font-weight: bold; color: #ff4500; word-break: break-all;"></p>
+        <h2 style="text-align: center;">Creators Hub Dashboard</h2>
+        <p>Welcome, <span id="user-email" style="font-weight: bold; color: #333;"></span></p>
+        
+        <div class="stats-box">
+            <p>📊 Total Clicks: <span id="total-clicks">1,245</span></p>
+            <p>💰 Total Earnings: <span id="total-earnings">$142.50</span></p>
+            <p>🚀 Active Campaigns: <span id="active-campaigns">Deal Logic / AI</span></p>
+        </div>
+
         <button class="logout-btn" onclick="handleLogout()">Log Out</button>
     </div>
 
     <!-- Firebase SDK & Logic -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-      import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+      import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
 
-      // Your web app's Firebase configuration
       const firebaseConfig = {
         apiKey: "AIzaSyCyRgUFz7YOwa6mjqY9f7YF_DMVZ1U13sY",
         authDomain: "creators-hub-2e0fd.firebaseapp.com",
@@ -54,7 +67,6 @@
         measurementId: "G-E4N3K3RGQP"
       };
 
-      // Initialize Firebase
       const app = initializeApp(firebaseConfig);
       const analytics = getAnalytics(app);
       const auth = getAuth(app);
@@ -90,21 +102,34 @@
           }
       }
 
+      window.handleForgotPassword = function() {
+          const email = document.getElementById('email').value;
+          if (!email) {
+              alert("Please enter your email address first, then click 'Forgot Password?'");
+              return;
+          }
+
+          sendPasswordResetEmail(auth, email)
+              .then(() => {
+                  alert("Password reset email sent! Check your inbox.");
+              })
+              .catch((error) => {
+                  alert("Error: " + error.message);
+              });
+      }
+
       window.handleLogout = function() {
           signOut(auth).catch((error) => {
               console.log("Logout Error: ", error);
           });
       }
 
-      // Check user login state automatically
       onAuthStateChanged(auth, (user) => {
           if (user) {
-              // User is signed in, hide form and show dashboard
               document.getElementById('auth-container').style.display = 'none';
               document.getElementById('dashboard').style.display = 'block';
               document.getElementById('user-email').innerText = user.email;
           } else {
-              // User is signed out, show form and hide dashboard
               document.getElementById('auth-container').style.display = 'block';
               document.getElementById('dashboard').style.display = 'none';
           }
