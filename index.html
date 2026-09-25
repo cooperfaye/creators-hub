@@ -1,18 +1,17 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creators Hub - Mavely Style Dashboard</title>
+    <title>Dollar General Deals Hub - Creator Dashboard</title>
     <style>
         :root {
             --bg-main: #f8fafc;
             --card-bg: #ffffff;
             --text-main: #0f172a;
             --text-muted: #64748b;
-            --primary: #7c3aed;
-            --primary-hover: #6d28d9;
+            --primary: #0071dc;
+            --primary-hover: #005bb5;
             --border-color: #e2e8f0;
             --success: #10b981;
         }
@@ -28,7 +27,7 @@
             padding-bottom: 40px;
         }
         
-        /* Top Mavely Navbar */
+        /* Top Navbar */
         .mavely-nav {
             background: #ffffff;
             border-bottom: 1px solid var(--border-color);
@@ -46,21 +45,22 @@
             gap: 15px;
         }
         .menu-icon {
-            font-size: 20px;
+            font-size: 22px;
             cursor: pointer;
             color: var(--text-main);
         }
         .brand-logo-box {
-            background: #000;
+            background: #0071dc;
             color: #fff;
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 900;
-            border-radius: 6px;
-            font-size: 18px;
+            font-weight: 800;
+            border-radius: 8px;
+            font-size: 16px;
+            letter-spacing: -1px;
         }
         .nav-url-box {
             flex: 1;
@@ -70,6 +70,7 @@
             border-radius: 8px;
             overflow: hidden;
             border: 1px solid var(--border-color);
+            margin: 0 10px;
         }
         .nav-url-box input {
             flex: 1;
@@ -108,6 +109,7 @@
             margin-bottom: 20px;
         }
 
+        /* Stats Section */
         .stats-card-box {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -121,6 +123,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         .stats-top h2 {
             font-size: 18px;
@@ -129,9 +133,9 @@
         .time-filters {
             display: flex;
             background: #f1f5f9;
-            padding: 3px;
+            padding: 4px;
             border-radius: 8px;
-            gap: 2px;
+            gap: 4px;
         }
         .time-btn {
             background: transparent;
@@ -139,10 +143,14 @@
             padding: 5px 10px;
             font-size: 12px;
             font-weight: 600;
-            color: var(--primary);
+            color: var(--text-muted);
             cursor: pointer;
             border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .time-btn.active {
             background: #ffffff;
+            color: var(--primary);
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
@@ -150,6 +158,11 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
+        }
+        @media(min-width: 600px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
         }
         .stat-item {
             background: #fafafa;
@@ -164,20 +177,22 @@
             margin-bottom: 5px;
         }
         .stat-item h3 {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
             color: var(--text-main);
         }
 
+        /* Result Link Box */
         .result-box {
-            background: #f5f3ff;
-            border: 1px solid #ddd6fe;
+            background: #f0f7ff;
+            border: 1px solid #bae6fd;
             padding: 15px;
             border-radius: 10px;
             margin-bottom: 20px;
             display: none;
             align-items: center;
             justify-content: space-between;
+            gap: 10px;
         }
         .result-box a {
             color: var(--primary);
@@ -197,6 +212,7 @@
             white-space: nowrap;
         }
 
+        /* Brands Section */
         .section-box {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -216,12 +232,17 @@
             padding-bottom: 5px;
         }
         .brand-pill {
-            min-width: 130px;
+            min-width: 150px;
             background: #fafafa;
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 15px 10px;
             text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .brand-pill:hover {
+            border-color: var(--primary);
         }
         .brand-circle {
             width: 45px;
@@ -234,19 +255,20 @@
             justify-content: center;
             margin: 0 auto 8px auto;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 14px;
         }
         .brand-pill p {
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
             color: var(--text-main);
         }
         .brand-pill span {
-            font-size: 10px;
+            font-size: 11px;
             color: var(--success);
             font-weight: 700;
         }
 
+        /* Tables */
         .table-container {
             overflow-x: auto;
         }
@@ -267,6 +289,7 @@
             font-weight: 600;
         }
 
+        /* Modals & Sidebar */
         .modal {
             display: none;
             position: fixed;
@@ -354,17 +377,19 @@
 </head>
 <body>
 
+    <!-- Navbar -->
     <div class="mavely-nav">
         <div class="nav-left">
             <div class="menu-icon" onclick="toggleSidebar()">☰</div>
-            <div class="brand-logo-box">L</div>
+            <div class="brand-logo-box">DG</div>
         </div>
         <div class="nav-url-box">
-            <input type="text" id="longUrl" placeholder="Enter URL (e.g. Walmart product link)">
+            <input type="text" id="longUrl" placeholder="Enter Walmart URL to shorten">
             <button class="nav-url-btn" onclick="generateLink()">🔗</button>
         </div>
     </div>
 
+    <!-- Sidebar Menu -->
     <div class="sidebar-menu" id="sidebarMenu">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <h3 id="sidebarUserName">My Account</h3>
@@ -380,6 +405,7 @@
         
         <div class="welcome-header" id="welcomeText">Welcome, Creator!</div>
 
+        <!-- Generated Link Result Box -->
         <div class="result-box" id="resultBox">
             <div>
                 <span style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 2px;">Smart Link Generated:</span>
@@ -388,21 +414,25 @@
             <button class="copy-btn" onclick="copyShortLink()">Copy Link</button>
         </div>
 
+        <!-- Quick Stats Widget with Date Filters -->
         <div class="stats-card-box">
             <div class="stats-top">
                 <h2>Quick Stats</h2>
                 <div class="time-filters">
-                    <button class="time-btn">MTD</button>
+                    <button class="time-btn active" onclick="filterStats('1D', this)">1 Day</button>
+                    <button class="time-btn" onclick="filterStats('15D', this)">15 Days</button>
+                    <button class="time-btn" onclick="filterStats('1M', this)">1 Month</button>
+                    <button class="time-btn" onclick="filterStats('1Y', this)">1 Year</button>
                 </div>
             </div>
             <div class="stats-grid">
                 <div class="stat-item">
                     <span>Sales</span>
-                    <h3 id="totalSales">$753.80</h3>
+                    <h3 id="statSales">$0.00</h3>
                 </div>
                 <div class="stat-item">
                     <span>Commission</span>
-                    <h3 id="totalCommission">$0.00</h3>
+                    <h3 id="statCommission">$0.00</h3>
                 </div>
                 <div class="stat-item">
                     <span>Clicks</span>
@@ -410,32 +440,24 @@
                 </div>
                 <div class="stat-item">
                     <span>Conversion</span>
-                    <h3>3.07%</h3>
+                    <h3 id="statConversion">0.00%</h3>
                 </div>
             </div>
         </div>
 
+        <!-- Exclusive Brand Section (Only Walmart) -->
         <div class="section-box">
-            <h3>Trending Brands</h3>
+            <h3>Featured Brand</h3>
             <div class="brands-flex">
-                <div class="brand-pill">
-                    <div class="brand-circle" style="background:#000;">MK</div>
-                    <p>Michael Kors</p>
-                    <span>Up to 10%</span>
-                </div>
-                <div class="brand-pill">
+                <div class="brand-pill" onclick="selectWalmartBrand()">
                     <div class="brand-circle">WM</div>
                     <p>Walmart Affiliate</p>
-                    <span>$7.00 Com.</span>
-                </div>
-                <div class="brand-pill">
-                    <div class="brand-circle" style="background:#0284c7;">COL</div>
-                    <p>Columbia</p>
-                    <span>Up to 8%</span>
+                    <span>Up to 7% Com.</span>
                 </div>
             </div>
         </div>
 
+        <!-- Link History -->
         <div class="section-box" id="linksSection">
             <h3>Link History</h3>
             <div class="table-container">
@@ -454,6 +476,7 @@
             </div>
         </div>
 
+        <!-- Payment History -->
         <div class="section-box" id="paymentSection">
             <h3>Payment History</h3>
             <div class="table-container">
@@ -474,7 +497,7 @@
 
     </div>
 
-    <!-- Auth Modal -->
+    <!-- Login / Signup Modal -->
     <div class="modal" id="authModal">
         <div class="modal-content">
             <h2 id="authTitle">Create Account</h2>
@@ -496,22 +519,7 @@
             
             <div style="display: flex; justify-content: space-between; margin-top: 12px; font-size: 13px;">
                 <span style="color: var(--primary); cursor: pointer;" onclick="toggleAuthMode()" id="authSwitchText">Already have an account? Login</span>
-                <span style="color: var(--text-muted); cursor: pointer;" id="forgotPassText" onclick="openForgotModal()">Forgot Password?</span>
             </div>
-        </div>
-    </div>
-
-    <!-- Forgot Password Modal -->
-    <div class="modal" id="forgotModal">
-        <div class="modal-content">
-            <h2>Reset Password</h2>
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">Enter your registered email address to receive a password reset link.</p>
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" id="forgotEmail" placeholder="name@gmail.com">
-            </div>
-            <button class="btn-main" onclick="sendResetLink()">Send Reset Link</button>
-            <button class="btn-main" onclick="closeForgotModal()" style="background: #e2e8f0; color: var(--text-main); margin-top: 8px;">Cancel</button>
         </div>
     </div>
 
@@ -520,19 +528,12 @@
         <div class="modal-content">
             <h2>Account Settings</h2>
             <div class="form-group">
-                <label>General / Profile Type</label>
-                <select id="profileType">
-                    <option value="General">General Creator</option>
-                    <option value="Influencer">VIP Influencer</option>
-                </select>
+                <label>Full Name</label>
+                <input type="text" id="settingsName">
             </div>
             <div class="form-group">
-                <label>First Name</label>
-                <input type="text" id="settingsFirstName">
-            </div>
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" id="settingsEmail" disabled>
+                <label>Email Address (Account ID)</label>
+                <input type="email" id="settingsEmail" disabled style="background:#f1f5f9;">
             </div>
             <div class="form-group">
                 <label>PayPal Email Address</label>
@@ -550,13 +551,13 @@
         window.onload = function() {
             const hash = window.location.hash.substring(1);
             if (hash) {
-                let savedLinks = JSON.parse(localStorage.getItem('creators_links') || '{}');
+                let savedLinks = JSON.parse(localStorage.getItem('dg_links') || '{}');
                 if (savedLinks[hash]) {
-                    let linkHistory = JSON.parse(localStorage.getItem('creators_history') || '[]');
+                    let linkHistory = JSON.parse(localStorage.getItem('dg_history') || '[]');
                     linkHistory.forEach(item => {
                         if(item.code === hash) item.clicks = (item.clicks || 0) + 1;
                     });
-                    localStorage.setItem('creators_history', JSON.stringify(linkHistory));
+                    localStorage.setItem('dg_history', JSON.stringify(linkHistory));
                     window.location.href = savedLinks[hash];
                     return;
                 }
@@ -571,32 +572,38 @@
             let switchText = document.getElementById('authSwitchText');
             let nameGroup = document.getElementById('nameGroup');
             let submitBtn = document.getElementById('authSubmitBtn');
-            let forgotText = document.getElementById('forgotPassText');
 
             if (isLoginMode) {
                 title.innerText = "Welcome Back";
                 switchText.innerText = "Don't have an account? Sign Up";
                 nameGroup.style.display = "none";
                 submitBtn.innerText = "Login";
-                forgotText.style.display = "block";
             } else {
                 title.innerText = "Create Account";
                 switchText.innerText = "Already have an account? Login";
                 nameGroup.style.display = "block";
                 submitBtn.innerText = "Get Started";
-                forgotText.style.display = "none";
             }
         }
 
-        function openForgotModal() {
-            document.getElementById('authModal').style.display = 'none';
-            document.getElementById('forgotModal').style.display = 'flex';
-        }
+        function submitAuth() {
+            let email = document.getElementById('authEmail').value.trim();
+            let password = document.getElementById('authPassword').value.trim();
+            let name = document.getElementById('authName').value.trim();
 
-        function closeForgotModal() {
-            document.getElementById('forgotModal').style.display = 'none';
-            document.getElementById('authModal').style.display = 'flex';
-        }
+            if (!email || !password) {
+                alert('Please enter both email and password!');
+                return;
+            }
 
-        function sendResetLink() {
-          
+            if (isLoginMode) {
+                let savedUser = JSON.parse(localStorage.getItem('dg_user_' + email));
+                if (!savedUser || savedUser.password !== password) {
+                    alert('Invalid email or password!');
+                    return;
+                }
+                name = savedUser.name;
+            } else {
+                if (!name) name = email.split('@')[0];
+                let userData = { name: name, email: email, password: password, paypal: '' };
+                localStorage.setItem('dg_user_' + e
