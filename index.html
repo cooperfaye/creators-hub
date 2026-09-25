@@ -59,6 +59,14 @@
         const profileNameDisplay = document.getElementById('profileNameDisplay');
         const profileEmailDisplay = document.getElementById('profileEmailDisplay');
 
+        // Custom Link Generator Elements
+        const urlInput = document.getElementById('urlInput');
+        const generateLinkBtn = document.getElementById('generateLinkBtn');
+        const linkResultModal = document.getElementById('linkResultModal');
+        const generatedLinkOutput = document.getElementById('generatedLinkOutput');
+        const copyLinkBtn = document.getElementById('copyLinkBtn');
+        const closeLinkModal = document.getElementById('closeLinkModal');
+
         let isLogin = false; // Default mode is Signup
 
         // Toggle between Login and Signup modes
@@ -162,6 +170,33 @@
             settingsModal.classList.add('hidden');
         });
 
+        // Custom Link Generator Logic
+        generateLinkBtn.addEventListener('click', () => {
+            const longUrl = urlInput.value.trim();
+            if (!longUrl) {
+                alert("Please enter a valid URL first!");
+                return;
+            }
+            // Generate custom tracked short link format
+            const uniqueId = Math.random().toString(36.substring(2, 8));
+            const shortLink = `https://cooperfaye.github.io/r?id=${uniqueId}`;
+            
+            generatedLinkOutput.value = shortLink;
+            linkResultModal.classList.remove('hidden');
+        });
+
+        copyLinkBtn.addEventListener('click', () => {
+            generatedLinkOutput.select();
+            document.execCommand('copy');
+            copyLinkBtn.innerText = "Copied!";
+            setTimeout(() => { copyLinkBtn.innerText = "Copy Link"; }, 2000);
+        });
+
+        closeLinkModal.addEventListener('click', () => {
+            linkResultModal.classList.add('hidden');
+            urlInput.value = '';
+        });
+
         // Logout Handler
         logoutBtn.addEventListener('click', async () => {
             await signOut(auth);
@@ -226,10 +261,10 @@
             </div>
         </div>
 
-        <!-- URL Shortener Bar Mock -->
+        <!-- Custom Link Generator Bar -->
         <div class="bg-white p-2 rounded-xl shadow-sm flex items-center border">
-            <input type="text" placeholder="Enter URL" class="w-full px-3 py-1 outline-none text-sm text-gray-600">
-            <button class="bg-purple-700 text-white p-2 rounded-lg">🔗</button>
+            <input type="text" id="urlInput" placeholder="Enter URL to shorten" class="w-full px-3 py-1 outline-none text-sm text-gray-600">
+            <button id="generateLinkBtn" class="bg-purple-700 hover:bg-purple-800 text-white p-2 rounded-lg transition" title="Generate Link">🔗</button>
         </div>
 
         <!-- Payment Notice Banner -->
@@ -250,7 +285,7 @@
         <!-- Welcome Greeting -->
         <h2 class="text-xl font-bold text-gray-900 pt-2">Welcome, <span id="welcomeUserDisplay">User</span>!</h2>
 
-        <!-- Quick Stats Section (Cleared) -->
+        <!-- Quick Stats Section -->
         <div class="bg-white p-4 rounded-xl shadow-sm space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="font-bold text-gray-800">Quick Stats</h3>
@@ -262,7 +297,7 @@
                 </div>
             </div>
 
-            <!-- Stats Grid (Set to 0) -->
+            <!-- Stats Grid -->
             <div class="grid grid-cols-2 gap-3">
                 <div class="p-3 border rounded-xl bg-gray-50">
                     <p class="text-xs text-gray-500">Sales</p>
@@ -315,7 +350,24 @@
                 </div>
             </div>
 
-            <button id="closeSettingsBtn" onclick="document.getElementById('settingsModal').classList.add('hidden')" class="w-full py-2 bg-purple-700 text-white font-semibold rounded-lg hover:bg-purple-800 transition mt-2">Close</button>
+            <button onclick="document.getElementById('settingsModal').classList.add('hidden')" class="w-full py-2 bg-purple-700 text-white font-semibold rounded-lg hover:bg-purple-800 transition mt-2">Close</button>
+        </div>
+    </div>
+
+    <!-- Link Result Modal -->
+    <div id="linkResultModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white w-full max-w-sm p-6 rounded-2xl shadow-xl space-y-4 relative">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-gray-800">Your Shortened Link</h3>
+                <button id="closeLinkModal" class="text-gray-500 hover:text-black font-bold text-lg">✕</button>
+            </div>
+            
+            <div class="space-y-2">
+                <label class="block text-xs text-gray-500">Copy your custom link below:</label>
+                <input type="text" id="generatedLinkOutput" readonly class="w-full p-2 border rounded-lg bg-gray-50 text-sm font-mono text-gray-700 select-all">
+            </div>
+
+            <button id="copyLinkBtn" class="w-full py-2 bg-purple-700 text-white font-semibold rounded-lg hover:bg-purple-800 transition">Copy Link</button>
         </div>
     </div>
 
