@@ -51,7 +51,6 @@
     <div class="card">
         <h2>Creator Hub Sign Up</h2>
         
-        <!-- Email aur Password Input Fields -->
         <input type="email" id="email" placeholder="Email address">
         <input type="password" id="password" placeholder="Password">
         
@@ -60,14 +59,12 @@
         <button class="btn-forgot" onclick="handleForgotPassword()">Forgot Password?</button>
     </div>
 
-    <!-- Firebase SDK Imports -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // Apne Firebase project ka configuration yahan dalein
         const firebaseConfig = {
-            apiKey: "AzaSy... (Aapke firebase project ki key)",
+            apiKey: "AIzaSyCgRGUpFz7Y0waNmJgqYf7YF...",
             authDomain: "creators-hub-2eOfd.firebaseapp.com",
             projectId: "creators-hub-2eOfd",
             storageBucket: "creators-hub-2eOfd.appspot.com",
@@ -78,10 +75,14 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // Sign Up Function
         window.handleSignUp = function() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                alert("Please enter both email and password!");
+                return;
+            }
 
             createUserWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
@@ -92,7 +93,6 @@
                 });
         };
 
-        // Forgot Password Function
         window.handleForgotPassword = function() {
             const email = document.getElementById('email').value;
             if (!email) {
