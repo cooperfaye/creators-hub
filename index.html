@@ -4,377 +4,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Top Click Deals - Affiliate Dashboard</title>
+    <title>Walmart Creator Portal</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        body {
-            background-color: #f4f6f9;
-            color: #333;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        /* Auth Styles */
-        .auth-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .auth-card {
-            background: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            width: 100%;
-            max-width: 400px;
-        }
-        .auth-card h2 {
-            margin-bottom: 20px;
-            color: #333;
-            text-align: center;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-        .btn {
-            width: 100%;
-            padding: 10px;
-            background: #667eea;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .btn:hover {
-            background: #5a6fd6;
-        }
-        .switch-text {
-            margin-top: 15px;
-            text-align: center;
-            font-size: 14px;
-        }
-        .switch-text a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        .switch-text a:hover {
-            text-decoration: underline;
-        }
-
-        /* Dashboard Styles */
-        .dashboard {
-            display: none;
-        }
-        header {
-            background: #fff;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        header h1 {
-            font-size: 22px;
-            color: #4a5568;
-        }
-        .logout-btn {
-            background: #e53e3e;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        .logout-btn:hover {
-            background: #c53030;
-        }
-        .dashboard-content {
-            background: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        .stat-card {
-            background: #f7fafc;
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }
-        .stat-card h3 {
-            font-size: 14px;
-            color: #718096;
-            margin-bottom: 5px;
-        }
-        .stat-card p {
-            font-size: 24px;
-            font-weight: bold;
-            color: #2d3748;
-        }
-        .link-generator {
-            margin-top: 20px;
-        }
-        .link-generator h3 {
-            margin-bottom: 15px;
-            color: #2d3748;
-        }
-        .link-box {
-            display: flex;
-            gap: 10px;
-        }
-        .link-box input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #cbd5e0;
-            border-radius: 5px;
-        }
-        .link-box button {
-            padding: 10px 20px;
-            background: #48bb78;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        .link-box button:hover {
-            background: #38a169;
-        }
-        .error-msg {
-            color: #e53e3e;
-            font-size: 13px;
-            margin-bottom: 10px;
-            text-align: center;
-        }
+        body { font-family: Arial, sans-serif; background: #0b0f19; color: #fff; margin: 0; padding: 20px; }
+        .box { max-width: 700px; margin: 30px auto; background: #161f33; padding: 30px; border-radius: 10px; border: 1px solid #2a3b5c; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 5px; border: 1px solid #2a3b5c; background: #0b0f19; color: #fff; box-sizing: border-box; font-size: 14px; }
+        button { background: #0071dc; border: none; font-weight: bold; cursor: pointer; }
+        button:hover { background: #005bb5; }
+        .hidden { display: none !important; }
+        .card { background: #0b0f19; padding: 15px; margin-top: 10px; border-radius: 6px; border: 1px solid #2a3b5c; }
+        .danger { background: #dc3545; }
+        .success { background: #28a745; }
+        .flex { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
     </style>
 </head>
 <body>
 
-    <!-- AUTH SECTION (Login / Signup) -->
-    <div id="authSection" class="auth-wrapper">
-        <!-- Sign Up Form -->
-        <div id="signupCard" class="auth-card">
-            <h2>Create Account</h2>
-            <div id="signupError" class="error-msg"></div>
-            <div class="form-group">
-                <label>Your Name</label>
-                <input type="text" id="signupName" placeholder="Enter your name">
-            </div>
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" id="signupEmail" placeholder="Enter your email">
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="signupPassword" placeholder="Create a password">
-            </div>
-            <button class="btn" onclick="handleSignup()">Sign Up</button>
-            <div class="switch-text">
-                Already have an account? <a href="#" onclick="switchTab('login')">Login here</a>
-            </div>
-        </div>
+<div class="box" id="loginBox">
+    <h2 style="color: #0071dc; text-align: center; margin-top: 0;">Walmart Creator Portal</h2>
+    <p style="text-align: center; color: #8899a6; font-size: 13px;">CEO Admin: admin@walmart.com / admin123</p>
+    
+    <form onsubmit="handleLogin(event)">
+        <input type="email" id="loginEmail" placeholder="Email Address" required>
+        <input type="password" id="loginPassword" placeholder="Password" required>
+        <button type="submit">Login to Account</button>
+    </form>
+    
+    <div style="text-align: center; margin-top: 15px;">
+        <button onclick="registerUser()" style="background: #28a745;">Register New Creator Account</button>
+    </div>
+</div>
 
-        <!-- Login Form -->
-        <div id="loginCard" class="auth-card" style="display: none;">
-            <h2>Welcome Back</h2>
-            <div id="loginError" class="error-msg"></div>
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" id="loginEmail" placeholder="Enter your email">
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="loginPassword" placeholder="Enter your password">
-            </div>
-            <button class="btn" onclick="handleLogin()">Login</button>
-            <div class="switch-text">
-                Don't have an account? <a href="#" onclick="switchTab('signup')">Sign up here</a>
-            </div>
+<div class="box hidden" id="dashboardBox">
+    <div class="flex" style="border-bottom: 1px solid #2a3b5c; padding-bottom: 10px;">
+        <h3 id="welcomeText" style="margin: 0; color: #0071dc;"></h3>
+        <button onclick="logout()" class="danger" style="width: auto; padding: 8px 15px; margin: 0;">Logout</button>
+    </div>
+
+    <!-- Partner Panel -->
+    <div id="partnerSection" class="hidden">
+        <div class="card">
+            <h4>Generate Smart Tracking Link</h4>
+            <input type="text" id="targetUrl" placeholder="Paste Walmart URL (https://www.walmart.com/...)">
+            <button onclick="createLink()" class="success">Create Link</button>
+        </div>
+        <div class="card">
+            <h4>Your Active Links</h4>
+            <div id="linksList">No links yet.</div>
         </div>
     </div>
 
-    <!-- DASHBOARD SECTION -->
-    <div id="dashboardSection" class="dashboard container">
-        <header>
-            <h1>Top Click Deals - Dashboard</h1>
-            <button class="logout-btn" onclick="handleLogout()">Logout</button>
-        </header>
-        <div class="dashboard-content">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <h3>Total Clicks</h3>
-                    <p>1,245</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Active Links</h3>
-                    <p>18</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Estimated Earnings</h3>
-                    <p>$142.50</p>
-                </div>
-            </div>
-
-            <div class="link-generator">
-                <h3>Generate Affiliate Tracking Link</h3>
-                <div class="link-box">
-                    <input type="text" id="targetUrl" placeholder="Paste your affiliate or product URL here...">
-                    <button onclick="generateLink()">Generate</button>
-                </div>
-                <p id="generatedResult" style="margin-top: 10px; font-weight: 600; color: #4a5568;"></p>
-            </div>
+    <!-- CEO Admin Panel -->
+    <div id="adminSection" class="hidden">
+        <div class="card" style="border-color: #0071dc;">
+            <h4 style="color: #0071dc; margin-top: 0;">👑 CEO Master Control Panel</h4>
+            <p style="color: #8899a6; font-size: 13px;">As CEO, you can view all creators, check their performance, and delete or block any account.</p>
+            <div id="adminUsersList">Loading users...</div>
         </div>
     </div>
+</div>
 
-    <script>
-        // Check session on page load
-        window.onload = function() {
-            const loggedInUser = localStorage.getItem('tcd_logged_in_user');
-            if (loggedInUser) {
-                showDashboard();
-            } else {
-                showAuth();
-            }
-        };
+<script>
+    const ADMIN_EMAIL = "admin@walmart.com";
+    const ADMIN_PASS = "admin123";
 
-        // Switch between Signup and Login view
-        function switchTab(tab) {
-            document.getElementById('signupError').innerText = '';
-            document.getElementById('loginError').innerText = '';
-            if (tab === 'login') {
-                document.getElementById('signupCard').style.display = 'none';
-                document.getElementById('loginCard').style.display = 'block';
-            } else {
-                document.getElementById('loginCard').style.display = 'none';
-                document.getElementById('signupCard').style.display = 'block';
-            }
+    function getDatabase() {
+        let users = JSON.parse(localStorage.getItem('walmart_final_users'));
+        if (!users) {
+            users = [
+                { name: "CEO Admin", email: ADMIN_EMAIL, pass: ADMIN_PASS, role: "admin", links: [] }
+            ];
+            localStorage.setItem('walmart_final_users', JSON.stringify(users));
         }
+        return users;
+    }
 
-        // Handle Sign Up
-        function handleSignup() {
-            const name = document.getElementById('signupName').value.trim();
-            const email = document.getElementById('signupEmail').value.trim();
-            const password = document.getElementById('signupPassword').value.trim();
-            const errorEl = document.getElementById('signupError');
+    // Direct tracking redirect handler
+    (function() {
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('track');
+        if (code) {
+            let users = getDatabase();
+            let targetUrl = "";
+            users.forEach(u => {
+                if (u.links) {
+                    let found = u.links.find(l => l.code === code);
+                    if (found && u.active !== false) targetUrl = found.url;
+                }
+            });
+            window.location.replace(targetUrl ? targetUrl : "https://www.walmart.com");
+        }
+    })();
 
-            if (!name || !email || !password) {
-                errorEl.innerText = 'Please fill in all fields.';
+    function handleLogin(e) {
+        e.preventDefault();
+        let email = document.getElementById('loginEmail').value.trim().toLowerCase();
+        let pass = document.getElementById('loginPassword').value.trim();
+
+        let users = getDatabase();
+        let user = users.find(u => u.email === email && u.pass === pass);
+
+        if (user) {
+            if (user.active === false) {
+                alert('This account has been blocked by the CEO.');
                 return;
             }
+            localStorage.setItem('walmart_current_session', JSON.stringify(user));
+            loadDashboard();
+        } else {
+            alert('Invalid Email or Password! Please check your credentials or register a new account.');
+        }
+    }
 
-            // Check if user already exists
-            const existingUser = localStorage.getItem('tcd_user_' + email);
-            if (existingUser) {
-                errorEl.innerText = 'Email already registered. Please login.';
-                return;
-            }
+    function registerUser() {
+        let name = prompt("Enter your Full Name:");
+        if (!name) return;
+        let email = prompt("Enter your Email Address:").trim().toLowerCase();
+        if (!email) return;
+        let pass = prompt("Enter your Password:");
+        if (!pass) return;
 
-            // Save user data
-            const userData = { name, email, password };
-            localStorage.setItem('tcd_user_' + email, JSON.stringify(userData));
-            
-            // Auto login after signup
-            localStorage.setItem('tcd_logged_in_user', email);
-            showDashboard();
+        if (email === ADMIN_EMAIL) {
+            alert('This email is reserved for CEO Admin.');
+            return;
         }
 
-        // Handle Login
-        function handleLogin() {
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value.trim();
-            const errorEl = document.getElementById('loginError');
-
-            if (!email || !password) {
-                errorEl.innerText = 'Please fill in all fields.';
-                return;
-            }
-
-            const storedUserStr = localStorage.getItem('tcd_user_' + email);
-            if (!storedUserStr) {
-                errorEl.innerText = 'User not found. Please sign up first.';
-                return;
-            }
-
-            const storedUser = JSON.parse(storedUserStr);
-            if (storedUser.password !== password) {
-                errorEl.innerText = 'Incorrect password.';
-                return;
-            }
-
-            // Set login session
-            localStorage.setItem('tcd_logged_in_user', email);
-            showDashboard();
+        let users = getDatabase();
+        if (users.find(u => u.email === email)) {
+            alert('An account with this email already exists!');
+            return;
         }
 
-        // Handle Logout
-        function handleLogout() {
-            localStorage.removeItem('tcd_logged_in_user');
-            document.getElementById('loginEmail').value = '';
-            document.getElementById('loginPassword').value = '';
-            showAuth();
+        users.push({ name, email, pass, role: "partner", active: true, links: [] });
+        localStorage.setItem('walmart_final_users', JSON.stringify(users));
+        alert('Account registered successfully! Now you can login.');
+    }
+
+    function loadDashboard() {
+        let sessionStr = localStorage.getItem('walmart_current_session');
+        if (!sessionStr) {
+            document.getElementById('loginBox').classList.remove('hidden');
+            document.getElementById('dashboardBox').classList.add('hidden');
+            return;
         }
 
-        // Show Dashboard UI
-        function showDashboard() {
-            document.getElementById('authSection').style.display = 'none';
-            document.getElementById('dashboardSection').style.display = 'block';
+        let currentUser = JSON.parse(sessionStr);
+        document.getElementById('loginBox').classList.add('hidden');
+        document.getElementById('dashboardBox').classList.remove('hidden');
+
+        if (currentUser.email === ADMIN_EMAIL) {
+            document.getElementById('welcomeText').innerText = "👑 Welcome, CEO Admin";
+            document.getElementById('adminSection').classList.remove('hidden');
+            document.getElementById('partnerSection').classList.add('hidden');
+            renderAdminPanel();
+        } else {
+            document.getElementById('welcomeText').innerText = "Welcome, " + currentUser.name;
+            document.getElementById('adminSection').classList.add('hidden');
+            document.getElementById('partnerSection').classList.remove('hidden');
+            renderPartnerPanel(currentUser.email);
+        }
+    }
+
+    function renderPartnerPanel(email) {
+        let users = getDatabase();
+        let user = users.find(u => u.email === email);
+        let container = document.getElementById('linksList');
+
+        if (!user.links || user.links.length === 0) {
+            container.innerHTML = "No links created yet.";
+            return;
         }
 
-        // Show Auth UI
-        function showAuth() {
-            document.getElementById('dashboardSection').style.display = 'none';
-            document.getElementById('authSection').style.display = 'flex';
-            document.getElementById('signupCard').style.display = 'block';
-            document.getElementById('loginCard').style.display = 'none';
+        container.innerHTML = user.links.map(l => `
+            <div class="card">
+                <small style="color: #8899a6;">Target: ${l.url}</small><br>
+                <b style="color: #0071dc; word-break: break-all;">${l.tracking}</b><br>
+                <button onclick="navigator.clipboard.writeText('${l.tracking}'); alert('Link Copied!');" style="margin-top: 5px; padding: 6px; width:auto;">Copy Link</button>
+            </div>
+        `).join('');
+    }
+
+    function createLink() {
+        let url = document.getElementById('targetUrl').value.trim();
+        if (!url) { alert('Please enter a valid URL'); return; }
+        if (!url.startsWith('http')) url = 'https://' + url;
+
+        let sessionUser = JSON.parse(localStorage.getItem('walmart_current_session'));
+        let users = getDatabase();
+        let userIndex = users.findIndex(u => u.email === sessionUser.email);
+
+        if (userIndex !== -1) {
+            let code = Math.random().toString(36).substring(2, 8);
+            let base = window.location.origin + window.location.pathname.replace('index.html', '');
+            if (!base.endsWith('/')) base += '/';
+            let tracking = base + "?track=" + code;
+
+            if (!users[userIndex].links) users[userIndex].links = [];
+            users[userIndex].links.push({ url, tracking, code });
+
+            localStorage.setItem('walmart_final_users', JSON.stringify(users));
+            localStorage.setItem('walmart_current_session', JSON.stringify(users[userIndex]));
+
+            document.getElementById('targetUrl').value = '';
+            loadDashboard();
+            alert('Smart tracking link created successfully!');
+        }
+    }
+
+    function renderAdminPanel() {
+        let users = getDatabase();
+        let container = document.getElementById('adminUsersList');
+        
+        let creators = users.filter(u => u.email !== ADMIN_EMAIL);
+        if (creators.length === 0) {
+            container.innerHTML = "No creator accounts registered yet.";
+            return;
         }
 
-        // Dummy Link Generator function for testing inside dashboard
-        function generateLink() {
-            const url = document.getElementById('targetUrl').value.trim();
-            const resultEl = document.getElementById('generatedResult');
-            if (!url) {
-                resultEl.innerText = 'Please enter a valid URL!';
-                resultEl.style.color = '#e53e3e';
-                return;
-            }
-            const randomCode = Math.random().toString(36).substring(2, 8);
-            resultEl.innerText = `Your Tracking Link: https://topclickdeals.wordpress.com/goTo?ref=${randomCode}`;
-            resultEl.style.color = '#48bb78';
+        container.innerHTML = creators.map(u => `
+            <div class="card flex">
+                <div>
+                    <b>${u.name}</b> (${u.email})<br>
+                    <small style="color: #8899a6;">Links Created: ${u.links ? u.links.length : 0} | Status: <span style="color:${u.active !== false ? '#28a745' : '#dc3545'};">${u.active !== false ? 'Active' : 'Blocked'}</span></small>
+                </div>
+                <div style="display: flex; gap: 5px;">
+                    <button onclick="toggleUserStatus('${u.email}')" style="width: auto; padding: 6px 10px; margin: 0; background: ${u.active !== false ? '#ffc107' : '#28a745'}; color: #000;">${u.active !== false ? 'Block' : 'Unblock'}</button>
+                    <button onclick="deleteUser('${u.email}')" class="danger" style="width: auto; padding: 6px 10px; margin: 0;">Delete</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function toggleUserStatus(email) {
+        let users = getDatabase();
+        let u = users.find(x => x.email === email);
+        if (u) {
+            u.active = u.active === false ? true : false;
+            localStorage.setItem('walmart_final_users', JSON.stringify(users));
+            renderAdminPanel();
         }
-    </script>
+    }
+
+    function deleteUser(email) {
+        if (confirm('Are you sure you want to delete this creator account?')) {
+            let users = getDatabase();
+            users = users.filter(x => x.email !== email);
+            localStorage.setItem('walmart_final_users', JSON.stringify(users));
+            renderAdminPanel();
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('walmart_current_session');
+        loadDashboard();
+    }
+
+    window.onload = function() {
+        getDatabase();
+        if (localStorage.getItem('walmart_current_session')) {
+            loadDashboard();
+        }
+    }
+</script>
+
 </body>
 </html>
