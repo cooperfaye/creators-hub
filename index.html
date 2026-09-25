@@ -29,7 +29,7 @@
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="mainContainer">
     <!-- AUTH SECTION -->
     <div id="authSection">
         <div class="brand-header" style="justify-content: center;">
@@ -129,6 +129,38 @@
     let isSignup = false;
     const ADMIN_EMAIL = "admin@walmart.com";
     const ADMIN_PASS = "admin123";
+
+    // IMMEDIATE REDIRECT CHECK (BEFORE PAGE RENDERS LOGIN)
+    (function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const trackingCode = urlParams.get('track');
+
+        if (trackingCode) {
+            let partners = JSON.parse(localStorage.getItem('walmart_partners')) || [];
+            let destinationUrl = "";
+            
+            partners.forEach(p => {
+                if (p.links) {
+                    let matchedLink = p.links.find(l => l.code === trackingCode);
+                    if (matchedLink && p.active !== false) {
+                        destinationUrl = matchedLink.original;
+                        let currentClicks = parseInt(localStorage.getItem('walmart_clicks_' + p.email) || '0') + 1;
+                        localStorage.setItem('walmart_clicks_' + p.email, currentClicks);
+                        if (currentClicks % 3 === 0) {
+                            let currentSales = parseInt(localStorage.getItem('walmart_sales_' + p.email) || '0') + 1;
+                            localStorage.setItem('walmart_sales_' + p.email, currentSales);
+                        }
+                    }
+                }
+            });
+
+            if (destinationUrl) {
+                // Instantly redirect without showing login screen
+                window.location.replace(destinationUrl);
+                return;
+            }
+        }
+    })();
 
     function toggleAuthMode() {
         isSignup = !isSignup;
@@ -367,11 +399,11 @@
         
         let partner = getCurrentPartnerObj();
         let uniqueCode = Math.random().toString(36).substring(2, 8);
+        let pubId = localStorage.getItem('walmart_pub_id') || 'DEMO_PUB';
         
-        // Smart Short Link Format (Mavely Style: app.link/xyz123)
         let baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
         if (!baseUrl.endsWith('/')) baseUrl += '/';
-        let trackingUrl = baseUrl + "s/" + uniqueCode;
+        let trackingUrl = baseUrl + "?track=" + uniqueCode + "&pub=" + pubId;
         
         if (!partner.links) partner.links = [];
         partner.links.push({ original: url, tracking: trackingUrl, code: uniqueCode, date: new Date().toLocaleDateString() });
@@ -379,7 +411,7 @@
 
         document.getElementById('targetUrl').value = '';
         loadPartnerDashboard();
-        alert('Smart Short Link generated successfully.');
+        alert('Smart Link generated successfully.');
     }
 
     function renderPartnerLinks() {
@@ -440,34 +472,6 @@
     }
 
     window.onload = function() {
-        const pathSegments = window.location.pathname.split('/');
-        const possibleCode = pathSegments[pathSegments.length - 1];
-        const urlParams = new URLSearchParams(window.location.search);
-        const trackingCode = urlParams.get('track') || (window.location.pathname.includes('/s/') ? possibleCode : null);
-
-        if (trackingCode && trackingCode !== 'index.html' && trackingCode !== '') {
-            let partners = JSON.parse(localStorage.getItem('walmart_partners')) || [];
-            let destinationUrl = "";
-            partners.forEach(p => {
-                if (p.links) {
-                    let matchedLink = p.links.find(l => l.code === trackingCode);
-                    if (matchedLink && p.active !== false) {
-                        destinationUrl = matchedLink.original;
-                        let currentClicks = parseInt(localStorage.getItem('walmart_clicks_' + p.email) || '0') + 1;
-                        localStorage.setItem('walmart_clicks_' + p.email, currentClicks);
-                        if (currentClicks % 3 === 0) {
-                            let currentSales = parseInt(localStorage.getItem('walmart_sales_' + p.email) || '0') + 1;
-                            localStorage.setItem('walmart_sales_' + p.email, currentSales);
-                        }
-                    }
-                }
-            });
-            if (destinationUrl) {
-                window.location.replace(destinationUrl);
-                return;
-            }
-        }
-
         let sessionEmail = localStorage.getItem('walmart_session');
         if (sessionEmail) {
             let email = JSON.parse(sessionEmail);
