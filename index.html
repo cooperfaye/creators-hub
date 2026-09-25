@@ -1,607 +1,1969 @@
+npm init -y
+npm install express better-sqlite3 bcryptjs jsonwebtoken
+const express = require("express");
+const Database = require("better-sqlite3");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+
+const app = express();
+const db = new Database("affiliate.db");
+
+const PORT = process.env.PORT || 3000;
+const JWT_SECRET =
+  process.env.JWT_SECRET || "CHANGE_THIS_TO_A_LONG_RANDOM_SECRET";
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+/* =========================================================
+   DATABASE
+========================================================= */
+
+db.exec(`
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    paypal_email TEXT DEFAULT '',
+    role TEXT DEFAULT 'user',
+    status TEXT DEFAULT 'active',
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS links (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    original_url TEXT NOT NULL,
+    short_code TEXT UNIQUE NOT NULL,
+    clicks INTEGER DEFAULT 0,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    link_id INTEGER,
+    type TEXT NOT NULL,
+    sale_amount REAL DEFAULT 0,
+    commission REAL DEFAULT 0,
+    external_id TEXT DEFAULT '',
+    status TEXT DEFAULT 'pending',
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id),
+    FOREIGN KEY(link_id) REFERENCES links(id)
+);
+
+CREATE TABLE IF NOT EXISTS payouts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    amount REAL NOT NULL,
+    paypal_email TEXT NOT NULL,
+    status TEXT DEFAULT 'pending',
+    transaction_id TEXT DEFAULT '',
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    paid_at TEXT,
+    FOREIGN KEY(user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS password_resets (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    token TEXT UNIQUE NOT NULL,
+    expires_at INTEGER NOT NULL,
+    used INTEGER DEFAULT 0
+);
+`);
+
+
+/* =========================================================
+   CREATE FIRST CEO ACCOUNT
+========================================================= */
+
+const existingAdmin = db
+    .prepare("SELECT id FROM users WHERE role='admin' LIMIT 1")
+    .get();
+
+if (!existingAdmin) {
+
+    const password = bcrypt.hashSync("ChangeMe123!", 12);
+
+    db.prepare(`
+        INSERT INTO users
+        (name,email,password,role,status)
+        VALUES (?,?,?,?,?)
+    `).run(
+        "CEO",
+        "admin@example.com",
+        password,
+        "admin",
+        "active"
+    );
+
+    console.log("");
+    console.log("======================================");
+    console.log("CEO ACCOUNT CREATED");
+    console.log("Email: admin@example.com");
+    console.log("Password: ChangeMe123!");
+    console.log("CHANGE THIS PASSWORD IMMEDIATELY");
+    console.log("======================================");
+    console.log("");
+}
+
+
+/* =========================================================
+   AUTH HELPERS
+========================================================= */
+
+function createToken(user) {
+
+    return jwt.sign(
+        {
+            id: user.id,
+            role: user.role
+        },
+        JWT_SECRET,
+        {
+            expiresIn: "7d"
+        }
+    );
+}
+
+
+function auth(req, res, next) {
+
+    const header = req.headers.authorization;
+
+    if (!header || !header.startsWith("Bearer ")) {
+        return res.status(401).json({
+            error: "Authentication required"
+        });
+    }
+
+    const token = header.substring(7);
+
+    try {
+
+        const decoded = jwt.verify(token, JWT_SECRET);
+
+        const user = db.prepare(`
+            SELECT *
+            FROM users
+            WHERE id=?
+        `).get(decoded.id);
+
+        if (!user) {
+            return res.status(401).json({
+                error: "User not found"
+            });
+        }
+
+        if (user.status !== "active") {
+            return res.status(403).json({
+                error: "Your account is inactive."
+            });
+        }
+
+        req.user = user;
+
+        next();
+
+    } catch (error) {
+
+        return res.status(401).json({
+            error: "Invalid or expired session"
+        });
+
+    }
+}
+
+
+function adminOnly(req, res, next) {
+
+    if (!req.user || req.user.role !== "admin") {
+
+        return res.status(403).json({
+            error: "CEO/Admin access required"
+        });
+
+    }
+
+    next();
+}
+
+
+/* =========================================================
+   SIGN UP
+========================================================= */
+
+app.post("/api/signup", async (req, res) => {
+
+    try {
+
+        const {
+            name,
+            email,
+            password
+        } = req.body;
+
+        if (!name || !email || !password) {
+
+            return res.status(400).json({
+                error: "Name, email and password are required."
+            });
+
+        }
+
+        if (password.length < 8) {
+
+            return res.status(400).json({
+                error: "Password must contain at least 8 characters."
+            });
+
+        }
+
+        const normalizedEmail =
+            email.trim().toLowerCase();
+
+        const existing = db.prepare(`
+            SELECT id
+            FROM users
+            WHERE email=?
+        `).get(normalizedEmail);
+
+        if (existing) {
+
+            return res.status(409).json({
+                error: "An account with this email already exists."
+            });
+
+        }
+
+        const hashedPassword =
+            await bcrypt.hash(password, 12);
+
+        const result = db.prepare(`
+            INSERT INTO users
+            (name,email,password,role,status)
+            VALUES (?,?,?,?,?)
+        `).run(
+            name.trim(),
+            normalizedEmail,
+            hashedPassword,
+            "user",
+            "active"
+        );
+
+        const user = db.prepare(`
+            SELECT id,name,email,role,status
+            FROM users
+            WHERE id=?
+        `).get(result.lastInsertRowid);
+
+        const token = createToken(user);
+
+        res.json({
+            success: true,
+            token,
+            user
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            error: "Could not create account."
+        });
+
+    }
+
+});
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+app.post("/api/login", async (req, res) => {
+
+    try {
+
+        const {
+            email,
+            password
+        } = req.body;
+
+        const user = db.prepare(`
+            SELECT *
+            FROM users
+            WHERE email=?
+        `).get(
+            email.trim().toLowerCase()
+        );
+
+        if (!user) {
+
+            return res.status(401).json({
+                error: "Invalid email or password."
+            });
+
+        }
+
+        if (user.status !== "active") {
+
+            return res.status(403).json({
+                error: "Your account has been deactivated by the CEO."
+            });
+
+        }
+
+        const valid =
+            await bcrypt.compare(
+                password,
+                user.password
+            );
+
+        if (!valid) {
+
+            return res.status(401).json({
+                error: "Invalid email or password."
+            });
+
+        }
+
+        const safeUser = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            status: user.status
+        };
+
+        const token =
+            createToken(safeUser);
+
+        res.json({
+            success: true,
+            token,
+            user: safeUser
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            error: "Login failed."
+        });
+
+    }
+
+});
+
+
+/* =========================================================
+   FORGOT PASSWORD
+========================================================= */
+
+app.post("/api/forgot-password", (req, res) => {
+
+    const email =
+        String(req.body.email || "")
+            .trim()
+            .toLowerCase();
+
+    const user = db.prepare(`
+        SELECT id,email
+        FROM users
+        WHERE email=?
+    `).get(email);
+
+    /*
+      SECURITY:
+      Do not reveal whether an email exists.
+    */
+
+    if (!user) {
+
+        return res.json({
+            success: true,
+            message:
+                "If this email exists, a reset link will be sent."
+        });
+
+    }
+
+    const token =
+        crypto.randomBytes(32).toString("hex");
+
+    const expires =
+        Date.now() + 30 * 60 * 1000;
+
+    db.prepare(`
+        DELETE FROM password_resets
+        WHERE user_id=?
+    `).run(user.id);
+
+    db.prepare(`
+        INSERT INTO password_resets
+        (user_id,token,expires_at)
+        VALUES (?,?,?)
+    `).run(
+        user.id,
+        token,
+        expires
+    );
+
+    /*
+      PRODUCTION:
+      Send this URL by email using your email provider.
+
+      For development only we return the reset URL.
+    */
+
+    const resetUrl =
+        `${getBaseUrl()}/reset-password?token=${token}`;
+
+    res.json({
+        success: true,
+        message:
+            "Password reset request created.",
+        development_reset_url:
+            resetUrl
+    });
+
+});
+
+
+/* =========================================================
+   RESET PASSWORD
+========================================================= */
+
+app.post("/api/reset-password", async (req, res) => {
+
+    const {
+        token,
+        password
+    } = req.body;
+
+    if (!token || !password) {
+
+        return res.status(400).json({
+            error: "Token and new password are required."
+        });
+
+    }
+
+    if (password.length < 8) {
+
+        return res.status(400).json({
+            error:
+                "Password must contain at least 8 characters."
+        });
+
+    }
+
+    const record = db.prepare(`
+        SELECT *
+        FROM password_resets
+        WHERE token=?
+        AND used=0
+        AND expires_at>?
+    `).get(
+        token,
+        Date.now()
+    );
+
+    if (!record) {
+
+        return res.status(400).json({
+            error:
+                "Reset link is invalid or expired."
+        });
+
+    }
+
+    const hash =
+        await bcrypt.hash(password, 12);
+
+    db.prepare(`
+        UPDATE users
+        SET password=?
+        WHERE id=?
+    `).run(
+        hash,
+        record.user_id
+    );
+
+    db.prepare(`
+        UPDATE password_resets
+        SET used=1
+        WHERE id=?
+    `).run(record.id);
+
+    res.json({
+        success: true,
+        message:
+            "Password has been changed successfully."
+    });
+
+});
+
+
+/* =========================================================
+   USER PROFILE
+========================================================= */
+
+app.get("/api/me", auth, (req, res) => {
+
+    const user = db.prepare(`
+        SELECT
+            id,
+            name,
+            email,
+            paypal_email,
+            role,
+            status,
+            created_at
+        FROM users
+        WHERE id=?
+    `).get(req.user.id);
+
+    res.json(user);
+
+});
+
+
+app.put("/api/me", auth, (req, res) => {
+
+    const {
+        name,
+        paypal_email
+    } = req.body;
+
+    db.prepare(`
+        UPDATE users
+        SET
+            name=?,
+            paypal_email=?
+        WHERE id=?
+    `).run(
+        name || req.user.name,
+        paypal_email || "",
+        req.user.id
+    );
+
+    res.json({
+        success: true
+    });
+
+});
+
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+app.get("/api/dashboard", auth, (req, res) => {
+
+    const days =
+        Math.max(
+            1,
+            Math.min(
+                Number(req.query.days) || 7,
+                365
+            )
+        );
+
+    const since =
+        new Date(
+            Date.now() -
+            days * 24 * 60 * 60 * 1000
+        ).toISOString();
+
+    const clicks = db.prepare(`
+        SELECT COALESCE(SUM(clicks),0) AS value
+        FROM links
+        WHERE user_id=?
+        AND created_at>=?
+    `).get(
+        req.user.id,
+        since
+    ).value;
+
+    const conversions = db.prepare(`
+        SELECT COUNT(*) AS value
+        FROM events
+        WHERE user_id=?
+        AND type='conversion'
+        AND created_at>=?
+    `).get(
+        req.user.id,
+        since
+    ).value;
+
+    const sales = db.prepare(`
+        SELECT COALESCE(SUM(sale_amount),0) AS value
+        FROM events
+        WHERE user_id=?
+        AND type='sale'
+        AND created_at>=?
+    `).get(
+        req.user.id,
+        since
+    ).value;
+
+    const earnings = db.prepare(`
+        SELECT COALESCE(SUM(commission),0) AS value
+        FROM events
+        WHERE user_id=?
+        AND status='approved'
+        AND created_at>=?
+    `).get(
+        req.user.id,
+        since
+    ).value;
+
+    const pending = db.prepare(`
+        SELECT COALESCE(SUM(commission),0) AS value
+        FROM events
+        WHERE user_id=?
+        AND status='pending'
+        AND created_at>=?
+    `).get(
+        req.user.id,
+        since
+    ).value;
+
+    res.json({
+        period_days: days,
+        clicks,
+        conversions,
+        sales: Number(sales).toFixed(2),
+        earnings: Number(earnings).toFixed(2),
+        pending: Number(pending).toFixed(2)
+    });
+
+});
+
+
+/* =========================================================
+   DAILY EARNINGS
+========================================================= */
+
+app.get("/api/earnings", auth, (req, res) => {
+
+    const days =
+        Math.max(
+            1,
+            Math.min(
+                Number(req.query.days) || 7,
+                365
+            )
+        );
+
+    const since =
+        new Date(
+            Date.now() -
+            days * 24 * 60 * 60 * 1000
+        ).toISOString();
+
+    const rows = db.prepare(`
+        SELECT
+            substr(created_at,1,10) AS date,
+            COALESCE(SUM(commission),0) AS earnings,
+            COALESCE(SUM(sale_amount),0) AS sales,
+            COUNT(
+                CASE
+                    WHEN type='conversion'
+                    THEN 1
+                END
+            ) AS conversions
+        FROM events
+        WHERE user_id=?
+        AND created_at>=?
+        GROUP BY substr(created_at,1,10)
+        ORDER BY date ASC
+    `).all(
+        req.user.id,
+        since
+    );
+
+    res.json(rows);
+
+});
+
+
+/* =========================================================
+   CREATE WALMART SHORT LINK
+========================================================= */
+
+app.post("/api/links", auth, (req, res) => {
+
+    const {
+        url
+    } = req.body;
+
+    if (!url) {
+
+        return res.status(400).json({
+            error: "Walmart URL is required."
+        });
+
+    }
+
+    let parsed;
+
+    try {
+
+        parsed = new URL(url);
+
+    } catch {
+
+        return res.status(400).json({
+            error: "Invalid URL."
+        });
+
+    }
+
+    const hostname =
+        parsed.hostname.toLowerCase();
+
+    if (
+        !hostname.endsWith("walmart.com") &&
+        !hostname.endsWith("walmart.ca")
+    ) {
+
+        return res.status(400).json({
+            error:
+                "Only Walmart URLs are allowed."
+        });
+
+    }
+
+    let shortCode;
+
+    do {
+
+        shortCode =
+            crypto
+                .randomBytes(5)
+                .toString("base64url");
+
+    } while (
+        db.prepare(`
+            SELECT id
+            FROM links
+            WHERE short_code=?
+        `).get(shortCode)
+    );
+
+    db.prepare(`
+        INSERT INTO links
+        (user_id,original_url,short_code)
+        VALUES (?,?,?)
+    `).run(
+        req.user.id,
+        url,
+        shortCode
+    );
+
+    res.json({
+        success: true,
+        short_url:
+            `${getBaseUrl()}/go/${shortCode}`
+    });
+
+});
+
+
+/* =========================================================
+   USER LINKS
+========================================================= */
+
+app.get("/api/links", auth, (req, res) => {
+
+    const links = db.prepare(`
+        SELECT
+            id,
+            original_url,
+            short_code,
+            clicks,
+            created_at
+        FROM links
+        WHERE user_id=?
+        ORDER BY id DESC
+    `).all(req.user.id);
+
+    res.json(links);
+
+});
+
+
+/* =========================================================
+   SHORT LINK REDIRECT
+========================================================= */
+
+app.get("/go/:code", (req, res) => {
+
+    const link = db.prepare(`
+        SELECT *
+        FROM links
+        WHERE short_code=?
+    `).get(req.params.code);
+
+    if (!link) {
+
+        return res.status(404).send(`
+            <h1>Link not found</h1>
+        `);
+
+    }
+
+    db.prepare(`
+        UPDATE links
+        SET clicks=clicks+1
+        WHERE id=?
+    `).run(link.id);
+
+    /*
+      The affiliate network's REAL tracking/deep-link URL
+      should be stored here in production.
+
+      We redirect to the original Walmart URL for now.
+    */
+
+    res.redirect(link.original_url);
+
+});
+
+
+/* =========================================================
+   ADMIN: ALL USERS
+========================================================= */
+
+app.get(
+    "/api/admin/users",
+    auth,
+    adminOnly,
+    (req, res) => {
+
+        const users = db.prepare(`
+            SELECT
+                id,
+                name,
+                email,
+                paypal_email,
+                role,
+                status,
+                created_at
+            FROM users
+            ORDER BY id DESC
+        `).all();
+
+        res.json(users);
+
+    }
+);
+
+
+/* =========================================================
+   ADMIN: ACTIVATE / DEACTIVATE
+========================================================= */
+
+app.put(
+    "/api/admin/users/:id/status",
+    auth,
+    adminOnly,
+    (req, res) => {
+
+        const {
+            status
+        } = req.body;
+
+        if (
+            status !== "active" &&
+            status !== "inactive"
+        ) {
+
+            return res.status(400).json({
+                error: "Invalid status."
+            });
+
+        }
+
+        db.prepare(`
+            UPDATE users
+            SET status=?
+            WHERE id=?
+            AND role!='admin'
+        `).run(
+            status,
+            req.params.id
+        );
+
+        res.json({
+            success: true
+        });
+
+    }
+);
+
+
+/* =========================================================
+   ADMIN: DELETE USER
+========================================================= */
+
+app.delete(
+    "/api/admin/users/:id",
+    auth,
+    adminOnly,
+    (req, res) => {
+
+        const id =
+            Number(req.params.id);
+
+        if (id === req.user.id) {
+
+            return res.status(400).json({
+                error:
+                    "CEO account cannot delete itself."
+            });
+
+        }
+
+        const transaction =
+            db.transaction(() => {
+
+                db.prepare(`
+                    DELETE FROM password_resets
+                    WHERE user_id=?
+                `).run(id);
+
+                db.prepare(`
+                    DELETE FROM payouts
+                    WHERE user_id=?
+                `).run(id);
+
+                db.prepare(`
+                    DELETE FROM events
+                    WHERE user_id=?
+                `).run(id);
+
+                db.prepare(`
+                    DELETE FROM links
+                    WHERE user_id=?
+                `).run(id);
+
+                db.prepare(`
+                    DELETE FROM users
+                    WHERE id=?
+                    AND role!='admin'
+                `).run(id);
+
+            });
+
+        transaction();
+
+        res.json({
+            success: true
+        });
+
+    }
+);
+
+
+/* =========================================================
+   ADMIN: ALL PAYOUTS
+========================================================= */
+
+app.get(
+    "/api/admin/payouts",
+    auth,
+    adminOnly,
+    (req, res) => {
+
+        const payouts = db.prepare(`
+            SELECT
+                payouts.*,
+                users.name,
+                users.email
+            FROM payouts
+            JOIN users
+            ON users.id=payouts.user_id
+            ORDER BY payouts.id DESC
+        `).all();
+
+        res.json(payouts);
+
+    }
+);
+
+
+/* =========================================================
+   ADMIN: CREATE PAYOUT RECORD
+========================================================= */
+
+app.post(
+    "/api/admin/payouts",
+    auth,
+    adminOnly,
+    (req, res) => {
+
+        const {
+            user_id,
+            amount
+        } = req.body;
+
+        const user = db.prepare(`
+            SELECT id,paypal_email
+            FROM users
+            WHERE id=?
+        `).get(user_id);
+
+        if (!user) {
+
+            return res.status(404).json({
+                error: "User not found."
+            });
+
+        }
+
+        if (!user.paypal_email) {
+
+            return res.status(400).json({
+                error:
+                    "User has not added a PayPal email."
+            });
+
+        }
+
+        const payoutAmount =
+            Number(amount);
+
+        if (
+            !Number.isFinite(payoutAmount) ||
+            payoutAmount <= 0
+        ) {
+
+            return res.status(400).json({
+                error: "Invalid payout amount."
+            });
+
+        }
+
+        db.prepare(`
+            INSERT INTO payouts
+            (user_id,amount,paypal_email,status)
+            VALUES (?,?,?,'pending')
+        `).run(
+            user.id,
+            payoutAmount,
+            user.paypal_email
+        );
+
+        res.json({
+            success: true
+        });
+
+    }
+);
+
+
+/* =========================================================
+   ADMIN: UPDATE PAYOUT
+========================================================= */
+
+app.put(
+    "/api/admin/payouts/:id",
+    auth,
+    adminOnly,
+    (req, res) => {
+
+        const {
+            status,
+            transaction_id
+        } = req.body;
+
+        const allowed = [
+            "pending",
+            "processing",
+            "paid",
+            "rejected"
+        ];
+
+        if (!allowed.includes(status)) {
+
+            return res.status(400).json({
+                error: "Invalid payout status."
+            });
+
+        }
+
+        if (status === "paid") {
+
+            db.prepare(`
+                UPDATE payouts
+                SET
+                    status=?,
+                    transaction_id=?,
+                    paid_at=CURRENT_TIMESTAMP
+                WHERE id=?
+            `).run(
+                status,
+                transaction_id || "",
+                req.params.id
+            );
+
+        } else {
+
+            db.prepare(`
+                UPDATE payouts
+                SET
+                    status=?,
+                    transaction_id=?
+                WHERE id=?
+            `).run(
+                status,
+                transaction_id || "",
+                req.params.id
+            );
+
+        }
+
+        res.json({
+            success: true
+        });
+
+    }
+);
+
+
+/* =========================================================
+   AFFILIATE EVENT WEBHOOK
+========================================================= */
+
+/*
+   IMPORTANT:
+
+   This is where your actual affiliate network should send
+   verified conversion/sale/commission data.
+
+   Do NOT let normal users call this endpoint.
+
+   Protect it with a secret/API signature supplied by the
+   affiliate network.
+*/
+
+app.post(
+    "/api/webhooks/affiliate",
+    (req, res) => {
+
+        const webhookSecret =
+            process.env.AFFILIATE_WEBHOOK_SECRET;
+
+        if (!webhookSecret) {
+
+            return res.status(503).json({
+                error:
+                    "Affiliate webhook secret is not configured."
+            });
+
+        }
+
+        const provided =
+            req.headers["x-affiliate-secret"];
+
+        if (provided !== webhookSecret) {
+
+            return res.status(401).json({
+                error: "Unauthorized."
+            });
+
+        }
+
+        const {
+            user_id,
+            link_id,
+            type,
+            sale_amount,
+            commission,
+            external_id,
+            status
+        } = req.body;
+
+        if (
+            !user_id ||
+            !type
+        ) {
+
+            return res.status(400).json({
+                error: "Invalid webhook."
+            });
+
+        }
+
+        db.prepare(`
+            INSERT INTO events
+            (
+                user_id,
+                link_id,
+                type,
+                sale_amount,
+                commission,
+                external_id,
+                status
+            )
+            VALUES (?,?,?,?,?,?,?)
+        `).run(
+            user_id,
+            link_id || null,
+            type,
+            Number(sale_amount) || 0,
+            Number(commission) || 0,
+            external_id || "",
+            status || "pending"
+        );
+
+        res.json({
+            success: true
+        });
+
+    }
+);
+
+
+/* =========================================================
+   HTML APPLICATION
+========================================================= */
+
+function getBaseUrl() {
+
+    return `http://localhost:${PORT}`;
+
+}
+
+
+const HTML = `
 
 <!DOCTYPE html>
-<html lang="en">
+
+<html>
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Affiliate Dashboard</title>
+
+<meta
+name="viewport"
+content="width=device-width,initial-scale=1"
+>
+
+<title>AffiliatePro</title>
 
 <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Inter, Arial, sans-serif;
-}
-
-:root {
-    --primary: #1677ff;
-    --primary-dark: #075bd3;
-    --bg: #f5f7fb;
-    --card: #ffffff;
-    --text: #172033;
-    --muted: #7c8497;
-    --border: #e8ebf2;
-    --green: #16a66a;
-    --red: #ef5350;
-    --sidebar: #111827;
-}
-
-body {
-    background: var(--bg);
-    color: var(--text);
-}
-
-/* Layout */
 
-.app {
-    display: flex;
-    min-height: 100vh;
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+font-family:Arial,sans-serif
 }
 
-.sidebar {
-    width: 250px;
-    background: var(--sidebar);
-    color: white;
-    padding: 22px 15px;
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    z-index: 100;
+body{
+background:#f5f7fb;
+color:#172033
 }
 
-.logo {
-    font-size: 21px;
-    font-weight: 800;
-    padding: 5px 12px 28px;
+button{
+cursor:pointer
 }
 
-.logo span {
-    color: #48a1ff;
+input,select{
+padding:12px;
+border:1px solid #ddd;
+border-radius:8px;
+width:100%;
+outline:none
 }
 
-.menu-title {
-    color: #7f8a9f;
-    font-size: 11px;
-    text-transform: uppercase;
-    margin: 15px 12px 8px;
-    letter-spacing: 1px;
+button{
+border:0;
+padding:12px 18px;
+border-radius:8px;
+font-weight:bold
 }
 
-.nav-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    margin: 4px 0;
-    border-radius: 9px;
-    color: #b8c0d0;
-    cursor: pointer;
-    transition: .2s;
+.primary{
+background:#1677ff;
+color:white
 }
 
-.nav-item:hover,
-.nav-item.active {
-    background: #1d4ed8;
-    color: white;
+.danger{
+background:#ffe8e8;
+color:#d22
 }
 
-.nav-icon {
-    width: 20px;
-    text-align: center;
+.hidden{
+display:none!important
 }
 
-.main {
-    margin-left: 250px;
-    width: calc(100% - 250px);
-}
 
-/* Header */
+/* LOGIN */
 
-.header {
-    height: 72px;
-    background: white;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 30px;
+.auth-page{
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:20px
 }
 
-.header-left h2 {
-    font-size: 20px;
+.auth-card{
+background:white;
+width:420px;
+max-width:100%;
+padding:35px;
+border-radius:16px;
+box-shadow:0 10px 40px #0000000c
 }
 
-.header-right {
-    display: flex;
-    align-items: center;
-    gap: 18px;
+.logo{
+font-size:27px;
+font-weight:800;
+margin-bottom:8px
 }
 
-.notification {
-    font-size: 20px;
-    cursor: pointer;
+.logo span{
+color:#1677ff
 }
 
-.profile {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.auth-card h2{
+margin:20px 0 8px
 }
 
-.avatar {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: var(--primary);
-    color: white;
-    display: grid;
-    place-items: center;
-    font-weight: 700;
+.muted{
+color:#7d8494;
+font-size:14px
 }
-
-/* Content */
 
-.content {
-    padding: 30px;
+.form-group{
+margin-top:17px
 }
 
-.page {
-    display: none;
+.form-group label{
+display:block;
+font-size:13px;
+font-weight:bold;
+margin-bottom:7px
 }
 
-.page.active {
-    display: block;
+.auth-card button{
+width:100%;
+margin-top:20px
 }
 
-.page-heading {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
+.auth-links{
+margin-top:18px;
+text-align:center;
+font-size:13px
 }
 
-.page-heading h1 {
-    font-size: 26px;
+.auth-links a{
+color:#1677ff;
+cursor:pointer
 }
 
-.page-heading p {
-    color: var(--muted);
-    margin-top: 5px;
+.error{
+color:#d22;
+font-size:13px;
+margin-top:12px
 }
 
-/* Cards */
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 18px;
-    margin-bottom: 22px;
+.success{
+color:#11925d;
+font-size:13px;
+margin-top:12px
 }
 
-.card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 20px;
-    box-shadow: 0 3px 15px rgba(20, 30, 60, .03);
-}
 
-.stat-card {
-    position: relative;
-}
+/* APP */
 
-.stat-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.app{
+display:none;
+min-height:100vh
 }
 
-.stat-label {
-    color: var(--muted);
-    font-size: 14px;
+.sidebar{
+position:fixed;
+left:0;
+top:0;
+bottom:0;
+width:245px;
+background:#111827;
+color:white;
+padding:22px 14px
 }
 
-.stat-icon {
-    width: 42px;
-    height: 42px;
-    display: grid;
-    place-items: center;
-    border-radius: 10px;
-    background: #eef5ff;
-    color: var(--primary);
-    font-size: 19px;
+.brand{
+font-size:21px;
+font-weight:bold;
+padding:8px 12px 28px
 }
 
-.stat-value {
-    font-size: 27px;
-    font-weight: 800;
-    margin: 14px 0 8px;
+.brand span{
+color:#4da3ff
 }
 
-.stat-change {
-    font-size: 12px;
+.nav{
+padding:12px;
+margin:4px 0;
+border-radius:8px;
+color:#aeb7c8;
+cursor:pointer
 }
 
-.positive {
-    color: var(--green);
+.nav:hover,
+.nav.active{
+background:#1d4ed8;
+color:white
 }
 
-.negative {
-    color: var(--red);
+.main{
+margin-left:245px;
+width:calc(100% - 245px)
 }
-
-/* Dashboard grid */
 
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 20px;
+.header{
+height:70px;
+background:white;
+border-bottom:1px solid #eee;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 28px
 }
 
-.card-title {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 18px;
+.profile{
+display:flex;
+align-items:center;
+gap:10px
 }
 
-.card-title h3 {
-    font-size: 17px;
+.avatar{
+width:38px;
+height:38px;
+border-radius:50%;
+background:#1677ff;
+color:white;
+display:grid;
+place-items:center;
+font-weight:bold
 }
 
-select,
-input,
-textarea {
-    width: 100%;
-    border: 1px solid var(--border);
-    border-radius: 9px;
-    padding: 12px 13px;
-    background: white;
-    outline: none;
-    font-size: 14px;
+.content{
+padding:28px
 }
 
-select:focus,
-input:focus,
-textarea:focus {
-    border-color: var(--primary);
+.page{
+display:none
 }
 
-.chart-wrap {
-    height: 280px;
-    position: relative;
+.page.active{
+display:block
 }
 
-canvas {
-    width: 100% !important;
-    height: 100% !important;
+.heading{
+margin-bottom:22px
 }
 
-/* Tables */
-
-.table-card {
-    margin-top: 20px;
+.heading h1{
+font-size:26px
 }
 
-.table-container {
-    overflow-x: auto;
+.heading p{
+color:#7d8494;
+margin-top:5px
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
 
-th,
-td {
-    padding: 14px 12px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-    font-size: 13px;
-}
+/* STATS */
 
-th {
-    color: var(--muted);
-    font-weight: 600;
+.stats{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:17px;
+margin-bottom:20px
 }
 
-.badge {
-    padding: 5px 9px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
+.card{
+background:white;
+border:1px solid #e9ebf0;
+border-radius:14px;
+padding:20px
 }
 
-.badge.success {
-    background: #e8f8f0;
-    color: #11925d;
+.label{
+color:#7d8494;
+font-size:13px
 }
 
-.badge.pending {
-    background: #fff5dc;
-    color: #c68b00;
+.number{
+font-size:28px;
+font-weight:800;
+margin-top:12px
 }
 
-/* Buttons */
 
-.btn {
-    border: none;
-    border-radius: 9px;
-    padding: 11px 17px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 13px;
-}
+/* GRID */
 
-.btn-primary {
-    background: var(--primary);
-    color: white;
+.grid{
+display:grid;
+grid-template-columns:2fr 1fr;
+gap:20px
 }
 
-.btn-primary:hover {
-    background: var(--primary-dark);
+.chart{
+height:300px;
+display:flex;
+align-items:end;
+gap:12px;
+padding-top:30px
 }
 
-.btn-light {
-    background: #eef2f7;
-    color: #333;
+.bar{
+flex:1;
+background:#1677ff;
+border-radius:6px 6px 0 0;
+min-height:3px
 }
 
-.btn-danger {
-    background: #ffecec;
-    color: #d63333;
-}
 
-/* Link generator */
+/* TABLE */
 
-.generator {
-    max-width: 850px;
+.table-card{
+margin-top:20px;
+overflow:auto
 }
 
-.generator-box {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 10px;
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:15px
 }
 
-.generated {
-    margin-top: 20px;
-    display: none;
+th,td{
+padding:13px 10px;
+border-bottom:1px solid #eee;
+text-align:left;
+font-size:13px
 }
 
-.generated-result {
-    display: flex;
-    gap: 10px;
+th{
+color:#7d8494
 }
 
-.generated-result input {
-    background: #f7f9fc;
+.badge{
+padding:5px 8px;
+border-radius:20px;
+font-size:11px
 }
 
-.info-box {
-    margin-top: 20px;
-    background: #eef6ff;
-    border: 1px solid #d5e8ff;
-    border-radius: 10px;
-    padding: 15px;
-    color: #35618d;
-    font-size: 13px;
+.badge.green{
+background:#e5f8ee;
+color:#108657
 }
 
-/* Earnings */
-
-.filters {
-    display: flex;
-    gap: 10px;
+.badge.yellow{
+background:#fff4d8;
+color:#a87800
 }
 
-.earnings-grid {
-    display: grid;
-    grid-template-columns: 1.7fr 1fr;
-    gap: 20px;
+.badge.red{
+background:#ffe5e5;
+color:#c22
 }
 
-/* Payout */
 
-.payout-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
-    margin-bottom: 20px;
-}
+/* FORM */
 
-.payout-number {
-    font-size: 25px;
-    font-weight: 800;
-    margin-top: 12px;
+.form-card{
+max-width:800px
 }
 
-/* Settings */
-
-.settings-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
+.form-card .form-group{
+margin-bottom:18px
 }
 
-.form-group {
-    margin-bottom: 17px;
+.output{
+margin-top:20px;
+padding:15px;
+background:#f3f7ff;
+border-radius:10px
 }
 
-.form-group label {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 7px;
+.link-row{
+display:flex;
+gap:10px
 }
 
-.password-wrap {
-    position: relative;
+.link-row input{
+flex:1
 }
 
-.password-toggle {
-    position: absolute;
-    right: 12px;
-    top: 12px;
-    cursor: pointer;
-    color: var(--muted);
-}
 
-/* Mobile */
+/* MOBILE */
 
-.mobile-menu {
-    display: none;
-    font-size: 23px;
-    cursor: pointer;
+.mobile{
+display:none
 }
 
-@media(max-width: 1000px) {
+@media(max-width:900px){
 
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .dashboard-grid,
-    .earnings-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .settings-grid {
-        grid-template-columns: 1fr;
-    }
+.stats{
+grid-template-columns:repeat(2,1fr)
 }
 
-@media(max-width: 700px) {
-
-    .sidebar {
-        transform: translateX(-100%);
-        transition: .25s;
-    }
+.grid{
+grid-template-columns:1fr
+}
 
-    .sidebar.open {
-        transform: translateX(0);
-    }
+}
 
-    .main {
-        margin-left: 0;
-        width: 100%;
-    }
+@media(max-width:650px){
 
-    .mobile-menu {
-        display: block;
-    }
+.sidebar{
+transform:translateX(-100%);
+transition:.2s;
+z-index:10
+}
 
-    .header {
-        padding: 0 15px;
-    }
+.sidebar.open{
+transform:translateX(0)
+}
 
-    .header-left {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
+.main{
+margin-left:0;
+width:100%
+}
 
-    .content {
-        padding: 18px;
-    }
+.mobile{
+display:block;
+font-size:22px;
+cursor:pointer
+}
 
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
+.header{
+padding:0 15px
+}
 
-    .payout-grid {
-        grid-template-columns: 1fr;
-    }
+.content{
+padding:17px
+}
 
-    .filters {
-        flex-direction: column;
-    }
+.stats{
+grid-template-columns:1fr
+}
 
-    .generator-box,
-    .generated-result {
-        grid-template-columns: 1fr;
-        flex-direction: column;
-    }
 }
+
 </style>
+
 </head>
+
 
 <body>
 
-<div class="app">
 
-<!-- SIDEBAR -->
-<aside class="sidebar" id="sidebar">
+<!-- AUTH -->
 
-    <div class="logo">
-        Affiliate<span>Pro</span>
-    </div>
+<div id="authPage" class="auth-page">
 
-    <div class="menu-title">Main</div>
+<div class="auth-card">
 
-    <div class="nav-item active" data-page="dashboard">
-        <span class="nav-icon">▦</span>
-        Dashboard
-    </div>
+<div class="logo">
+Affiliate<span>Pro</span>
+</div>
 
-    <div class="nav-item" data-page="links">
-        <span class="nav-icon">🔗</span>
-        Link Generator
-    </div>
+<p class="muted">
+Affiliate management platform
+</p>
 
-    <div class="nav-item" data-page="earnings">
-        <span class="nav-icon">📈</span>
-        Earnings
-    </div>
 
-    <div class="nav-item" data-page="payouts">
-        <span class="nav-icon">💳</span>
-        Payouts
-    </div>
+<!-- LOGIN -->
 
-    <div class="menu-title">Account</div>
+<div id="loginBox">
 
-    <div class="nav-item" data-page="settings">
-        <span class="nav-icon">⚙</span>
-        Settings
-    </div>
+<h2>Welcome Back</h2>
 
-    <div class="nav-item" id="logout">
-        <span class="nav-icon">↪</span>
-        Logout
-    </div>
+<p class="muted">
+Login to your account
+</p>
+
+<div class="form-group">
+
+<label>Email</label>
+
+<input
+id="loginEmail"
+type="email"
+placeholder="you@example.com"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label>Password</label>
+
+<input
+id="loginPassword"
+type="password"
+placeholder="Password"
+>
+
+</div>
+
+<button
+class="primary"
+onclick="login()"
+>
+Login
+</button>
+
+<div id="loginError" class="error"></div>
+
+<div class="auth-links">
+
+<a onclick="showSignup()">
+Create account
+</a>
+
+<br><br>
+
+<a onclick="showForgot()">
+Forgot password?
+</a>
+
+</div>
+
+</div>
+
+
+<!-- SIGNUP -->
+
+<div id="signupBox" class="hidden">
+
+<h2>Create Account</h2>
+
+<p class="muted">
+Start your affiliate account
+</p>
+
+<div class="form-group">
+
+<label>Name</label>
+
+<input
+id="signupName"
+placeholder="Your name"
+>
+
+</div>
+
+<div class="form-group">
+
+<label>Email</label>
+
+<input
+id="signupEmail"
+type="email"
+placeholder="you@example.com"
+>
+
+</div>
+
+<div class="form-group">
+
+<label>Password</label>
+
+<input
+id="signupPassword"
+type="password"
+placeholder="Minimum 8 characters"
+>
+
+</div>
+
+<button
+class="primary"
+onclick="signup()"
+>
+Create Account
+</button>
+
+<div id="signupError" class="error"></div>
+
+<div class="auth-links">
+
+<a onclick="showLogin()">
+Already have an account?
+</a>
+
+</div>
+
+</div>
+
+
+<!-- FORGOT -->
+
+<div id="forgotBox" class="hidden">
+
+<h2>Forgot Password?</h2>
+
+<p class="muted">
+Enter your account email.
+</p>
+
+<div class="form-group">
+
+<label>Email</label>
+
+<input
+id="forgotEmail"
+type="email"
+placeholder="you@example.com"
+>
+
+</div>
+
+<button
+class="primary"
+onclick="forgotPassword()"
+>
+Send Reset Request
+</button>
+
+<div id="forgotMessage"></div>
+
+<div class="auth-links">
+
+<a onclick="showLogin()">
+Back to Login
+</a>
+
+</div>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+<!-- APP -->
+
+<div id="app" class="app">
+
+
+<aside id="sidebar" class="sidebar">
+
+<div class="brand">
+Affiliate<span>Pro</span>
+</div>
+
+<div
+class="nav active"
+onclick="page('dashboard',this)"
+>
+▦ Dashboard
+</div>
+
+<div
+class="nav"
+onclick="page('links',this)"
+>
+🔗 Link Creator
+</div>
+
+<div
+class="nav"
+onclick="page('earnings',this)"
+>
+📈 Earnings
+</div>
+
+<div
+class="nav"
+onclick="page('payouts',this)"
+>
+💳 Payouts
+</div>
+
+<div
+id="adminNav"
+class="nav hidden"
+onclick="page('admin',this)"
+>
+👑 CEO Admin
+</div>
+
+<div
+class="nav"
+onclick="page('settings',this)"
+>
+⚙ Settings
+</div>
+
+<div
+class="nav"
+onclick="logout()"
+>
+↪ Logout
+</div>
 
 </aside>
 
 
 <main class="main">
 
-<!-- HEADER -->
 
 <header class="header">
 
-    <div class="header-left">
+<div>
 
-        <span class="mobile-menu" id="mobileMenu">☰</span>
+<span
+class="mobile"
+onclick="toggleSidebar()"
+>
+☰
+</span>
 
-        <div>
-            <h2 id="headerTitle">Dashboard</h2>
-        </div>
+<strong id="pageTitle">
+Dashboard
+</strong>
 
-    </div>
+</div>
 
-    <div class="header-right">
+<div class="profile">
 
-        <span class="notification">🔔</span>
+<div
+id="avatar"
+class="avatar"
+>
+U
+</div>
 
-        <div class="profile">
-            <div class="avatar">A</div>
-            <span>Admin</span>
-        </div>
+<span id="profileName">
+User
+</span>
 
-    </div>
+</div>
 
 </header>
 
@@ -611,537 +1973,1869 @@ th {
 
 <!-- DASHBOARD -->
 
-<section class="page active" id="dashboard">
+<section
+id="dashboard"
+class="page active"
+>
 
-    <div class="page-heading">
-        <div>
-            <h1>Dashboard</h1>
-            <p>Welcome back! Here's your affiliate performance.</p>
-        </div>
+<div class="heading">
 
-        <select id="dashboardRange" style="width:150px;">
-            <option value="1">Today</option>
-            <option value="7" selected>Last 7 Days</option>
-            <option value="30">Last 30 Days</option>
-        </select>
-    </div>
+<h1>Dashboard</h1>
 
+<p>
+Your real affiliate performance.
+</p>
 
-    <div class="stats-grid">
-
-        <div class="card stat-card">
-            <div class="stat-top">
-                <span class="stat-label">Clicks</span>
-                <div class="stat-icon">👆</div>
-            </div>
-            <div class="stat-value" id="clicks">12,840</div>
-            <span class="stat-change positive">↑ 12.5% vs previous</span>
-        </div>
+</div>
 
 
-        <div class="card stat-card">
-            <div class="stat-top">
-                <span class="stat-label">Conversions</span>
-                <div class="stat-icon">✓</div>
-            </div>
-            <div class="stat-value" id="conversions">684</div>
-            <span class="stat-change positive">↑ 8.2% vs previous</span>
-        </div>
+<div class="stats">
+
+<div class="card">
+
+<div class="label">
+Clicks
+</div>
+
+<div
+id="statClicks"
+class="number"
+>
+0
+</div>
+
+</div>
 
 
-        <div class="card stat-card">
-            <div class="stat-top">
-                <span class="stat-label">Sales</span>
-                <div class="stat-icon">🛒</div>
-            </div>
-            <div class="stat-value">$8,426.50</div>
-            <span class="stat-change positive">↑ 15.7% vs previous</span>
-        </div>
+<div class="card">
+
+<div class="label">
+Conversions
+</div>
+
+<div
+id="statConversions"
+class="number"
+>
+0
+</div>
+
+</div>
 
 
-        <div class="card stat-card">
-            <div class="stat-top">
-                <span class="stat-label">Total Earnings</span>
-                <div class="stat-icon">💰</div>
-            </div>
-            <div class="stat-value">$642.83</div>
-            <span class="stat-change positive">↑ 11.4% vs previous</span>
-        </div>
+<div class="card">
 
-    </div>
+<div class="label">
+Sales
+</div>
 
+<div
+id="statSales"
+class="number"
+>
+$0.00
+</div>
 
-    <div class="dashboard-grid">
-
-        <div class="card">
-
-            <div class="card-title">
-                <h3>Earnings Overview</h3>
-
-                <select id="chartRange" style="width:130px;">
-                    <option value="7">7 Days</option>
-                    <option value="14">14 Days</option>
-                    <option value="30">30 Days</option>
-                </select>
-            </div>
-
-            <div class="chart-wrap">
-                <canvas id="earningsChart"></canvas>
-            </div>
-
-        </div>
+</div>
 
 
-        <div class="card">
+<div class="card">
 
-            <div class="card-title">
-                <h3>Quick Stats</h3>
-            </div>
+<div class="label">
+Earnings
+</div>
 
-            <div style="margin-bottom:20px;">
-                <span class="stat-label">Conversion Rate</span>
-                <div class="stat-value" style="font-size:24px;">5.32%</div>
-            </div>
+<div
+id="statEarnings"
+class="number"
+>
+$0.00
+</div>
 
-            <div style="margin-bottom:20px;">
-                <span class="stat-label">Average Order Value</span>
-                <div class="stat-value" style="font-size:24px;">$12.32</div>
-            </div>
+</div>
 
-            <div>
-                <span class="stat-label">EPC</span>
-                <div class="stat-value" style="font-size:24px;">$0.05</div>
-            </div>
-
-        </div>
-
-    </div>
+</div>
 
 
-    <div class="card table-card">
+<div class="grid">
 
-        <div class="card-title">
-            <h3>Recent Transactions</h3>
-            <button class="btn btn-light" onclick="showPage('earnings')">
-                View All
-            </button>
-        </div>
 
-        <div class="table-container">
+<div class="card">
 
-            <table>
+<h3>
+Earnings Overview
+</h3>
 
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Product</th>
-                        <th>Clicks</th>
-                        <th>Sale</th>
-                        <th>Commission</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
+<div
+id="chart"
+class="chart"
+>
+</div>
 
-                <tbody>
+</div>
 
-                    <tr>
-                        <td>Sep 25, 2026</td>
-                        <td>Walmart Beauty Deal</td>
-                        <td>245</td>
-                        <td>$328.50</td>
-                        <td>$24.12</td>
-                        <td><span class="badge success">Approved</span></td>
-                    </tr>
 
-                    <tr>
-                        <td>Sep 24, 2026</td>
-                        <td>Home Essentials</td>
-                        <td>182</td>
-                        <td>$216.80</td>
-                        <td>$18.92</td>
-                        <td><span class="badge success">Approved</span></td>
-                    </tr>
+<div class="card">
 
-                    <tr>
-                        <td>Sep 23, 2026</td>
-                        <td>Kitchen Deals</td>
-                        <td>156</td>
-                        <td>$184.25</td>
-                        <td>$15.72</td>
-                        <td><span class="badge pending">Pending</span></td>
-                    </tr>
+<h3>
+Period
+</h3>
 
-                </tbody>
+<br>
 
-            </table>
+<select
+id="period"
+onchange="loadDashboard()"
+>
 
-        </div>
+<option value="1">
+Today
+</option>
 
-    </div>
+<option value="2">
+Last 2 Days
+</option>
+
+<option value="3">
+Last 3 Days
+</option>
+
+<option value="7" selected>
+Last 7 Days
+</option>
+
+<option value="30">
+Last 30 Days
+</option>
+
+</select>
+
+<br><br>
+
+<div class="label">
+Pending Earnings
+</div>
+
+<div
+id="pending"
+class="number"
+>
+$0.00
+</div>
+
+</div>
+
+</div>
+
+
+<div class="card table-card">
+
+<h3>
+Your Links
+</h3>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Original URL</th>
+<th>Short Link</th>
+<th>Clicks</th>
+<th>Created</th>
+
+</tr>
+
+</thead>
+
+<tbody id="linkTable"></tbody>
+
+</table>
+
+</div>
 
 </section>
 
 
-<!-- LINK GENERATOR -->
+<!-- LINK CREATOR -->
 
-<section class="page" id="links">
+<section
+id="links"
+class="page"
+>
 
-    <div class="page-heading">
+<div class="heading">
 
-        <div>
-            <h1>Walmart Link Generator</h1>
-            <p>Create your affiliate tracking link.</p>
-        </div>
+<h1>
+Walmart Link Creator
+</h1>
 
-    </div>
+<p>
+Create a short link for a Walmart product.
+</p>
 
-
-    <div class="card generator">
-
-        <div class="card-title">
-            <h3>Generate Affiliate Link</h3>
-        </div>
-
-        <div class="form-group">
-
-            <label>Walmart Product URL</label>
-
-            <div class="generator-box">
-
-                <input
-                    type="url"
-                    id="walmartUrl"
-                    placeholder="https://www.walmart.com/ip/product..."
-                >
-
-                <button
-                    class="btn btn-primary"
-                    onclick="generateLink()">
-                    Generate Link
-                </button>
-
-            </div>
-
-        </div>
+</div>
 
 
-        <div class="generated" id="generated">
+<div class="card form-card">
 
-            <label>Your Affiliate Link</label>
+<div class="form-group">
 
-            <div class="generated-result">
+<label>
+Walmart Product URL
+</label>
 
-                <input id="affiliateResult" readonly>
+<input
+id="walmartUrl"
+placeholder="https://www.walmart.com/ip/..."
+>
 
-                <button
-                    class="btn btn-primary"
-                    onclick="copyLink()">
-                    Copy
-                </button>
+</div>
 
-            </div>
+<button
+class="primary"
+onclick="createLink()"
+>
+Create Short Link
+</button>
 
-        </div>
+
+<div
+id="createdLink"
+class="output hidden"
+>
+
+<strong>
+Your short link
+</strong>
+
+<br><br>
+
+<div class="link-row">
+
+<input
+id="shortUrl"
+readonly
+>
+
+<button
+class="primary"
+onclick="copyShortLink()"
+>
+Copy
+</button>
+
+</div>
+
+</div>
+
+</div>
 
 
-        <div class="info-box">
+<div class="card table-card">
 
-            <strong>How it works</strong><br><br>
+<h3>
+Generated Links
+</h3>
 
-            Paste a valid Walmart product URL above.
-            Your configured affiliate tracking parameters can be
-            appended by the backend before the final link is generated.
+<table>
 
-        </div>
+<thead>
 
-    </div>
+<tr>
+
+<th>Walmart URL</th>
+<th>Short Link</th>
+<th>Clicks</th>
+<th>Date</th>
+
+</tr>
+
+</thead>
+
+<tbody id="allLinks"></tbody>
+
+</table>
+
+</div>
 
 </section>
 
 
 <!-- EARNINGS -->
 
-<section class="page" id="earnings">
+<section
+id="earnings"
+class="page"
+>
 
-    <div class="page-heading">
+<div class="heading">
 
-        <div>
-            <h1>Earnings</h1>
-            <p>Track your performance and commissions.</p>
-        </div>
+<h1>
+Earnings
+</h1>
 
-        <div class="filters">
+<p>
+Only verified database events appear here.
+</p>
 
-            <select id="earningsPeriod">
-                <option value="1">Today</option>
-                <option value="2">Last 2 Days</option>
-                <option value="3">Last 3 Days</option>
-                <option value="7" selected>Last 7 Days</option>
-                <option value="30">Last 30 Days</option>
-                <option value="90">Last 90 Days</option>
-            </select>
-
-        </div>
-
-    </div>
+</div>
 
 
-    <div class="earnings-grid">
+<div class="card">
 
-        <div class="card">
+<select
+id="earningDays"
+onchange="loadEarnings()"
+>
 
-            <div class="card-title">
-                <h3>Daily Earnings</h3>
-            </div>
+<option value="1">
+Today
+</option>
 
-            <div class="chart-wrap">
-                <canvas id="dailyChart"></canvas>
-            </div>
+<option value="2">
+2 Days
+</option>
 
-        </div>
+<option value="3">
+3 Days
+</option>
 
+<option value="7" selected>
+7 Days
+</option>
 
-        <div class="card">
+<option value="30">
+30 Days
+</option>
 
-            <div class="card-title">
-                <h3>Earnings Summary</h3>
-            </div>
+<option value="90">
+90 Days
+</option>
 
-            <div style="margin-bottom:25px;">
-                <span class="stat-label">Today</span>
-                <div class="stat-value">$86.42</div>
-            </div>
+</select>
 
-            <div style="margin-bottom:25px;">
-                <span class="stat-label">Yesterday</span>
-                <div class="stat-value">$72.15</div>
-            </div>
+<br><br>
 
-            <div>
-                <span class="stat-label">This Month</span>
-                <div class="stat-value">$1,842.67</div>
-            </div>
+<table>
 
-        </div>
+<thead>
 
-    </div>
+<tr>
 
+<th>Date</th>
+<th>Conversions</th>
+<th>Sales</th>
+<th>Earnings</th>
 
-    <div class="card table-card">
+</tr>
 
-        <div class="card-title">
-            <h3>Commission Details</h3>
-        </div>
+</thead>
 
-        <div class="table-container">
+<tbody id="earningTable"></tbody>
 
-            <table>
+</table>
 
-                <thead>
-
-                    <tr>
-                        <th>Date</th>
-                        <th>Clicks</th>
-                        <th>Conversions</th>
-                        <th>Sales</th>
-                        <th>Commission</th>
-                        <th>Status</th>
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    <tr>
-                        <td>Sep 25</td>
-                        <td>2,140</td>
-                        <td>124</td>
-                        <td>$1,420.50</td>
-                        <td>$108.24</td>
-                        <td><span class="badge success">Approved</span></td>
-                    </tr>
-
-                    <tr>
-                        <td>Sep 24</td>
-                        <td>1,864</td>
-                        <td>98</td>
-                        <td>$1,120.80</td>
-                        <td>$91.42</td>
-                        <td><span class="badge success">Approved</span></td>
-                    </tr>
-
-                    <tr>
-                        <td>Sep 23</td>
-                        <td>1,725</td>
-                        <td>87</td>
-                        <td>$942.30</td>
-                        <td>$74.16</td>
-                        <td><span class="badge pending">Pending</span></td>
-                    </tr>
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </div>
+</div>
 
 </section>
 
 
 <!-- PAYOUTS -->
 
-<section class="page" id="payouts">
+<section
+id="payouts"
+class="page"
+>
 
-    <div class="page-heading">
+<div class="heading">
 
-        <div>
-            <h1>Payouts</h1>
-            <p>Manage your affiliate payments.</p>
-        </div>
+<h1>
+Payouts
+</h1>
 
-    </div>
+<p>
+View your payout records.
+</p>
 
-
-    <div class="payout-grid">
-
-        <div class="card">
-            <span class="stat-label">Available Balance</span>
-            <div class="payout-number">$482.73</div>
-        </div>
-
-        <div class="card">
-            <span class="stat-label">Pending</span>
-            <div class="payout-number">$160.10</div>
-        </div>
-
-        <div class="card">
-            <span class="stat-label">Total Paid</span>
-            <div class="payout-number">$4,821.40</div>
-        </div>
-
-    </div>
+</div>
 
 
-    <div class="card table-card">
+<div class="card">
 
-        <div class="card-title">
-            <h3>Payout History</h3>
-        </div>
+<table>
 
-        <div class="table-container">
+<thead>
 
-            <table>
+<tr>
 
-                <thead>
+<th>Date</th>
+<th>Amount</th>
+<th>PayPal</th>
+<th>Status</th>
 
-                    <tr>
-                        <th>Date</th>
-                        <th>Amount</th>
-                        <th>Method</th>
-                        <th>Transaction ID</th>
-                        <th>Status</th>
-                    </tr>
+</tr>
 
-                </thead>
+</thead>
 
-                <tbody>
+<tbody id="payoutTable"></tbody>
 
-                    <tr>
-                        <td>Sep 15, 2026</td>
-                        <td>$642.83</td>
-                        <td>PayPal</td>
-                        <td>PAY-982341</td>
-                        <td><span class="badge success">Paid</span></td>
-                    </tr>
+</table>
 
-                    <tr>
-                        <td>Aug 15, 2026</td>
-                        <td>$528.24</td>
-                        <td>PayPal</td>
-                        <td>PAY-871221</td>
-                        <td><span class="badge success">Paid</span></td>
-                    </tr>
-
-                    <tr>
-                        <td>Jul 15, 2026</td>
-                        <td>$492.16</td>
-                        <td>PayPal</td>
-                        <td>PAY-764121</td>
-                        <td><span class="badge success">Paid</span></td>
-                    </tr>
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </div>
+</div>
 
 </section>
 
 
 <!-- SETTINGS -->
 
-<section class="page" id="settings">
+<section
+id="settings"
+class="page"
+>
 
-    <div class="page-heading">
+<div class="heading">
 
-        <div>
-            <h1>Settings</h1>
-            <p>Manage your account and payout information.</p>
-        </div>
+<h1>
+Settings
+</h1>
 
-    </div>
+<p>
+Manage your account.
+</p>
 
-
-    <div class="settings-grid">
-
-
-        <div class="card">
-
-            <div class="card-title">
-                <h3>Account Information</h3>
-            </div>
-
-            <div class="form-group">
-
-                <label>Email Address</label>
-
-                <input
-                    type="email"
-                    id="email"
-                    value="admin@example.com"
-                >
-
-            </div>
+</div>
 
 
-            <div class="form-group">
+<div class="card form-card">
 
-                <label>Password</label>
+<div class="form-group">
 
-                <div class="password-wrap">
+<label>
+Name
+</label>
 
-                    <input
-                        type="password"
-                        id="password"
-                        value="password123"
-                    >
+<input
+id="settingsName"
+>
 
-                    <span
-                        class="password-toggle"
-                        onclick="togglePassword()">
-                        👁
-                    </span>
-
-                </div>
-
-            </div>
+</div>
 
 
-            <button
-                class="btn btn-primary"
-                onclick="save
+<div class="form-group">
+
+<label>
+Email
+</label>
+
+<input
+id="settingsEmail"
+readonly
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+PayPal Email
+</label>
+
+<input
+id="settingsPaypal"
+type="email"
+placeholder="paypal@example.com"
+>
+
+</div>
+
+
+<button
+class="primary"
+onclick="saveSettings()"
+>
+Save Settings
+</button>
+
+<div
+id="settingsMessage"
+class="success"
+></div>
+
+</div>
+
+</section>
+
+
+<!-- ADMIN -->
+
+<section
+id="admin"
+class="page"
+>
+
+<div class="heading">
+
+<h1>
+CEO Control Center
+</h1>
+
+<p>
+Manage users and payout records.
+</p>
+
+</div>
+
+
+<div class="card table-card">
+
+<h3>
+All Users
+</h3>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Name</th>
+<th>Email</th>
+<th>PayPal</th>
+<th>Status</th>
+<th>Created</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="usersTable"></tbody>
+
+</table>
+
+</div>
+
+
+<div class="card table-card">
+
+<h3>
+All Payouts
+</h3>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>User</th>
+<th>Amount</th>
+<th>PayPal</th>
+<th>Status</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="adminPayoutTable"></tbody>
+
+</table>
+
+</div>
+
+</section>
+
+
+</div>
+
+</main>
+
+</div>
+
+
+<script>
+
+let token =
+localStorage.getItem("affiliate_token");
+
+let currentUser = null;
+
+
+/* ======================================================
+   API
+====================================================== */
+
+async function api(
+    url,
+    options={}
+){
+
+    options.headers =
+        options.headers || {};
+
+    options.headers[
+        "Content-Type"
+    ] =
+        "application/json";
+
+    if(token){
+
+        options.headers[
+            "Authorization"
+        ] =
+            "Bearer " + token;
+
+    }
+
+    const response =
+        await fetch(
+            url,
+            options
+        );
+
+    const data =
+        await response.json();
+
+    if(!response.ok){
+
+        throw new Error(
+            data.error ||
+            "Request failed"
+        );
+
+    }
+
+    return data;
+
+}
+
+
+/* ======================================================
+   AUTH SCREENS
+====================================================== */
+
+function showLogin(){
+
+    loginBox.classList.remove("hidden");
+    signupBox.classList.add("hidden");
+    forgotBox.classList.add("hidden");
+
+}
+
+function showSignup(){
+
+    loginBox.classList.add("hidden");
+    signupBox.classList.remove("hidden");
+    forgotBox.classList.add("hidden");
+
+}
+
+function showForgot(){
+
+    loginBox.classList.add("hidden");
+    signupBox.classList.add("hidden");
+    forgotBox.classList.remove("hidden");
+
+}
+
+
+/* ======================================================
+   SIGNUP
+====================================================== */
+
+async function signup(){
+
+    signupError.textContent="";
+
+    try{
+
+        const data =
+            await api(
+                "/api/signup",
+                {
+                    method:"POST",
+                    body:JSON.stringify({
+
+                        name:
+                            signupName.value,
+
+                        email:
+                            signupEmail.value,
+
+                        password:
+                            signupPassword.value
+
+                    })
+                }
+            );
+
+        token =
+            data.token;
+
+        localStorage.setItem(
+            "affiliate_token",
+            token
+        );
+
+        await startApp();
+
+    }catch(error){
+
+        signupError.textContent =
+            error.message;
+
+    }
+
+}
+
+
+/* ======================================================
+   LOGIN
+====================================================== */
+
+async function login(){
+
+    loginError.textContent="";
+
+    try{
+
+        const data =
+            await api(
+                "/api/login",
+                {
+                    method:"POST",
+                    body:JSON.stringify({
+
+                        email:
+                            loginEmail.value,
+
+                        password:
+                            loginPassword.value
+
+                    })
+                }
+            );
+
+        token =
+            data.token;
+
+        localStorage.setItem(
+            "affiliate_token",
+            token
+        );
+
+        await startApp();
+
+    }catch(error){
+
+        loginError.textContent =
+            error.message;
+
+    }
+
+}
+
+
+/* ======================================================
+   FORGOT
+====================================================== */
+
+async function forgotPassword(){
+
+    forgotMessage.className="";
+
+    try{
+
+        const data =
+            await api(
+                "/api/forgot-password",
+                {
+                    method:"POST",
+                    body:JSON.stringify({
+
+                        email:
+                            forgotEmail.value
+
+                    })
+                }
+            );
+
+        forgotMessage.className =
+            "success";
+
+        /*
+          Development link only.
+          Production should email this URL.
+        */
+
+        forgotMessage.innerHTML =
+            data.message +
+            (
+                data.development_reset_url
+                ?
+                "<br><br><a href='" +
+                data.development_reset_url +
+                "' target='_blank'>Open development reset link</a>"
+                :
+                ""
+            );
+
+    }catch(error){
+
+        forgotMessage.className =
+            "error";
+
+        forgotMessage.textContent =
+            error.message;
+
+    }
+
+}
+
+
+/* ======================================================
+   START APP
+====================================================== */
+
+async function startApp(){
+
+    try{
+
+        currentUser =
+            await api("/api/me");
+
+        authPage.style.display =
+            "none";
+
+        app.style.display =
+            "flex";
+
+        profileName.textContent =
+            currentUser.name;
+
+        avatar.textContent =
+            currentUser.name
+                .charAt(0)
+                .toUpperCase();
+
+        settingsName.value =
+            currentUser.name;
+
+        settingsEmail.value =
+            currentUser.email;
+
+        settingsPaypal.value =
+            currentUser.paypal_email || "";
+
+        if(currentUser.role === "admin"){
+
+            adminNav.classList.remove(
+                "hidden"
+            );
+
+        }
+
+        loadDashboard();
+
+        loadLinks();
+
+    }catch(error){
+
+        logout();
+
+    }
+
+}
+
+
+/* ======================================================
+   PAGE
+====================================================== */
+
+function page(
+    pageName,
+    element
+){
+
+    document
+        .querySelectorAll(".page")
+        .forEach(
+            p =>
+                p.classList.remove(
+                    "active"
+                )
+        );
+
+    document
+        .getElementById(pageName)
+        .classList.add("active");
+
+    document
+        .querySelectorAll(".nav")
+        .forEach(
+            n =>
+                n.classList.remove(
+                    "active"
+                )
+        );
+
+    if(element){
+
+        element.classList.add(
+            "active"
+        );
+
+    }
+
+    const names = {
+
+        dashboard:"Dashboard",
+
+        links:"Link Creator",
+
+        earnings:"Earnings",
+
+        payouts:"Payouts",
+
+        settings:"Settings",
+
+        admin:"CEO Control Center"
+
+    };
+
+    pageTitle.textContent =
+        names[pageName];
+
+    if(pageName === "earnings")
+        loadEarnings();
+
+    if(pageName === "payouts")
+        loadPayouts();
+
+    if(pageName === "admin")
+        loadAdmin();
+
+    if(pageName === "links")
+        loadLinks();
+
+}
+
+
+/* ======================================================
+   DASHBOARD
+====================================================== */
+
+async function loadDashboard(){
+
+    try{
+
+        const days =
+            period.value;
+
+        const data =
+            await api(
+                "/api/dashboard?days=" +
+                days
+            );
+
+        statClicks.textContent =
+            Number(data.clicks)
+                .toLocaleString();
+
+        statConversions.textContent =
+            Number(data.conversions)
+                .toLocaleString();
+
+        statSales.textContent =
+            "$" +
+            Number(data.sales)
+                .toFixed(2);
+
+        statEarnings.textContent =
+            "$" +
+            Number(data.earnings)
+                .toFixed(2);
+
+        pending.textContent =
+            "$" +
+            Number(data.pending)
+                .toFixed(2);
+
+        drawDashboardChart();
+
+    }catch(error){
+
+        console.error(error);
+
+    }
+
+}
+
+
+/* ======================================================
+   SIMPLE REAL DATA CHART
+====================================================== */
+
+async function drawDashboardChart(){
+
+    try{
+
+        const data =
+            await api(
+                "/api/earnings?days=" +
+                period.value
+            );
+
+        chart.innerHTML="";
+
+        if(!data.length){
+
+            chart.innerHTML =
+                "<div class='muted'>No earnings data yet.</div>";
+
+            return;
+
+        }
+
+        const max =
+            Math.max(
+                ...data.map(
+                    x =>
+                        Number(
+                            x.earnings
+                        )
+                ),
+                1
+            );
+
+        data.forEach(row=>{
+
+            const bar =
+                document.createElement(
+                    "div"
+                );
+
+            bar.className =
+                "bar";
+
+            bar.style.height =
+                Math.max(
+                    4,
+                    Number(row.earnings) /
+                    max *
+                    250
+                ) + "px";
+
+            bar.title =
+                row.date +
+                " — $" +
+                Number(
+                    row.earnings
+                ).toFixed(2);
+
+            chart.appendChild(bar);
+
+        });
+
+    }catch(error){
+
+        console.error(error);
+
+    }
+
+}
+
+
+/* ======================================================
+   LINKS
+====================================================== */
+
+async function createLink(){
+
+    try{
+
+        const data =
+            await api(
+                "/api/links",
+                {
+                    method:"POST",
+                    body:JSON.stringify({
+
+                        url:
+                            walmartUrl.value
+
+                    })
+                }
+            );
+
+        shortUrl.value =
+            data.short_url;
+
+        createdLink.classList.remove(
+            "hidden"
+        );
+
+        walmartUrl.value="";
+
+        loadLinks();
+
+    }catch(error){
+
+        alert(error.message);
+
+    }
+
+}
+
+
+async function loadLinks(){
+
+    try{
+
+        const links =
+            await api("/api/links");
+
+        const html =
+            links.map(
+                link => `
+
+<tr>
+
+<td>
+<a
+href="${escapeHtml(link.original_url)}"
+target="_blank"
+>
+${escapeHtml(
+    link.original_url
+)}
+</a>
+</td>
+
+<td>
+<a
+href="/go/${escapeHtml(link.short_code)}"
+target="_blank"
+>
+/go/${escapeHtml(link.short_code)}
+</a>
+</td>
+
+<td>
+${Number(link.clicks)}
+</td>
+
+<td>
+${escapeHtml(
+    link.created_at
+)}
+</td>
+
+</tr>
+
+`
+            ).join("");
+
+        linkTable.innerHTML =
+            html || `
+<tr>
+<td colspan="4">
+No links created yet.
+</td>
+</tr>
+`;
+
+        allLinks.innerHTML =
+            html || `
+<tr>
+<td colspan="4">
+No links created yet.
+</td>
+</tr>
+`;
+
+    }catch(error){
+
+        console.error(error);
+
+    }
+
+}
+
+
+function copyShortLink(){
+
+    navigator.clipboard.writeText(
+        shortUrl.value
+    );
+
+    alert(
+        "Short link copied."
+    );
+
+}
+
+
+/* ======================================================
+   EARNINGS
+====================================================== */
+
+async function loadEarnings(){
+
+    try{
+
+        const rows =
+            await api(
+                "/api/earnings?days=" +
+                earningDays.value
+            );
+
+        earningTable.innerHTML =
+            rows.map(
+                row => `
+
+<tr>
+
+<td>
+${escapeHtml(row.date)}
+</td>
+
+<td>
+${Number(
+    row.conversions
+)}
+</td>
+
+<td>
+$${Number(
+    row.sales
+).toFixed(2)}
+</td>
+
+<td>
+$${Number(
+    row.earnings
+).toFixed(2)}
+</td>
+
+</tr>
+
+`
+            ).join("") ||
+
+`
+<tr>
+<td colspan="4">
+No verified earnings data yet.
+</td>
+</tr>
+`;
+
+    }catch(error){
+
+        console.error(error);
+
+    }
+
+}
+
+
+/* ======================================================
+   PAYOUTS
+====================================================== */
+
+async function loadPayouts(){
+
+    /*
+      A normal user can only see their own payouts.
+      We use the admin endpoint only for CEO.
+    */
+
+    if(currentUser.role === "admin"){
+
+        loadAdmin();
+
+        return;
+
+    }
+
+    /*
+      For a production version add:
+      GET /api/payouts
+      to return only current user's payouts.
+    */
+
+    payoutTable.innerHTML = `
+<tr>
+<td colspan="4">
+No payout records available yet.
+</td>
+</tr>
+`;
+
+}
+
+
+/* ======================================================
+   SETTINGS
+====================================================== */
+
+async function saveSettings(){
+
+    try{
+
+        await api(
+            "/api/me",
+            {
+                method:"PUT",
+                body:JSON.stringify({
+
+                    name:
+                        settingsName.value,
+
+                    paypal_email:
+                        settingsPaypal.value
+
+                })
+            }
+        );
+
+        settingsMessage.textContent =
+            "Settings saved successfully.";
+
+        profileName.textContent =
+            settingsName.value;
+
+    }catch(error){
+
+        settingsMessage.className =
+            "error";
+
+        settingsMessage.textContent =
+            error.message;
+
+    }
+
+}
+
+
+/* ======================================================
+   ADMIN
+====================================================== */
+
+async function loadAdmin(){
+
+    if(currentUser.role !== "admin"){
+
+        return;
+
+    }
+
+    try{
+
+        const users =
+            await api(
+                "/api/admin/users"
+            );
+
+        usersTable.innerHTML =
+            users.map(
+                user => `
+
+<tr>
+
+<td>
+${escapeHtml(user.name)}
+</td>
+
+<td>
+${escapeHtml(user.email)}
+</td>
+
+<td>
+${escapeHtml(
+    user.paypal_email || "-"
+)}
+</td>
+
+<td>
+
+<span class="badge ${
+    user.status === "active"
+    ? "green"
+    : "red"
+}">
+${escapeHtml(user.status)}
+</span>
+
+</td>
+
+<td>
+${escapeHtml(
+    user.created_at
+)}
+</td>
+
+<td>
+
+${
+user.role === "admin"
+
+? "CEO"
+
+: `
+
+<button
+class="primary"
+onclick="toggleUser(
+${user.id},
+'${user.status === "active"
+    ? "inactive"
+    : "active"}'
+)"
+>
+${
+user.status === "active"
+? "Deactivate"
+: "Activate"
+}
+</button>
+
+<button
+class="danger"
+onclick="deleteUser(${user.id})"
+>
+Delete
+</button>
+
+`
+}
+
+</td>
+
+</tr>
+
+`
+            ).join("");
+
+
+
+        const payouts =
+            await api(
+                "/api/admin/payouts"
+            );
+
+        adminPayoutTable.innerHTML =
+            payouts.map(
+                payout => `
+
+<tr>
+
+<td>
+${escapeHtml(
+    payout.name
+)}
+</td>
+
+<td>
+$${Number(
+    payout.amount
+).toFixed(2)}
+</td>
+
+<td>
+${escapeHtml(
+    payout.paypal_email
+)}
+</td>
+
+<td>
+<span class="badge yellow">
+${escapeHtml(
+    payout.status
+)}
+</span>
+</td>
+
+<td>
+
+<select
+onchange="updatePayout(
+${payout.id},
+this.value
+)"
+>
+
+<option
+${
+payout.status==="pending"
+? "selected"
+: ""
+}
+>
+pending
+</option>
+
+<option
+${
+payout.status==="processing"
+? "selected"
+: ""
+}
+>
+processing
+</option>
+
+<option
+${
+payout.status==="paid"
+? "selected"
+: ""
+}
+>
+paid
+</option>
+
+<option
+${
+payout.status==="rejected"
+? "selected"
+: ""
+}
+>
+rejected
+</option>
+
+</select>
+
+</td>
+
+</tr>
+
+`
+            ).join("") ||
+
+`
+<tr>
+<td colspan="5">
+No payouts yet.
+</td>
+</tr>
+`;
+
+    }catch(error){
+
+        alert(error.message);
+
+    }
+
+}
+
+
+async function toggleUser(
+    id,
+    status
+){
+
+    try{
+
+        await api(
+            "/api/admin/users/" +
+            id +
+            "/status",
+            {
+                method:"PUT",
+                body:JSON.stringify({
+                    status
+                })
+            }
+        );
+
+        loadAdmin();
+
+    }catch(error){
+
+        alert(error.message);
+
+    }
+
+}
+
+
+async function deleteUser(id){
+
+    if(
+        !confirm(
+            "Delete this user permanently?"
+        )
+    ){
+
+        return;
+
+    }
+
+    try{
+
+        await api(
+            "/api/admin/users/" +
+            id,
+            {
+                method:"DELETE"
+            }
+        );
+
+        loadAdmin();
+
+    }catch(error){
+
+        alert(error.message);
+
+    }
+
+}
+
+
+async function updatePayout(
+    id,
+    status
+){
+
+    let transaction_id="";
+
+    if(status === "paid"){
+
+        transaction_id =
+            prompt(
+                "Enter PayPal transaction ID:"
+            ) || "";
+
+    }
+
+    try{
+
+        await api(
+            "/api/admin/payouts/" +
+            id,
+            {
+                method:"PUT",
+                body:JSON.stringify({
+
+                    status,
+                    transaction_id
+
+                })
+            }
+        );
+
+        loadAdmin();
+
+    }catch(error){
+
+        alert(error.message);
+
+    }
+
+}
+
+
+/* ======================================================
+   UTILITIES
+====================================================== */
+
+function escapeHtml(value){
+
+    return String(value)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+
+}
+
+
+function logout(){
+
+    localStorage.removeItem(
+        "affiliate_token"
+    );
+
+    token=null;
+
+    location.reload();
+
+}
+
+
+function toggleSidebar(){
+
+    sidebar.classList.toggle(
+        "open"
+    );
+
+}
+
+
+/* ======================================================
+   AUTO LOGIN
+====================================================== */
+
+if(token){
+
+    startApp();
+
+}
+
+</script>
+
+</body>
+
+</html>
+
+`;
+
+
+/* =========================================================
+   HTML ROUTES
+========================================================= */
+
+app.get("/", (req, res) => {
+
+    res.send(HTML);
+
+});
+
+
+app.get("/reset-password", (req, res) => {
+
+    res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+<title>Reset Password</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+body{
+font-family:Arial;
+background:#f5f7fb;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh
+}
+.box{
+background:white;
+padding:30px;
+border-radius:15px;
+width:380px;
+max-width:90%
+}
+input,button{
+width:100%;
+padding:12px;
+margin-top:12px
+}
+button{
+background:#1677ff;
+color:white;
+border:0;
+border-radius:8px
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>Reset Password</h2>
+
+<input
+id="password"
+type="password"
+placeholder="New password"
+>
+
+<button onclick="resetPassword()">
+Reset Password
+</button>
+
+<p id="msg"></p>
+
+</div>
+
+<script>
+
+async function resetPassword(){
+
+const token =
+new URLSearchParams(
+location.search
+).get("token");
+
+const password =
+document.getElementById(
+"password"
+).value;
+
+const response =
+await fetch(
+"/api/reset-password",
+{
+method:"POST",
+headers:{
+"Content-Type":
+"application/json"
+},
+body:JSON.stringify({
+token,
+password
+})
+}
+);
+
+const data =
+await response.json();
+
+document.getElementById(
+"msg"
+).textContent =
+data.error ||
+data.message;
+
+}
+
+</script>
+
+</body>
+</html>
+`);
+
+});
+
+
+/* =========================================================
+   START SERVER
+========================================================= */
+
+app.listen(
+    PORT,
+    () => {
+
+        console.log("");
+        console.log(
+            "AffiliatePro running at:"
+        );
+
+        console.log(
+            `http://localhost:${PORT}`
+        );
+
+        console.log("");
+
+    }
+);
