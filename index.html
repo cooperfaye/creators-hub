@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creators Hub - Dashboard & Link Generator</title>
+    <title>Creators Hub - Pro Link Generator & Dashboard</title>
     <style>
         * {
             box-sizing: border-box;
@@ -31,7 +31,12 @@
             font-size: 22px;
             color: #6200ea;
         }
-        .auth-btn {
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .auth-btn, .settings-btn {
             background: #6200ea;
             color: white;
             border: none;
@@ -39,9 +44,18 @@
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 14px;
         }
-        .auth-btn:hover {
+        .auth-btn:hover, .settings-btn:hover {
             background: #3700b3;
+        }
+        .settings-btn {
+            background: #03dac6;
+            color: #000;
+        }
+        .settings-btn:hover {
+            background: #018786;
+            color: #fff;
         }
         .container {
             max-width: 900px;
@@ -82,7 +96,7 @@
             margin-bottom: 15px;
             color: #333;
         }
-        input[type="text"] {
+        input[type="text"], input[type="email"], input[type="password"] {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
@@ -135,6 +149,52 @@
         th {
             color: #777;
         }
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 350px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: #6200ea;
+        }
+        .modal-content button {
+            width: 100%;
+            padding: 10px;
+            background: #6200ea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .modal-content button:hover {
+            background: #3700b3;
+        }
+        .close-link {
+            display: block;
+            margin-top: 15px;
+            color: #777;
+            cursor: pointer;
+            font-size: 13px;
+        }
     </style>
 </head>
 <body>
@@ -143,7 +203,10 @@
         <!-- Header & Auth System -->
         <header>
             <h1>🚀 Creators Hub</h1>
-            <button class="auth-btn" onclick="toggleAuth()" id="authBtn">Login / Sign Up</button>
+            <div class="header-right">
+                <button class="settings-btn" onclick="openSettings()">⚙️ Settings</button>
+                <button class="auth-btn" onclick="handleAuthClick()" id="authBtn">Login / Sign Up</button>
+            </div>
         </header>
 
         <!-- Analytics Dashboard -->
@@ -165,7 +228,7 @@
         <!-- Link Generator Section -->
         <div class="generator-box">
             <h2>Link Shortener & Generator</h2>
-            <input type="text" id="longUrl" placeholder="Paste your long affiliate or product link here...">
+            <input type="text" id="longUrl" placeholder="Paste your long product link here (e.g. Walmart, Amazon)...">
             <button class="generate-btn" onclick="generateLink()">Generate Link</button>
             <div class="result-box" id="resultBox">
                 <strong>Your short link is ready:</strong><br>
@@ -190,83 +253,246 @@
                         <td>#zutotf</td>
                         <td>342</td>
                     </tr>
-                    <tr>
-                        <td>amazon.com/dp/B08N...</td>
-                        <td>#amzn90</td>
-                        <td>906</td>
-                    </tr>
                 </tbody>
             </table>
         </div>
     </div>
 
+    <!-- Auth Modal (Login / Sign Up / Forgot Password) -->
+    <div class="modal" id="authModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Login</h2>
+            <input type="text" id="userName" placeholder="Full Name (for Sign Up only)" style="display:none;">
+            <input type="email" id="userEmail" placeholder="Enter Email">
+            <input type="password" id="userPassword" placeholder="Enter Password">
+            
+            <button id="modalActionBtn" onclick="submitAuth()">Login</button>
+            <span class="close-link" id="switchModeText" onclick="switchAuthMode()">Don't have an account? Sign Up</span>
+            <span class="close-link" onclick="forgotPassword()" style="color:#6200ea; margin-top:5px;">Forgot Password?</span>
+            <span class="close-link" onclick="closeModal()">Cancel</span>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <h2>Account Settings</h2>
+            <p id="settingsInfo" style="margin-bottom:15px; color:#555; text-align:left;"></p>
+            <button onclick="changePasswordPrompt()" style="background:#03dac6; color:#000;">Change Password</button>
+            <button onclick="closeSettings()" style="background:#777; margin-top:10px;">Close</button>
+        </div>
+    </div>
+
     <script>
-        // Check if page opened via a short link (Redirect logic)
+        // Check redirection and load data on startup
         window.onload = function() {
             const hash = window.location.hash.substring(1);
             if (hash) {
                 let savedLinks = JSON.parse(localStorage.getItem('creators_links') || '{}');
                 if (savedLinks[hash]) {
-                    window.location.href = savedLinks[hash]; // Redirect to original product URL
+                    window.location.href = savedLinks[hash]; // Instant redirect to original product URL
+                    return;
                 }
             }
+            checkLoginState();
+            loadSavedLinksTable();
         };
+
+        let isSignupMode = false;
+
+        function handleAuthClick() {
+            let currentUser = localStorage.getItem('creators_logged_in');
+            if (currentUser) {
+                if (confirm('Are you sure you want to Logout?')) {
+                    localStorage.removeItem('creators_logged_in');
+                    alert('Successfully logged out.');
+                    checkLoginState();
+                }
+            } else {
+                isSignupMode = false;
+                document.getElementById('modalTitle').innerText = 'Login';
+                document.getElementById('userName').style.display = 'none';
+                document.getElementById('modalActionBtn').innerText = 'Login';
+                document.getElementById('switchModeText').innerText = "Don't have an account? Sign Up";
+                document.getElementById('authModal').style.display = 'flex';
+            }
+        }
+
+        function switchAuthMode() {
+            isSignupMode = !isSignupMode;
+            if (isSignupMode) {
+                document.getElementById('modalTitle').innerText = 'Sign Up';
+                document.getElementById('userName').style.display = 'block';
+                document.getElementById('modalActionBtn').innerText = 'Register';
+                document.getElementById('switchModeText').innerText = 'Already have an account? Login';
+            } else {
+                document.getElementById('modalTitle').innerText = 'Login';
+                document.getElementById('userName').style.display = 'none';
+                document.getElementById('modalActionBtn').innerText = 'Login';
+                document.getElementById('switchModeText').innerText = "Don't have an account? Sign Up";
+            }
+        }
+
+        function submitAuth() {
+            let email = document.getElementById('userEmail').value.trim();
+            let password = document.getElementById('userPassword').value.trim();
+            let name = document.getElementById('userName').value.trim();
+
+            if (!email || !password) {
+                alert('Please fill in all required fields!');
+                return;
+            }
+
+            if (isSignupMode) {
+                if (!name) {
+                    alert('Please enter your name!');
+                    return;
+                }
+                let userData = { name: name, email: email, password: password };
+                localStorage.setItem('creators_user_' + email, JSON.stringify(userData));
+                localStorage.setItem('creators_logged_in', email);
+                alert('Account created and logged in successfully!');
+            } else {
+                let storedUser = localStorage.getItem('creators_user_' + email);
+                if (storedUser) {
+                    let userObj = JSON.parse(storedUser);
+                    if (userObj.password === password) {
+                        localStorage.setItem('creators_logged_in', email);
+                        alert('Successfully logged in!');
+                    } else {
+                        alert('Incorrect password!');
+                        return;
+                    }
+                } else {
+                    // Quick fallback registration if user doesn't exist
+                    let userData = { name: email.split('@')[0], email: email, password: password };
+                    localStorage.setItem('creators_user_' + email, JSON.stringify(userData));
+                    localStorage.setItem('creators_logged_in', email);
+                    alert('Account auto-registered and logged in!');
+                }
+            }
+            closeModal();
+            checkLoginState();
+        }
+
+        function forgotPassword() {
+            let email = prompt('Enter your registered email address to reset password:');
+            if (email) {
+                let storedUser = localStorage.getItem('creators_user_' + email);
+                if (storedUser) {
+                    let userObj = JSON.parse(storedUser);
+                    let newPass = prompt('Enter your new password:');
+                    if (newPass) {
+                        userObj.password = newPass;
+                        localStorage.setItem('creators_user_' + email, JSON.stringify(userObj));
+                        alert('Password successfully reset! You can now log in.');
+                    }
+                } else {
+                    alert('No account found with this email.');
+                }
+            }
+        }
+
+        function checkLoginState() {
+            let loggedInEmail = localStorage.getItem('creators_logged_in');
+            let authBtn = document.getElementById('authBtn');
+            if (loggedInEmail) {
+                let userObj = JSON.parse(localStorage.getItem('creators_user_' + loggedInEmail) || '{}');
+                let displayName = userObj.name || loggedInEmail;
+                authBtn.innerText = 'Logout (' + displayName + ')';
+            } else {
+                authBtn.innerText = 'Login / Sign Up';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('authModal').style.display = 'none';
+        }
+
+        function openSettings() {
+            let loggedInEmail = localStorage.getItem('creators_logged_in');
+            if (!loggedInEmail) {
+                alert('Please log in first to view settings.');
+                handleAuthClick();
+                return;
+            }
+            let userObj = JSON.parse(localStorage.getItem('creators_user_' + loggedInEmail) || '{}');
+            document.getElementById('settingsInfo').innerHTML = `<strong>Name:</strong> ${userObj.name || 'N/A'}<br><strong>Email:</strong> ${loggedInEmail}`;
+            document.getElementById('settingsModal').style.display = 'flex';
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+
+        function changePasswordPrompt() {
+            let loggedInEmail = localStorage.getItem('creators_logged_in');
+            let userObj = JSON.parse(localStorage.getItem('creators_user_' + loggedInEmail));
+            let currentP = prompt('Enter current password:');
+            if (currentP === userObj.password) {
+                let newP = prompt('Enter new password:');
+                if (newP) {
+                    userObj.password = newP;
+                    localStorage.setItem('creators_user_' + loggedInEmail, JSON.stringify(userObj));
+                    alert('Password changed successfully!');
+                    closeSettings();
+                }
+            } else {
+                alert('Incorrect current password!');
+            }
+        }
 
         function generateLink() {
             let urlInput = document.getElementById('longUrl').value.trim();
             if(!urlInput) {
-                alert('Please enter a link first!');
+                alert('Please enter a product link first!');
                 return;
             }
             
-            // Ensure URL has http/https
             if (!urlInput.startsWith('http://') && !urlInput.startsWith('https://')) {
                 urlInput = 'https://' + urlInput;
             }
             
-            // Generate random short code
             const randomCode = 'L' + Math.random().toString(36).substring(2, 8);
             
-            // Save mapping in localStorage so redirection works
             let savedLinks = JSON.parse(localStorage.getItem('creators_links') || '{}');
             savedLinks[randomCode] = urlInput;
             localStorage.setItem('creators_links', JSON.stringify(savedLinks));
 
+            // Save list for display table
+            let linkHistory = JSON.parse(localStorage.getItem('creators_history') || '[]');
+            linkHistory.unshift({ original: urlInput, code: randomCode, clicks: 0 });
+            localStorage.setItem('creators_history', JSON.stringify(linkHistory));
+
             const fullShortUrl = window.location.origin + '/#' + randomCode;
 
-            // Show result box
             const resultBox = document.getElementById('resultBox');
             const shortLinkOutput = document.getElementById('shortLinkOutput');
             shortLinkOutput.innerHTML = `<a href="${fullShortUrl}" target="_blank">${fullShortUrl}</a>`;
             resultBox.style.display = 'block';
 
-            // Add new link to table
-            const tableBody = document.getElementById('linkTableBody');
-            const newRow = document.createElement('tr');
-            newRow.innerHTML = `
-                <td>${urlInput.substring(0, 30)}...</td>
-                <td>#${randomCode}</td>
-                <td>0</td>
-            `;
-            tableBody.prepend(newRow);
+            loadSavedLinksTable();
 
-            // Increment active links count
             let activeCount = document.getElementById('activeLinks');
             activeCount.innerText = parseInt(activeCount.innerText) + 1;
         }
 
-        function toggleAuth() {
-            const btn = document.getElementById('authBtn');
-            if(btn.innerText === 'Login / Sign Up') {
-                let user = prompt('Enter your name or email for login:');
-                if(user) {
-                    btn.innerText = 'Logout (' + user + ')';
-                    alert('Successfully logged in!');
-                }
-            } else {
-                btn.innerText = 'Login / Sign Up';
-                alert('You have been logged out.');
-            }
+        function loadSavedLinksTable() {
+            let linkHistory = JSON.parse(localStorage.getItem('creators_history') || '[]');
+            let tableBody = document.getElementById('linkTableBody');
+            
+            let html = '';
+            // Default demo row + user items
+            html += `<tr><td>walmart.com/search?id=50...</td><td>#zutotf</td><td>342</td></tr>`;
+            
+            linkHistory.forEach(item => {
+                html += `<tr>
+                    <td>${item.original.substring(0, 30)}...</td>
+                    <td>#${item.code}</td>
+                    <td>${item.clicks}</td>
+                </tr>`;
+            });
+            tableBody.innerHTML = html;
         }
     </script>
 </body>
