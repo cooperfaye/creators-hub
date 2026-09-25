@@ -61,7 +61,7 @@
         </div>
 
         <div style="background: rgba(0, 113, 220, 0.1); border: 1px solid var(--accent-blue); padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 13px; color: #93c5fd;">
-            ⭐ <b>Walmart Creator Program:</b> Generate your custom tracking links and earn commissions on qualifying sales.
+            ⭐ <b>Walmart Creator Program:</b> Generate your custom smart links and earn commissions on qualifying sales.
         </div>
 
         <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr);">
@@ -72,13 +72,13 @@
         </div>
 
         <div class="section-block">
-            <h3>Generate Tracking Link</h3>
+            <h3>Generate Smart Short Link</h3>
             <input type="text" id="targetUrl" placeholder="Paste Walmart Product URL (e.g., https://www.walmart.com/ip/...)">
-            <button onclick="generateAffiliateLink()">Create Tracking Link</button>
+            <button onclick="generateAffiliateLink()">Create Smart Link</button>
         </div>
 
         <div class="section-block">
-            <h3>Active Links</h3>
+            <h3>Active Smart Links</h3>
             <div id="linksList">No active links found.</div>
         </div>
 
@@ -104,7 +104,6 @@
             <button onclick="logout()" class="btn-danger" style="width: auto; padding: 6px 14px; margin:0;">Sign Out</button>
         </div>
 
-        <!-- WALMART API & AFFILIATE CONFIGURATION SECTION -->
         <div class="section-block" style="border: 1px dashed var(--accent-blue);">
             <h3 style="margin-top:0; color: var(--accent-blue);">🔗 Walmart Creator API & Affiliate Configuration</h3>
             <small style="color: #94a3b8;">Enter your official Walmart Publisher ID / API Key once approved to sync real tracking.</small>
@@ -207,7 +206,6 @@
         document.getElementById('dashboardSection').classList.add('hidden');
         document.getElementById('adminSection').classList.remove('hidden');
         
-        // Load saved API configuration
         document.getElementById('ceoWalmartPublisherId').value = localStorage.getItem('walmart_pub_id') || '';
         document.getElementById('ceoWalmartApiKey').value = localStorage.getItem('walmart_api_key') || '';
 
@@ -368,11 +366,12 @@
         }
         
         let partner = getCurrentPartnerObj();
-        let uniqueCode = Math.random().toString(36).substring(2, 9);
-        let pubId = localStorage.getItem('walmart_pub_id') || 'DEMO_PUB';
+        let uniqueCode = Math.random().toString(36).substring(2, 8);
         
-        // Append official Publisher ID if available
-        let trackingUrl = window.location.origin + window.location.pathname.replace('index.html', '') + "?track=" + uniqueCode + "&pub=" + pubId;
+        // Smart Short Link Format (Mavely Style: app.link/xyz123)
+        let baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
+        if (!baseUrl.endsWith('/')) baseUrl += '/';
+        let trackingUrl = baseUrl + "s/" + uniqueCode;
         
         if (!partner.links) partner.links = [];
         partner.links.push({ original: url, tracking: trackingUrl, code: uniqueCode, date: new Date().toLocaleDateString() });
@@ -380,7 +379,7 @@
 
         document.getElementById('targetUrl').value = '';
         loadPartnerDashboard();
-        alert('Tracking link generated successfully with your Publisher configuration.');
+        alert('Smart Short Link generated successfully.');
     }
 
     function renderPartnerLinks() {
@@ -394,9 +393,9 @@
             <div class="item-box">
                 <div style="overflow: hidden;">
                     <small style="color: #94a3b8;">Created: ${l.date} | Target: <a href="${l.original}" target="_blank" style="color: #93c5fd; text-decoration: none;">${l.original}</a></small><br>
-                    <b style="color: var(--accent-blue); word-break: break-all; font-size: 13px;">${l.tracking}</b>
+                    <b style="color: var(--accent-blue); word-break: break-all; font-size: 14px;">${l.tracking}</b>
                 </div>
-                <button onclick="navigator.clipboard.writeText('${l.tracking}'); alert('Link copied!');" style="width: auto; padding: 8px 16px; margin: 0; background: var(--accent-blue); color: #f8fafc; flex-shrink: 0;">Copy</button>
+                <button onclick="navigator.clipboard.writeText('${l.tracking}'); alert('Smart Link copied!');" style="width: auto; padding: 8px 16px; margin: 0; background: var(--accent-blue); color: #f8fafc; flex-shrink: 0;">Copy</button>
             </div>
         `).join('');
     }
@@ -441,10 +440,12 @@
     }
 
     window.onload = function() {
+        const pathSegments = window.location.pathname.split('/');
+        const possibleCode = pathSegments[pathSegments.length - 1];
         const urlParams = new URLSearchParams(window.location.search);
-        const trackingCode = urlParams.get('track');
+        const trackingCode = urlParams.get('track') || (window.location.pathname.includes('/s/') ? possibleCode : null);
 
-        if (trackingCode) {
+        if (trackingCode && trackingCode !== 'index.html' && trackingCode !== '') {
             let partners = JSON.parse(localStorage.getItem('walmart_partners')) || [];
             let destinationUrl = "";
             partners.forEach(p => {
