@@ -1,21 +1,218 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyCyRgUFz7YOwa6mjqY9f7YF_DMVZ1U13sY",
-  authDomain: "creators-hub-2e0fd.firebaseapp.com",
-  projectId: "creators-hub-2e0fd",
-  storageBucket: "creators-hub-2e0fd.firebasestorage.app",
-  messagingSenderId: "829787471454",
-  appId: "1:829787471454:web:e5205456d4f7fc466a7ecf",
-  measurementId: "G-E4N3K3RGQP"
-};
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creators Hub - Login & Signup</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            sendPasswordResetEmail, 
+            updateProfile, 
+            onAuthStateChanged, 
+            signOut 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+        // TODO: Replace with your actual Firebase configuration details
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // DOM Elements
+        const authCard = document.getElementById('authCard');
+        const dashboardCard = document.getElementById('dashboardCard');
+        const formTitle = document.getElementById('formTitle');
+        const nameFieldContainer = document.getElementById('nameFieldContainer');
+        const nameInput = document.getElementById('nameInput');
+        const emailInput = document.getElementById('emailInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const toggleText = document.getElementById('toggleText');
+        const toggleBtn = document.getElementById('toggleBtn');
+        const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        
+        // Dashboard Elements
+        const userNameDisplay = document.getElementById('userNameDisplay');
+        const userEmailDisplay = document.getElementById('userEmailDisplay');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        let isLogin = false; // Default mode is Signup
+
+        // Toggle between Login and Signup modes
+        toggleBtn.addEventListener('click', () => {
+            isLogin = !isLogin;
+            errorMessage.classList.add('hidden');
+            successMessage.classList.add('hidden');
+            if (isLogin) {
+                formTitle.innerText = "Log In to Creators Hub";
+                nameFieldContainer.classList.add('hidden');
+                submitBtn.innerText = "Log In";
+                toggleText.innerText = "Don't have an account?";
+                toggleBtn.innerText = "Sign Up";
+                forgotPasswordBtn.classList.remove('hidden');
+            } else {
+                formTitle.innerText = "Create Your Account";
+                nameFieldContainer.classList.remove('hidden');
+                submitBtn.innerText = "Sign Up";
+                toggleText.innerText = "Already have an account?";
+                toggleBtn.innerText = "Log In";
+                forgotPasswordBtn.classList.add('hidden');
+            }
+        });
+
+        // Form Submit Handler (Signup / Login)
+        submitBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            errorMessage.classList.add('hidden');
+            successMessage.classList.add('hidden');
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+            const name = nameInput.value.trim();
+
+            if (!email || !password || (!isLogin && !name)) {
+                errorMessage.innerText = "Please fill in all required fields.";
+                errorMessage.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                if (isLogin) {
+                    // Log In existing user
+                    await signInWithEmailAndPassword(auth, email, password);
+                } else {
+                    // Create new user
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    // Set user's display name
+                    await updateProfile(userCredential.user, { displayName: name });
+                }
+            } catch (error) {
+                errorMessage.innerText = error.message;
+                errorMessage.classList.remove('hidden');
+            }
+        });
+
+        // Forgot Password Handler
+        forgotPasswordBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = emailInput.value.trim();
+            errorMessage.classList.add('hidden');
+            successMessage.classList.add('hidden');
+
+            if (!email) {
+                errorMessage.innerText = "Please enter your email address above to reset your password.";
+                errorMessage.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                await sendPasswordResetEmail(auth, email);
+                successMessage.innerText = "Password reset link sent to your email!";
+                successMessage.classList.remove('hidden');
+            } catch (error) {
+                errorMessage.innerText = error.message;
+                errorMessage.classList.remove('hidden');
+            }
+        });
+
+        // Auth State Observer to switch views automatically
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is logged in, show dashboard with their details
+                authCard.classList.add('hidden');
+                dashboardCard.classList.remove('hidden');
+                userNameDisplay.innerText = user.displayName || "Creators Hub User";
+                userEmailDisplay.innerText = user.email;
+            } else {
+                // User is logged out, show auth form
+                authCard.classList.remove('hidden');
+                dashboardCard.classList.add('hidden');
+                emailInput.value = '';
+                passwordInput.value = '';
+                nameInput.value = '';
+            }
+        });
+
+        // Logout Handler
+        logoutBtn.addEventListener('click', async () => {
+            await signOut(auth);
+        });
+    </script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-md p-6 bg-white rounded-xl shadow-lg m-4">
+        <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">Creators Hub</h1>
+
+        <!-- Error & Success Notifications -->
+        <div id="errorMessage" class="hidden mb-4 p-3 bg-red-100 text-red-700 text-sm rounded-lg"></div>
+        <div id="successMessage" class="hidden mb-4 p-3 bg-green-100 text-green-700 text-sm rounded-lg"></div>
+
+        <!-- Authentication Form Card -->
+        <div id="authCard">
+            <h2 id="formTitle" class="text-xl font-semibold text-gray-700 mb-4 text-center">Create Your Account</h2>
+            
+            <form class="space-y-4">
+                <div id="nameFieldContainer">
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Full Name</label>
+                    <input type="text" id="nameInput" placeholder="Enter your name" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Email Address</label>
+                    <input type="email" id="emailInput" placeholder="Enter your email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Password</label>
+                    <input type="password" id="passwordInput" placeholder="Enter your password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                </div>
+
+                <div class="flex justify-between items-center text-sm">
+                    <button id="forgotPasswordBtn" class="text-purple-600 hover:underline hidden">Forgot Password?</button>
+                </div>
+
+                <button type="submit" id="submitBtn" class="w-full py-2 bg-purple-700 text-white font-semibold rounded-lg hover:bg-purple-800 transition">Sign Up</button>
+            </form>
+
+            <div class="mt-4 text-center text-sm text-gray-600">
+                <span id="toggleText">Already have an account?</span>
+                <button id="toggleBtn" class="text-purple-700 font-semibold ml-1 hover:underline">Log In</button>
+            </div>
+        </div>
+
+        <!-- User Profile Dashboard Card -->
+        <div id="dashboardCard" class="hidden text-center space-y-4">
+            <div class="w-20 h-20 bg-purple-200 text-purple-700 rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-2">👤</div>
+            <h2 class="text-2xl font-bold text-gray-800" id="userNameDisplay">Welcome</h2>
+            <p class="text-gray-600 text-sm" id="userEmailDisplay"></p>
+            
+            <div class="p-4 bg-purple-50 rounded-lg text-left text-sm text-gray-700 space-y-2">
+                <p>✅ Successfully logged in to Creators Hub!</p>
+                <p>⚡ Your authentication and session are active.</p>
+            </div>
+
+            <button id="logoutBtn" class="w-full py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition">Log Out</button>
+        </div>
+    </div>
+
+</body>
+</html>
