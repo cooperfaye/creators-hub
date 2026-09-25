@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creators Hub - Pro Link Generator & Dashboard</title>
+    <title>Creators Hub - Pro Dashboard & Link Generator</title>
     <style>
         * {
             box-sizing: border-box;
@@ -149,7 +149,6 @@
         th {
             color: #777;
         }
-        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -184,9 +183,6 @@
             font-weight: bold;
             cursor: pointer;
             margin-top: 10px;
-        }
-        .modal-content button:hover {
-            background: #3700b3;
         }
         .close-link {
             display: block;
@@ -258,14 +254,13 @@
         </div>
     </div>
 
-    <!-- Auth Modal (Login / Sign Up / Forgot Password) -->
+    <!-- Auth Modal -->
     <div class="modal" id="authModal">
         <div class="modal-content">
             <h2 id="modalTitle">Login</h2>
-            <input type="text" id="userName" placeholder="Full Name (for Sign Up only)" style="display:none;">
+            <input type="text" id="userName" placeholder="Full Name" style="display:none;">
             <input type="email" id="userEmail" placeholder="Enter Email">
             <input type="password" id="userPassword" placeholder="Enter Password">
-            
             <button id="modalActionBtn" onclick="submitAuth()">Login</button>
             <span class="close-link" id="switchModeText" onclick="switchAuthMode()">Don't have an account? Sign Up</span>
             <span class="close-link" onclick="forgotPassword()" style="color:#6200ea; margin-top:5px;">Forgot Password?</span>
@@ -284,13 +279,12 @@
     </div>
 
     <script>
-        // Check redirection and load data on startup
         window.onload = function() {
             const hash = window.location.hash.substring(1);
             if (hash) {
                 let savedLinks = JSON.parse(localStorage.getItem('creators_links') || '{}');
                 if (savedLinks[hash]) {
-                    window.location.href = savedLinks[hash]; // Instant redirect to original product URL
+                    window.location.href = savedLinks[hash];
                     return;
                 }
             }
@@ -364,7 +358,6 @@
                         return;
                     }
                 } else {
-                    // Quick fallback registration if user doesn't exist
                     let userData = { name: email.split('@')[0], email: email, password: password };
                     localStorage.setItem('creators_user_' + email, JSON.stringify(userData));
                     localStorage.setItem('creators_logged_in', email);
@@ -385,7 +378,7 @@
                     if (newPass) {
                         userObj.password = newPass;
                         localStorage.setItem('creators_user_' + email, JSON.stringify(userObj));
-                        alert('Password successfully reset! You can now log in.');
+                        alert('Password successfully reset!');
                     }
                 } else {
                     alert('No account found with this email.');
@@ -459,7 +452,6 @@
             savedLinks[randomCode] = urlInput;
             localStorage.setItem('creators_links', JSON.stringify(savedLinks));
 
-            // Save list for display table
             let linkHistory = JSON.parse(localStorage.getItem('creators_history') || '[]');
             linkHistory.unshift({ original: urlInput, code: randomCode, clicks: 0 });
             localStorage.setItem('creators_history', JSON.stringify(linkHistory));
@@ -481,9 +473,7 @@
             let linkHistory = JSON.parse(localStorage.getItem('creators_history') || '[]');
             let tableBody = document.getElementById('linkTableBody');
             
-            let html = '';
-            // Default demo row + user items
-            html += `<tr><td>walmart.com/search?id=50...</td><td>#zutotf</td><td>342</td></tr>`;
+            let html = `<tr><td>walmart.com/search?id=50...</td><td>#zutotf</td><td>342</td></tr>`;
             
             linkHistory.forEach(item => {
                 html += `<tr>
