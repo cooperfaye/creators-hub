@@ -47,7 +47,6 @@
             max-width: 900px;
             margin: 0 auto;
         }
-        /* Dashboard Cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -71,7 +70,6 @@
             font-weight: bold;
             color: #333;
         }
-        /* Link Generator Box */
         .generator-box {
             background: white;
             padding: 25px;
@@ -114,7 +112,6 @@
             display: none;
             word-break: break-all;
         }
-        /* History / Links Table */
         .history-box {
             background: white;
             padding: 25px;
@@ -204,16 +201,38 @@
     </div>
 
     <script>
+        // Check if page opened via a short link (Redirect logic)
+        window.onload = function() {
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                let savedLinks = JSON.parse(localStorage.getItem('creators_links') || '{}');
+                if (savedLinks[hash]) {
+                    window.location.href = savedLinks[hash]; // Redirect to original product URL
+                }
+            }
+        };
+
         function generateLink() {
-            const urlInput = document.getElementById('longUrl').value;
+            let urlInput = document.getElementById('longUrl').value.trim();
             if(!urlInput) {
                 alert('Please enter a link first!');
                 return;
             }
             
+            // Ensure URL has http/https
+            if (!urlInput.startsWith('http://') && !urlInput.startsWith('https://')) {
+                urlInput = 'https://' + urlInput;
+            }
+            
             // Generate random short code
-            const randomCode = '#' + Math.random().toString(36).substring(2, 8);
-            const fullShortUrl = window.location.origin + '/' + randomCode;
+            const randomCode = 'L' + Math.random().toString(36).substring(2, 8);
+            
+            // Save mapping in localStorage so redirection works
+            let savedLinks = JSON.parse(localStorage.getItem('creators_links') || '{}');
+            savedLinks[randomCode] = urlInput;
+            localStorage.setItem('creators_links', JSON.stringify(savedLinks));
+
+            const fullShortUrl = window.location.origin + '/#' + randomCode;
 
             // Show result box
             const resultBox = document.getElementById('resultBox');
@@ -226,7 +245,7 @@
             const newRow = document.createElement('tr');
             newRow.innerHTML = `
                 <td>${urlInput.substring(0, 30)}...</td>
-                <td>${randomCode}</td>
+                <td>#${randomCode}</td>
                 <td>0</td>
             `;
             tableBody.prepend(newRow);
