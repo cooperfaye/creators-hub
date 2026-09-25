@@ -140,7 +140,7 @@
             if (user) {
                 authCard.classList.add('hidden');
                 dashboardView.classList.remove('hidden');
-                const displayName = user.displayName || "Jockey";
+                const displayName = user.displayName || "User";
                 welcomeUserDisplay.innerText = displayName;
                 profileNameDisplay.innerText = displayName;
                 profileEmailDisplay.innerText = user.email;
@@ -219,7 +219,6 @@
                 <span class="font-bold text-gray-800">Creators Hub</span>
             </div>
             <div class="flex items-center space-x-2">
-                <!-- Settings Button (Top Right) -->
                 <button id="settingsBtn" class="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 transition" title="Settings">
                     ⚙️
                 </button>
@@ -249,9 +248,9 @@
         </div>
 
         <!-- Welcome Greeting -->
-        <h2 class="text-xl font-bold text-gray-900 pt-2">Welcome, <span id="welcomeUserDisplay">Jockey</span>!</h2>
+        <h2 class="text-xl font-bold text-gray-900 pt-2">Welcome, <span id="welcomeUserDisplay">User</span>!</h2>
 
-        <!-- Quick Stats Section -->
+        <!-- Quick Stats Section (Cleared) -->
         <div class="bg-white p-4 rounded-xl shadow-sm space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="font-bold text-gray-800">Quick Stats</h3>
@@ -263,23 +262,23 @@
                 </div>
             </div>
 
-            <!-- Stats Grid -->
+            <!-- Stats Grid (Set to 0) -->
             <div class="grid grid-cols-2 gap-3">
                 <div class="p-3 border rounded-xl bg-gray-50">
                     <p class="text-xs text-gray-500">Sales</p>
-                    <p class="text-lg font-bold text-gray-800">$753.80</p>
+                    <p class="text-lg font-bold text-gray-800">$0.00</p>
                 </div>
                 <div class="p-3 border rounded-xl bg-gray-50">
                     <p class="text-xs text-gray-500">Commission</p>
-                    <p class="text-lg font-bold text-gray-800">$21.45</p>
+                    <p class="text-lg font-bold text-gray-800">$0.00</p>
                 </div>
                 <div class="p-3 border rounded-xl bg-gray-50">
                     <p class="text-xs text-gray-500">Clicks</p>
-                    <p class="text-lg font-bold text-gray-800">221</p>
+                    <p class="text-lg font-bold text-gray-800">0</p>
                 </div>
                 <div class="p-3 border rounded-xl bg-gray-50">
                     <p class="text-xs text-gray-500">Conversion</p>
-                    <p class="text-lg font-bold text-gray-800">3.17%</p>
+                    <p class="text-lg font-bold text-gray-800">0.00%</p>
                 </div>
             </div>
         </div>
@@ -291,7 +290,7 @@
         </div>
     </div>
 
-    <!-- Settings Modal (Popup when clicking gear icon) -->
+    <!-- Settings Modal -->
     <div id="settingsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div class="bg-white w-full max-w-sm p-6 rounded-2xl shadow-xl space-y-4 relative">
             <div class="flex justify-between items-center border-b pb-3">
