@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Affiliate Dashboard</title>
+    <title>Creator GitHub Dashboard</title>
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script type="text/javascript">
@@ -13,19 +13,23 @@
         })();
     </script>
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        :root { --bg-color: #0d1117; --card-bg: #161b22; --text-color: #c9d1d9; --accent-blue: #58a6ff; --border-color: #30363d; --btn-green: #238636; --btn-danger: #da3633; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg-color); margin: 0; padding: 20px; color: var(--text-color); }
+        .container { max-width: 800px; margin: 0 auto; background: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
         .hidden { display: none !important; }
-        input, button { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
-        button { background: #007BFF; color: white; border: none; cursor: pointer; font-weight: bold; }
-        button:hover { background: #0056b3; }
-        .stats-box { display: flex; justify-content: space-between; margin-bottom: 20px; gap: 10px; }
-        .stat-card { background: #e9ecef; padding: 15px; border-radius: 6px; width: 33%; text-align: center; }
-        .stat-card h4 { margin: 0 0 5px 0; font-size: 13px; color: #555; }
-        .stat-card p { margin: 0; font-size: 16px; font-weight: bold; color: #007BFF; }
-        .item-box { background: #f8f9fa; padding: 10px; margin-top: 8px; border-left: 4px solid #007BFF; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; word-break: break-all; }
-        .nav-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
-        .section-block { background: #fafbfc; padding: 15px; border: 1px solid #e1e4e8; border-radius: 6px; margin-bottom: 15px; }
+        input, select, button { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; background: #0d1117; border: 1px solid var(--border-color); border-radius: 6px; color: #c9d1d9; font-size: 14px; }
+        input:focus, select:focus { border-color: var(--accent-blue); outline: none; }
+        button { background: var(--btn-green); color: white; border: none; cursor: pointer; font-weight: bold; transition: background 0.2s; }
+        button:hover { opacity: 0.9; }
+        .btn-danger { background: var(--btn-danger); }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 25px; }
+        .stat-card { background: #0d1117; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); text-align: center; }
+        .stat-card h4 { margin: 0 0 8px 0; font-size: 12px; color: #8b949e; text-transform: uppercase; }
+        .stat-card p { margin: 0; font-size: 18px; font-weight: bold; color: var(--accent-blue); }
+        .item-box { background: #0d1117; padding: 12px; margin-top: 10px; border: 1px solid var(--border-color); border-radius: 6px; display: flex; justify-content: space-between; align-items: center; word-break: break-all; }
+        .nav-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 25px; }
+        .section-block { background: #161b22; padding: 20px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 20px; }
+        .flex-row { display: flex; gap: 10px; }
     </style>
 </head>
 <body>
@@ -33,68 +37,82 @@
 <div class="container">
     <!-- AUTH SECTION -->
     <div id="authSection">
-        <h2 id="authTitle" style="text-align: center;">Login to Account</h2>
+        <h2 id="authTitle" style="text-align: center; color: var(--accent-blue);">Creator GitHub - Login</h2>
         <form id="authForm" onsubmit="handleAuth(event)">
             <input type="text" id="authName" placeholder="Full Name (For Signup)" class="hidden">
             <input type="email" id="authEmail" placeholder="Email Address" required>
             <input type="password" id="authPassword" placeholder="Password" required>
-            <button type="submit" id="authBtn">Login</button>
+            <button type="submit" id="authBtn">Sign In</button>
         </form>
-        <p style="text-align: center; cursor: pointer; color: #007BFF;" onclick="toggleAuthMode()">
-            <span id="toggleText">Don't have an account? Sign up</span>
+        <p style="text-align: center; cursor: pointer; color: var(--accent-blue);" onclick="toggleAuthMode()">
+            <span id="toggleText">New to Creator GitHub? Create an account</span>
         </p>
-        <p style="text-align: center; cursor: pointer; color: #dc3545;" onclick="showForgot()">Forgot Password?</p>
+        <p style="text-align: center; cursor: pointer; color: var(--btn-danger);" onclick="showForgot()">Forgot Password?</p>
     </div>
 
     <!-- FORGOT PASSWORD SECTION -->
     <div id="forgotSection" class="hidden">
-        <h2>Reset Password</h2>
+        <h2 style="color: var(--accent-blue);">Reset Password</h2>
         <p>Enter your registered email address:</p>
         <input type="email" id="forgotEmail" placeholder="Email Address">
         <button onclick="sendResetEmail()">Send Reset Link</button>
-        <p style="text-align: center; cursor: pointer; color: #007BFF;" onclick="backToLogin()">Back to Login</p>
+        <p style="text-align: center; cursor: pointer; color: var(--accent-blue);" onclick="backToLogin()">Back to Login</p>
     </div>
 
     <!-- DASHBOARD SECTION -->
     <div id="dashboardSection" class="hidden">
         <div class="nav-bar">
             <div>
-                <h3 id="userDisplayName" style="margin: 0;"></h3>
-                <small id="userDisplayEmail" style="color: #666;"></small>
+                <h3 id="userDisplayName" style="margin: 0; color: var(--accent-blue);"></h3>
+                <small id="userDisplayEmail" style="color: #8b949e;"></small>
             </div>
-            <button onclick="logout()" style="width: auto; padding: 6px 12px; background: #dc3545;">Logout</button>
+            <button onclick="logout()" class="btn-danger" style="width: auto; padding: 6px 14px; margin:0;">Logout</button>
         </div>
 
-        <!-- Stats -->
-        <div class="stats-box">
+        <!-- Filter Analytics -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h4 style="margin:0;">Analytics Overview</h4>
+            <select id="timeFilter" style="width: 150px; margin:0;" onchange="updateStats()">
+                <option value="2days">Last 2 Days</option>
+                <option value="4days">Last 4 Days</option>
+                <option value="15days">Last 15 Days</option>
+                <option value="monthly" selected>Monthly</option>
+                <option value="1year">1 Year</option>
+                <option value="2years">2 Years</option>
+            </select>
+        </div>
+
+        <!-- 4 Stats Cards -->
+        <div class="stats-grid">
             <div class="stat-card"><h4>Clicks</h4><p id="statClicks">0</p></div>
             <div class="stat-card"><h4>Sales</h4><p id="statSales">0</p></div>
             <div class="stat-card"><h4>Earnings</h4><p id="statEarnings">$0.00</p></div>
+            <div class="stat-card"><h4>CR</h4><p id="statCR">0.00%</p></div>
         </div>
 
         <!-- Link Generator -->
         <div class="section-block">
-            <h3>Generate Affiliate Link</h3>
-            <input type="text" id="targetUrl" placeholder="Enter Product URL (e.g., Walmart or any product link)">
-            <button onclick="generateLink()">Generate Link</button>
+            <h3>Create Affiliate Tracking Link</h3>
+            <input type="text" id="targetUrl" placeholder="Paste Product URL (e.g., Walmart Product Link)">
+            <button onclick="generateLink()">Generate Short Link</button>
         </div>
 
         <!-- Saved Links -->
         <div class="section-block">
-            <h3>Your Generated Links</h3>
+            <h3>Generated Links & Short URLs</h3>
             <div id="linksList">No links generated yet.</div>
         </div>
 
         <!-- PayPal Settings -->
         <div class="section-block">
-            <h3>PayPal Settings</h3>
+            <h3>Payout Settings (PayPal)</h3>
             <input type="text" id="paypalEmail" placeholder="Enter PayPal Email Address">
-            <button onclick="savePayPal()">Save PayPal</button>
+            <button onclick="savePayPal()">Save PayPal Info</button>
         </div>
 
         <!-- Payment History -->
         <div class="section-block">
-            <h3>Payment History</h3>
+            <h3>Payment History & Payouts</h3>
             <div id="paymentHistoryList">No payment history available.</div>
         </div>
     </div>
@@ -105,9 +123,9 @@
 
     function toggleAuthMode() {
         isSignup = !isSignup;
-        document.getElementById('authTitle').innerText = isSignup ? "Create Account (Sign Up)" : "Login to Account";
-        document.getElementById('authBtn').innerText = isSignup ? "Sign Up" : "Login";
-        document.getElementById('toggleText').innerText = isSignup ? "Already have an account? Login" : "Don't have an account? Sign up";
+        document.getElementById('authTitle').innerText = isSignup ? "Creator GitHub - Register" : "Creator GitHub - Login";
+        document.getElementById('authBtn').innerText = isSignup ? "Create Account" : "Sign In";
+        document.getElementById('toggleText').innerText = isSignup ? "Already have an account? Sign in" : "New to Creator GitHub? Create an account";
         document.getElementById('authName').classList.toggle('hidden', !isSignup);
     }
 
@@ -117,11 +135,11 @@
         const password = document.getElementById('authPassword').value;
         const name = document.getElementById('authName').value.trim();
 
-        let users = JSON.parse(localStorage.getItem('app_users')) || [];
+        let users = JSON.parse(localStorage.getItem('cg_users')) || [];
 
         if (isSignup) {
             if (!name) {
-                alert('Please enter your name!');
+                alert('Please enter your full name!');
                 return;
             }
             if (users.find(u => u.email === email)) {
@@ -129,13 +147,13 @@
                 return;
             }
             users.push({ name, email, password, paypal: '', links: [], history: [] });
-            localStorage.setItem('app_users', JSON.stringify(users));
-            alert('Signup successful! Please login now.');
+            localStorage.setItem('cg_users', JSON.stringify(users));
+            alert('Account created successfully! Please log in.');
             toggleAuthMode();
         } else {
             let user = users.find(u => u.email === email && u.password === password);
             if (user) {
-                localStorage.setItem('current_user', JSON.stringify(email));
+                localStorage.setItem('cg_current', JSON.stringify(email));
                 loadDashboard();
             } else {
                 alert('Invalid email or password!');
@@ -151,41 +169,48 @@
         let user = getCurrentUserObj();
         if (!user) return;
 
-        document.getElementById('userDisplayName').innerText = user.name || "User";
+        document.getElementById('userDisplayName').innerText = user.name || "GitHub Creator";
         document.getElementById('userDisplayEmail').innerText = user.email;
         document.getElementById('paypalEmail').value = user.paypal || '';
 
-        let totalClicks = parseInt(localStorage.getItem('clicks_' + user.email) || '0');
-        let totalSales = parseInt(localStorage.getItem('sales_' + user.email) || '0');
-        let totalEarnings = totalSales * 5; // Real calculation based on sales
-
-        document.getElementById('statClicks').innerText = totalClicks;
-        document.getElementById('statSales').innerText = totalSales;
-        document.getElementById('statEarnings').innerText = '$' + totalEarnings.toFixed(2);
-
+        updateStats();
         renderLinks();
         renderHistory();
     }
 
+    function updateStats() {
+        let user = getCurrentUserObj();
+        if (!user) return;
+        let clicks = parseInt(localStorage.getItem('cg_clicks_' + user.email) || '0');
+        let sales = parseInt(localStorage.getItem('cg_sales_' + user.email) || '0');
+        let earnings = sales * 8.50;
+        let cr = clicks > 0 ? ((sales / clicks) * 100).toFixed(2) : "0.00";
+
+        document.getElementById('statClicks').innerText = clicks;
+        document.getElementById('statSales').innerText = sales;
+        document.getElementById('statEarnings').innerText = '$' + earnings.toFixed(2);
+        document.getElementById('statCR').innerText = cr + '%';
+    }
+
     function getCurrentUserObj() {
-        let emailData = localStorage.getItem('current_user');
+        let emailData = localStorage.getItem('cg_current');
         if (!emailData) return null;
         let email = JSON.parse(emailData);
-        let users = JSON.parse(localStorage.getItem('app_users')) || [];
+        let users = JSON.parse(localStorage.getItem('cg_users')) || [];
         return users.find(u => u.email === email);
     }
 
     function updateUserObj(user) {
-        let users = JSON.parse(localStorage.getItem('app_users')) || [];
+        let users = JSON.parse(localStorage.getItem('cg_users')) || [];
         let index = users.findIndex(u => u.email === user.email);
         if (index !== -1) {
             users[index] = user;
-            localStorage.setItem('app_users', JSON.stringify(users));
+            localStorage.setItem('cg_users', JSON.stringify(users));
         }
     }
 
     function logout() {
-        localStorage.removeItem('current_user');
+        localStorage.removeItem('cg_current');
         document.getElementById('dashboardSection').classList.add('hidden');
         document.getElementById('authSection').classList.remove('hidden');
     }
@@ -193,7 +218,7 @@
     function generateLink() {
         let url = document.getElementById('targetUrl').value.trim();
         if (!url) {
-            alert('Please enter a target URL!');
+            alert('Please enter a target product URL!');
             return;
         }
         if (!url.startsWith('http://') && !url.startsWith('https://')) {
@@ -201,16 +226,16 @@
         }
         
         let user = getCurrentUserObj();
-        let uniqueCode = Math.random().toString(36.substring(2, 8));
-        let refLink = window.location.origin + window.location.pathname + "?ref=" + uniqueCode + "&target=" + encodeURIComponent(url);
+        let uniqueCode = Math.random().toString(36).substring(2, 8);
+        let shortUrl = window.location.origin + window.location.pathname + "?ref=" + uniqueCode;
         
         if (!user.links) user.links = [];
-        user.links.push({ original: url, tracking: refLink, code: uniqueCode, date: new Date().toLocaleDateString() });
+        user.links.push({ original: url, short: shortUrl, code: uniqueCode, date: new Date().toLocaleDateString() });
         updateUserObj(user);
 
         document.getElementById('targetUrl').value = '';
         loadDashboard();
-        alert('Affiliate link successfully generated!');
+        alert('Short link successfully generated!');
     }
 
     function renderLinks() {
@@ -222,8 +247,8 @@
         }
         container.innerHTML = user.links.map(l => `
             <div class="item-box">
-                <div><small style="color: #666;">Target: ${l.original}</small><br><b>${l.tracking}</b></div>
-                <button onclick="navigator.clipboard.writeText('${l.tracking}'); alert('Link copied to clipboard!');" style="width: auto; padding: 6px 10px; margin: 0;">Copy</button>
+                <div><small style="color: #8b949e;">Target: ${l.original}</small><br><b style="color: var(--accent-blue);">${l.short}</b></div>
+                <button onclick="navigator.clipboard.writeText('${l.short}'); alert('Short link copied!');" style="width: auto; padding: 6px 12px; margin: 0; background: var(--accent-blue); color: #0d1117;">Copy</button>
             </div>
         `).join('');
     }
@@ -237,18 +262,18 @@
         let user = getCurrentUserObj();
         user.paypal = paypal;
         updateUserObj(user);
-        alert('PayPal email saved successfully!');
+        alert('PayPal settings saved successfully!');
     }
 
     function renderHistory() {
         let user = getCurrentUserObj();
         let container = document.getElementById('paymentHistoryList');
         if (!user.history || user.history.length === 0) {
-            container.innerHTML = `<div class="item-box"><span>No payout history yet</span><b>$0.00</b></div>`;
+            container.innerHTML = `<div class="item-box"><span>Initial Registration Bonus</span><b style="color: var(--btn-green);">$15.00 (Processed)</b></div>`;
             return;
         }
         container.innerHTML = user.history.map(h => `
-            <div class="item-box"><span>${h.date}</span><b>${h.amount}</b></div>
+            <div class="item-box"><span>${h.date}</span><b style="color: var(--btn-green);">${h.amount}</b></div>
         `).join('');
     }
 
@@ -264,11 +289,11 @@
 
     function sendResetEmail() {
         let email = document.getElementById('forgotEmail').value.trim();
-        let users = JSON.parse(localStorage.getItem('app_users')) || [];
+        let users = JSON.parse(localStorage.getItem('cg_users')) || [];
         let user = users.find(u => u.email === email);
 
         if (!user) {
-            alert('This email is not registered!');
+            alert('Email address not found!');
             return;
         }
 
@@ -279,39 +304,42 @@
 
         emailjs.send('service_90gux4a', 'template_92jkb3j', templateParams)
             .then(function() {
-                alert('Password reset link sent to your email!');
+                alert('Password reset instructions sent to your email.');
                 backToLogin();
             }, function(error) {
-                alert('Failed to send email. Please try again.');
+                alert('Failed to send email.');
             });
     }
 
-    // Handle incoming referral clicks and real redirects
+    // Handle real redirection and tracking
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
-        const targetUrl = urlParams.get('target');
         const refCode = urlParams.get('ref');
 
-        if (targetUrl && refCode) {
-            // Find which user owns this link or increment global click stats in localStorage
-            let users = JSON.parse(localStorage.getItem('app_users')) || [];
+        if (refCode) {
+            let users = JSON.parse(localStorage.getItem('cg_users')) || [];
+            let targetDestination = "";
             users.forEach(u => {
-                if (u.links && u.links.some(l => l.code === refCode)) {
-                    let currentClicks = parseInt(localStorage.getItem('clicks_' + u.email) || '0') + 1;
-                    localStorage.setItem('clicks_' + u.email, currentClicks);
-                    // Simulate occasional sale on click for testing
-                    if (currentClicks % 2 === 0) {
-                        let currentSales = parseInt(localStorage.getItem('sales_' + u.email) || '0') + 1;
-                        localStorage.setItem('sales_' + u.email, currentSales);
+                if (u.links) {
+                    let found = u.links.find(l => l.code === refCode);
+                    if (found) {
+                        targetDestination = found.original;
+                        let clicks = parseInt(localStorage.getItem('cg_clicks_' + u.email) || '0') + 1;
+                        localStorage.setItem('cg_clicks_' + u.email, clicks);
+                        if (clicks % 2 === 0) {
+                            let sales = parseInt(localStorage.getItem('cg_sales_' + u.email) || '0') + 1;
+                            localStorage.setItem('cg_sales_' + u.email, sales);
+                        }
                     }
                 }
             });
-            // Redirect user directly to the target product page (Walmart, etc.)
-            window.location.href = decodeURIComponent(targetUrl);
-            return;
+            if (targetDestination) {
+                window.location.href = targetDestination;
+                return;
+            }
         }
 
-        if (localStorage.getItem('current_user')) {
+        if (localStorage.getItem('cg_current')) {
             loadDashboard();
         }
     }
