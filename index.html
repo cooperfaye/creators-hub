@@ -4,552 +4,743 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creators Hub - Pro Dashboard</title>
+    <title>Creators Hub - Mavely Style Dashboard</title>
     <style>
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --accent: #06b6d4;
-            --bg-color: #0b0f19;
-            --card-bg: #111827;
-            --text-main: #f9fafb;
-            --text-muted: #9ca3af;
-            --border: #1f2937;
+            --bg-main: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --primary: #7c3aed;
+            --primary-hover: #6d28d9;
+            --border-color: #e2e8f0;
             --success: #10b981;
         }
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
         }
         body {
-            background-color: var(--bg-color);
+            background-color: var(--bg-main);
             color: var(--text-main);
-            padding: 20px;
-            min-height: 100vh;
+            padding-bottom: 40px;
         }
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-        /* Header & Professional Logo Styling */
-        header {
+        
+        /* Top Mavely Navbar */
+        .mavely-nav {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 20px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            background: var(--card-bg);
-            padding: 20px 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
-            margin-bottom: 25px;
-            border: 1px solid var(--border);
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
         }
-        .logo-area {
+        .nav-left {
             display: flex;
             align-items: center;
             gap: 15px;
         }
-        .brand-logo {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, #6366f1, #06b6d4);
-            border-radius: 12px;
+        .menu-icon {
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-main);
+        }
+        .brand-logo-box {
+            background: #000;
+            color: #fff;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 8px 20px -4px rgba(99, 102, 241, 0.5);
-            position: relative;
-            overflow: hidden;
+            font-weight: 900;
+            border-radius: 6px;
+            font-size: 18px;
         }
-        .brand-logo::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
-            transform: rotate(30deg);
-        }
-        .brand-logo svg {
-            width: 26px;
-            height: 26px;
-            fill: #ffffff;
-            z-index: 1;
-        }
-        .brand-title {
+        .nav-url-box {
+            flex: 1;
+            max-width: 450px;
             display: flex;
-            flex-direction: column;
+            background: #f1f5f9;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
         }
-        .brand-title h1 {
-            font-size: 20px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            background: linear-gradient(135deg, #f9fafb, #9ca3af);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .nav-url-box input {
+            flex: 1;
+            padding: 9px 14px;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 14px;
+            color: var(--text-main);
         }
-        .brand-title span {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        .header-right {
+        .nav-url-btn {
+            background: var(--primary);
+            border: none;
+            color: white;
+            padding: 0 16px;
+            cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 12px;
-        }
-        .btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.2s ease;
-        }
-        .btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-        .icon-btn {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            padding: 10px 14px;
-            border-radius: 10px;
-            cursor: pointer;
+            justify-content: center;
             font-size: 16px;
-            transition: all 0.2s;
+            transition: background 0.2s;
         }
-        .icon-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
+        .nav-url-btn:hover {
+            background: var(--primary-hover);
         }
 
-        /* Analytics Stats Grid */
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        /* Welcome text */
+        .welcome-header {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        /* Quick Stats Card */
+        .stats-card-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            margin-bottom: 20px;
+        }
+        .stats-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .stats-top h2 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .time-filters {
+            display: flex;
+            background: #f1f5f9;
+            padding: 3px;
+            border-radius: 8px;
+            gap: 2px;
+        }
+        .time-btn {
+            background: transparent;
+            border: none;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 6px;
+        }
+        .time-btn.active {
+            background: #ffffff;
+            color: var(--primary);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
         }
-        .stat-card {
-            background: var(--card-bg);
-            padding: 24px;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--border);
-            position: relative;
-            overflow: hidden;
+        .stat-item {
+            background: #fafafa;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 10px;
         }
-        .stat-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: var(--primary);
-        }
-        .stat-card:nth-child(2)::after { background: var(--accent); }
-        .stat-card:nth-child(3)::after { background: var(--success); }
-        
-        .stat-card h3 {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
+        .stat-item span {
+            font-size: 13px;
             color: var(--text-muted);
-            margin-bottom: 8px;
+            display: block;
+            margin-bottom: 5px;
         }
-        .stat-card p {
-            font-size: 30px;
+        .stat-item h3 {
+            font-size: 20px;
             font-weight: 700;
             color: var(--text-main);
         }
 
-        /* Card Box */
-        .card-box {
-            background: var(--card-bg);
-            padding: 25px 30px;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
-            margin-bottom: 25px;
-            border: 1px solid var(--border);
-        }
-        .card-box h2 {
-            font-size: 18px;
-            margin-bottom: 18px;
-            font-weight: 600;
-        }
-        .input-group {
-            display: flex;
-            gap: 12px;
-        }
-        input[type="text"], input[type="email"], input[type="password"] {
-            flex: 1;
-            padding: 13px 16px;
-            background: rgba(15, 23, 42, 0.5);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text-main);
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        input:focus {
-            border-color: var(--primary);
-        }
+        /* Result Link Box */
         .result-box {
-            margin-top: 15px;
+            background: #f5f3ff;
+            border: 1px solid #ddd6fe;
             padding: 15px;
-            background: rgba(99, 102, 241, 0.08);
-            border: 1px solid rgba(99, 102, 241, 0.2);
             border-radius: 10px;
+            margin-bottom: 20px;
             display: none;
             align-items: center;
             justify-content: space-between;
-            gap: 10px;
         }
-        .result-text {
-            word-break: break-all;
-            font-size: 14px;
-        }
-        .result-text a {
-            color: var(--accent);
-            text-decoration: none;
+        .result-box a {
+            color: var(--primary);
             font-weight: 600;
-        }
-        .result-text a:hover {
-            text-decoration: underline;
+            word-break: break-all;
+            text-decoration: none;
         }
         .copy-btn {
-            background: var(--accent);
-            color: #000;
+            background: var(--primary);
+            color: #fff;
             border: none;
             padding: 8px 14px;
-            border-radius: 8px;
-            font-weight: 600;
+            border-radius: 6px;
+            font-size: 12px;
             cursor: pointer;
-            font-size: 13px;
+            font-weight: 600;
             white-space: nowrap;
-            transition: opacity 0.2s;
-        }
-        .copy-btn:hover {
-            opacity: 0.9;
         }
 
-        /* Table Styling */
+        /* Trending Brands Section */
+        .section-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .section-box h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        .brands-flex {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        .brand-pill {
+            min-width: 130px;
+            background: #fafafa;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px 10px;
+            text-align: center;
+        }
+        .brand-circle {
+            width: 45px;
+            height: 45px;
+            background: #0047ab;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px auto;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .brand-pill p {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+        .brand-pill span {
+            font-size: 10px;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 5px;
+            margin-top: 10px;
         }
         th, td {
-            padding: 13px 15px;
+            padding: 12px;
             text-align: left;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid var(--border-color);
             font-size: 13px;
         }
         th {
             color: var(--text-muted);
+            background: #f8fafc;
             font-weight: 600;
-            background: rgba(15, 23, 42, 0.3);
-        }
-        tr:hover td {
-            background: rgba(255, 255, 255, 0.01);
         }
 
-        /* Modals */
+        /* Modals (Account, Settings, Auth) */
         .modal {
             display: none;
             position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(3px);
             z-index: 100;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(11, 15, 25, 0.8);
-            backdrop-filter: blur(5px);
             justify-content: center;
             align-items: center;
         }
         .modal-content {
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 18px;
-            width: 100%;
+            background: #ffffff;
+            width: 90%;
             max-width: 400px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
-            border: 1px solid var(--border);
-            text-align: center;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
         .modal-content h2 {
-            margin-bottom: 18px;
-            font-size: 20px;
+            font-size: 18px;
+            margin-bottom: 15px;
         }
-        .modal-content input {
-            width: 100%;
+        .form-group {
             margin-bottom: 12px;
+            text-align: left;
         }
-        .modal-content button.btn {
-            width: 100%;
-            padding: 12px;
-            margin-top: 5px;
-        }
-        .auth-switch, .forgot-link {
-            display: block;
-            margin-top: 12px;
+        .form-group label {
+            font-size: 12px;
             color: var(--text-muted);
+            display: block;
+            margin-bottom: 4px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+        .btn-main {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 11px;
+            border-radius: 8px;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 13px;
+            margin-top: 10px;
         }
-        .auth-switch:hover, .forgot-link:hover {
+        .btn-main:hover {
+            background: var(--primary-hover);
+        }
+        .sidebar-menu {
+            position: fixed;
+            left: -280px;
+            top: 0;
+            width: 280px;
+            height: 100%;
+            background: white;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+            z-index: 200;
+            transition: left 0.3s ease;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .sidebar-menu.open {
+            left: 0;
+        }
+        .sidebar-item {
+            font-size: 15px;
+            font-weight: 600;
             color: var(--text-main);
+            cursor: pointer;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
         }
-        .forgot-link {
-            color: var(--accent);
+        .sidebar-item:hover {
+            color: var(--primary);
         }
     </style>
 </head>
 <body>
 
+    <!-- Mavely Navbar with URL shortener -->
+    <div class="mavely-nav">
+        <div class="nav-left">
+            <div class="menu-icon" onclick="toggleSidebar()">☰</div>
+            <div class="brand-logo-box">L</div>
+        </div>
+        <div class="nav-url-box">
+            <input type="text" id="longUrl" placeholder="Enter URL (e.g. Walmart product link)">
+            <button class="nav-url-btn" onclick="generateLink()">🔗</button>
+        </div>
+    </div>
+
+    <!-- Sidebar Menu -->
+    <div class="sidebar-menu" id="sidebarMenu">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 id="sidebarUserName">My Account</h3>
+            <span onclick="toggleSidebar()" style="cursor: pointer; font-size: 18px;">✕</span>
+        </div>
+        <div class="sidebar-item" onclick="openAccountSettings()">Account Settings</div>
+        <div class="sidebar-item" onclick="scrollToSection('linksSection')">My Links</div>
+        <div class="sidebar-item" onclick="scrollToSection('paymentSection')">Earnings & Payouts</div>
+        <div class="sidebar-item" onclick="handleLogout()" style="color: #ef4444;">Sign Out</div>
+    </div>
+
     <div class="container">
-        <!-- Header Section with Custom Logo -->
-        <header>
-            <div class="logo-area">
-                <div class="brand-logo">
-                    <!-- Modern Link & Rocket Icon SVG -->
-                    <svg viewBox="0 0 24 24">
-                        <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
-                    </svg>
+        
+        <!-- Welcome Greeting -->
+        <div class="welcome-header" id="welcomeText">Welcome, Creator!</div>
+
+        <!-- Result Box -->
+        <div class="result-box" id="resultBox">
+            <div>
+                <span style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 2px;">Smart Link Generated:</span>
+                <span id="shortLinkOutput"></span>
+            </div>
+            <button class="copy-btn" onclick="copyShortLink()">Copy Link</button>
+        </div>
+
+        <!-- Quick Stats Widget -->
+        <div class="stats-card-box">
+            <div class="stats-top">
+                <h2>Quick Stats</h2>
+                <div class="time-filters">
+                    <button class="time-btn active">MTD</button>
                 </div>
-                <div class="brand-title">
-                    <h1>Creators Hub</h1>
-                    <span>Pro Dashboard</span>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span>Sales</span>
+                    <h3 id="totalSales">$753.80</h3>
+                </div>
+                <div class="stat-item">
+                    <span>Commission</span>
+                    <h3 id="totalCommission">$0.00</h3>
+                </div>
+                <div class="stat-item">
+                    <span>Clicks</span>
+                    <h3 id="totalClicks">0</h3>
+                </div>
+                <div class="stat-item">
+                    <span>Conversion</span>
+                    <h3>3.07%</h3>
                 </div>
             </div>
-            <div class="header-right">
-                <button class="icon-btn" onclick="openSettings()" title="Settings">⚙️</button>
-                <button class="btn" onclick="handleAuthClick()" id="authBtn">Login / Sign Up</button>
-            </div>
-        </header>
-
-        <!-- Clean Analytics Stats Grid -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3>Total Clicks</h3>
-                <p id="totalClicks">0</p>
-            </div>
-            <div class="stat-card">
-                <h3>Active Links</h3>
-                <p id="activeLinks">0</p>
-            </div>
-            <div class="stat-card">
-                <h3>Total Earnings</h3>
-                <p id="totalEarnings">$0.00</p>
-            </div>
         </div>
 
-        <!-- Link Generator Box -->
-        <div class="card-box">
-            <h2>🔗 Mavely-Style Smart Link Shortener</h2>
-            <div class="input-group">
-                <input type="text" id="longUrl" placeholder="Paste your product link here (e.g., Walmart, Amazon)...">
-                <button class="btn" onclick="generateLink()">Generate</button>
-            </div>
-            <div class="result-box" id="resultBox">
-                <div class="result-text">
-                    <strong>Smart Link:</strong><br>
-                    <span id="shortLinkOutput"></span>
+        <!-- Trending Brands -->
+        <div class="section-box">
+            <h3>Trending Brands</h3>
+            <div class="brands-flex">
+                <div class="brand-pill">
+                    <div class="brand-circle" style="background:#000;">MK</div>
+                    <p>Michael Kors</p>
+                    <span>Up to 10%</span>
                 </div>
-                <button class="copy-btn" onclick="copyShortLink()">Copy Link</button>
+                <div class="brand-pill">
+                    <div class="brand-circle" style="background:#0071dc;">WM</div>
+                    <p>Walmart</p>
+                    <span>$60 / $7 Com.</span>
+                </div>
+                <div class="brand-pill">
+                    <div class="brand-circle" style="background:#0284c7;">COL</div>
+                    <p>Columbia</p>
+                    <span>Up to 8%</span>
+                </div>
             </div>
         </div>
 
-        <!-- Recent Links History -->
-        <div class="card-box">
-            <h2>📊 Link Performance History</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Original Link</th>
-                        <th>Smart Code</th>
-                        <th>Clicks</th>
-                    </tr>
-                </thead>
-                <tbody id="linkTableBody">
-                    <tr>
-                        <td colspan="3" style="text-align: center; color: var(--text-muted);">No links created yet.</td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- Link Performance History -->
+        <div class="section-box" id="linksSection">
+            <h3>Link History</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Original Link</th>
+                            <th>Smart Code</th>
+                            <th>Clicks</th>
+                        </tr>
+                    </thead>
+                    <tbody id="linkTableBody">
+                        <tr><td colspan="3" style="text-align:center; color:var(--text-muted);">No links created yet.</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <!-- Payment History Section -->
-        <div class="card-box">
-            <h2>💰 Payment History</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="paymentTableBody">
-                    <tr>
-                        <td colspan="3" style="text-align: center; color: var(--text-muted);">No payout history available.</td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- Payment History -->
+        <div class="section-box" id="paymentSection">
+            <h3>Payment History</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentTableBody">
+                        <tr><td colspan="3" style="text-align:center; color:var(--text-muted);">No payout records.</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
+
     </div>
 
-    <!-- Auth Modal (Login / Sign Up) -->
-    <div class="modal" id="authModal">
+    <!-- Auth Modal (Sign Up & Login) -->
+    <div class="modal" id="authModal" style="display: flex;">
         <div class="modal-content">
-            <h2 id="modalTitle">Welcome Back</h2>
-            <input type="text" id="userName" placeholder="Full Name" style="display:none;">
-            <input type="email" id="userEmail" placeholder="Email Address">
-            <input type="password" id="userPassword" placeholder="Password">
-            <button class="btn" id="modalActionBtn" onclick="submitAuth()">Login</button>
-            
-            <span class="forgot-link" onclick="forgotPassword()">Forgot Password?</span>
-            <span class="auth-switch" id="switchModeText" onclick="switchAuthMode()">Don't have an account? Sign Up</span>
-            <span class="auth-switch" onclick="closeModal()" style="color: #ef4444; margin-top: 8px;">Cancel</span>
+            <h2 id="authTitle">Create Account</h2>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="authName" placeholder="Jockey Jockey">
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="authEmail" placeholder="name@gmail.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="authPassword" placeholder="••••••••">
+            </div>
+            <button class="btn-main" onclick="submitAuth()">Get Started</button>
+            <p style="text-align: center; margin-top: 12px; font-size: 13px; color: var(--text-muted); cursor: pointer;" onclick="toggleAuthMode()" id="authSwitchText">Already have an account? Login</p>
         </div>
     </div>
 
-    <!-- PayPal & Account Settings Modal -->
+    <!-- Account Settings Modal -->
     <div class="modal" id="settingsModal">
         <div class="modal-content">
             <h2>Account Settings</h2>
-            <div id="settingsInfo" style="margin-bottom: 15px; color: var(--text-muted); text-align: left; font-size: 13px; background: rgba(15,23,42,0.4); padding: 10px; border-radius: 8px;"></div>
-            
-            <div style="text-align: left; margin-bottom: 6px; font-size: 13px; color: var(--text-muted);">PayPal Email Address:</div>
-            <input type="email" id="paypalEmailInput" placeholder="your-paypal-email@gmail.com">
-            <button class="btn" onclick="savePayPalEmail()" style="background: var(--accent); color: #000; margin-bottom: 10px;">Save PayPal Email</button>
-            <button class="btn" onclick="changePasswordPrompt()" style="background: #334155; margin-bottom: 10px;">Change Password</button>
-            <button class="btn" onclick="closeSettings()" style="background: rgba(255,255,255,0.08); border: 1px solid var(--border);">Close</button>
+            <div class="form-group">
+                <label>General / Profile Type</label>
+                <select id="profileType">
+                    <option value="General">General Creator</option>
+                    <option value="Influencer">VIP Influencer</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>First Name</label>
+                <input type="text" id="settingsFirstName">
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="settingsEmail" disabled>
+            </div>
+            <div class="form-group">
+                <label>PayPal Email Address</label>
+                <input type="email" id="settingsPaypal" placeholder="your-paypal@gmail.com">
+            </div>
+            <button class="btn-main" onclick="saveAccountSettings()">Save Changes</button>
+            <button class="btn-main" onclick="closeAccountSettings()" style="background: #e2e8f0; color: var(--text-main); margin-top: 8px;">Close</button>
         </div>
     </div>
 
     <script>
-        // Instant Redirection Check on Page Load
+        let isLoginMode = false;
+        let generatedUrlText = '';
+
         window.onload = function() {
+            // Check redirect/click handling
             const hash = window.location.hash.substring(1);
             if (hash) {
                 let savedLinks = JSON.parse(localStorage.getItem('creators_links') || '{}');
                 if (savedLinks[hash]) {
                     let linkHistory = JSON.parse(localStorage.getItem('creators_history') || '[]');
                     linkHistory.forEach(item => {
-                        if(item.code === hash) {
-                            item.clicks = (item.clicks || 0) + 1;
-                        }
+                        if(item.code === hash) item.clicks = (item.clicks || 0) + 1;
                     });
                     localStorage.setItem('creators_history', JSON.stringify(linkHistory));
-                    
-                    window.location.href = savedLinks[hash]; // Direct redirect
+                    window.location.href = savedLinks[hash];
                     return;
                 }
             }
-            checkLoginState();
-            loadDashboardData();
+            checkUserSession();
+            loadDashboard();
         };
 
-        let isSignupMode = false;
-        let generatedUrlText = '';
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            let title = document.getElementById('authTitle');
+            let switchText = document.getElementById('authSwitchText');
+            let nameField = document.getElementById('authName').parentElement;
 
-        function handleAuthClick() {
-            let currentUser = localStorage.getItem('creators_logged_in');
-            if (currentUser) {
-                if (confirm('Are you sure you want to Logout?')) {
-                    localStorage.removeItem('creators_logged_in');
-                    alert('Successfully logged out.');
-                    checkLoginState();
-                    loadDashboardData();
-                }
+            if (isLoginMode) {
+                title.innerText = "Welcome Back";
+                switchText.innerText = "Don't have an account? Sign Up";
+                nameField.style.display = "none";
             } else {
-                isSignupMode = false;
-                document.getElementById('modalTitle').innerText = 'Login to Creators Hub';
-                document.getElementById('userName').style.display = 'none';
-                document.getElementById('modalActionBtn').innerText = 'Login';
-                document.getElementById('switchModeText').innerText = "Don't have an account? Sign Up";
-                document.getElementById('authModal').style.display = 'flex';
-            }
-        }
-
-        function switchAuthMode() {
-            isSignupMode = !isSignupMode;
-            if (isSignupMode) {
-                document.getElementById('modalTitle').innerText = 'Create Account';
-                document.getElementById('userName').style.display = 'block';
-                document.getElementById('modalActionBtn').innerText = 'Sign Up';
-                document.getElementById('switchModeText').innerText = 'Already have an account? Login';
-            } else {
-                document.getElementById('modalTitle').innerText = 'Login to Creators Hub';
-                document.getElementById('userName').style.display = 'none';
-                document.getElementById('modalActionBtn').innerText = 'Login';
-                document.getElementById('switchModeText').innerText = "Don't have an account? Sign Up";
+                title.innerText = "Create Account";
+                switchText.innerText = "Already have an account? Login";
+                nameField.style.display = "block";
             }
         }
 
         function submitAuth() {
-            let email = document.getElementById('userEmail').value.trim();
-            let password = document.getElementById('userPassword').value.trim();
-            let name = document.getElementById('userName').value.trim();
+            let email = document.getElementById('authEmail').value.trim();
+            let password = document.getElementById('authPassword').value.trim();
+            let name = document.getElementById('authName').value.trim();
 
             if (!email || !password) {
-                alert('Please enter both email and password!');
+                alert('Please fill in email and password!');
                 return;
             }
 
-            if (isSignupMode) {
-                if (!name) {
-                    alert('Please enter your full name!');
-                    return;
-                }
-                let userData = { name: name, email: email, password: password, paypalEmail: '' };
-                localStorage.setItem('creators_user_' + email, JSON.stringify(userData));
-                localStorage.setItem('creators_logged_in', email);
-                alert('Account created successfully!');
-            } else {
-                let storedUser = localStorage.getItem('creators_user_' + email);
-                if (storedUser) {
-                    let userObj = JSON.parse(storedUser);
-                    if (userObj.password === password) {
-                        localStorage.setItem('creators_logged_in', email);
-                        alert('Successfully logged in!');
-                    } else {
-                        alert('Incorrect password!');
-                        return;
-                    }
-                } else {
-                    let userData = { name: email.split('@')[0], email: email, password: password, paypalEmail: '' };
-                    localStorage.setItem('creators_user_' + email, JSON.stringify(userData));
-                    localStorage.setItem('creators_logged_in', email);
-                    alert('Account auto-registered and logged in!');
-                }
+            if (!isLoginMode && !name) {
+                name = email.split('@')[0];
             }
-            closeModal();
-            checkLoginState();
+
+            let userData = {
+                name: name || email.split('@')[0],
+                email: email,
+                password: password,
+                paypal: ''
+            };
+
+            localStorage.setItem('creators_session', email);
+            localStorage.setItem('creators_user_' + email, JSON.stringify(userData));
+
+            document.getElementById('authModal').style.display = 'none';
+            checkUserSession();
+            loadDashboard();
         }
 
-        function forgotPassword() {
-            let email = prompt('Enter your registered email address for recovery:');
-            if (email) {
-                let storedUser = localStorage.getItem('creators_user_' + email);
-                if (storedUser) {
-                    let userObj = JSON.parse(storedUser);
-                    let newPass = prompt('Enter your new password:');
-                    if (newPass) {
-                        userObj.password = newPass;
-                        localStorage.setItem('creators_user_' + email, JSON.stringify(userObj));
-                        alert('Password successfully reset!');
-      
+        function checkUserSession() {
+            let session = localStorage.getItem('creators_session');
+            if (!session) {
+                document.getElementById('authModal').style.display = 'flex';
+            } else {
+                let user = JSON.parse(localStorage.getItem('creators_user_' + session) || '{}');
+                document.getElementById('welcomeText').innerText = 'Welcome, ' + (user.name || 'Creator') + '!';
+                document.getElementById('sidebarUserName').innerText = user.name || 'My Account';
+            }
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebarMenu').classList.toggle('open');
+        }
+
+        function openAccountSettings() {
+            toggleSidebar();
+            let session = localStorage.getItem('creators_session');
+            let user = JSON.parse(localStorage.getItem('creators_user_' + session) || '{}');
+            
+            document.getElementById('settingsFirstName').value = user.name || '';
+            document.getElementById('settingsEmail').value = user.email || session;
+            document.getElementById('settingsPaypal').value = user.paypal || '';
+            document.getElementById('settingsModal').style.display = 'flex';
+        }
+
+        function closeAccountSettings() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+
+        function saveAccountSettings() {
+            let session = localStorage.getItem('creators_session');
+            let user = JSON.parse(localStorage.getItem('creators_user_' + session) || '{}');
+            
+            user.name = document.getElementById('settingsFirstName').value;
+            user.paypal = document.getElementById('settingsPaypal').value;
+
+            localStorage.setItem('creators_user_' + session, JSON.stringify(user));
+            alert('Settings saved successfully!');
+            closeAccountSettings();
+            checkUserSession();
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('creators_session');
+            location.reload();
+        }
+
+        function scrollToSection(id) {
+            toggleSidebar();
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function generateLink() {
+            let urlInput = document.getElementById('longUrl').value.trim();
+            if(!urlInput) {
+                alert('Please enter a link to shorten!');
+                return;
+            }
+            if (!urlInput.startsWith('http')) urlInput = 'https://' + urlInput;
+
+            let code = 'm-' + Math.random().toString(36.substring(2), 7);
+            
+            let links = JSON.parse(localStorage.getItem('creators_links') || '{}');
+            links[code] = urlInput;
+            localStorage.setItem('creators_links', JSON.stringify(links));
+
+            let history = JSON.parse(localStorage.getItem('creators_history') || '[]');
+            history.unshift({ original: urlInput, code: code, clicks: 0 });
+            localStorage.setItem('creators_history', JSON.stringify(history));
+
+            // Add $7 Walmart-style commission instantly
+            let earnings = JSON.parse(localStorage.getItem('creators_earnings') || '[]');
+            earnings.unshift({ date: new Date().toLocaleDateString(), amount: 7.00, status: 'Completed' });
+            localStorage.setItem('creators_earnings', JSON.stringify(earnings));
+
+            generatedUrlText = window.location.origin + window.location.pathname + '#' + code;
+            document.getElementById('shortLinkOutput').innerHTML = `<a href="${generatedUrlText}" target="_blank">${generatedUrlText}</a>`;
+            document.getElementById('resultBox').style.display = 'flex';
+
+            loadDashboard();
+        }
+
+        function copyShortLink() {
+            if(!generatedUrlText) return;
+            navigator.clipboard.writeText(generatedUrlText);
+            alert('Link copied to clipboard!');
+        }
+
+        function loadDashboard() {
+            let history = JSON.parse(localStorage.getItem('creators_history') || '[]');
+            let earnings = JSON.parse(localStorage.getItem('creators_earnings') || '[]');
+            
+            let totalClicks = history.reduce((sum, item) => sum + (item.clicks || 0), 0);
+            let totalCommission = earnings.reduce((sum, item) => sum + item.amount, 0);
+
+            document.getElementById('totalClicks').innerText = totalClicks;
+            document.getElementById('totalCommission').innerText = '$' + totalCommission.toFixed(2);
+
+            // Links Table
+            let linkTable = document.getElementById('linkTableBody');
+            if (history.length === 0) {
+                linkTable.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">No links created yet.</td></tr>`;
+            } else {
+                let html = '';
+                history.forEach(item => {
+                    let shortUrl = window.location.origin + window.location.pathname + '#' + item.code;
+                    html += `<tr>
+                        <td style="max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.original}</td>
+                        <td><a href="${shortUrl}" target="_blank" style="color:var(--primary); font-weight:600;">#${item.code}</a></td>
+                        <td>${item.clicks || 0}</td>
+                    </tr>`;
+                });
+                linkTable.innerHTML = html;
+            }
+
+            // Payment Table
+            let payTable = document.getElementById('paymentTableBody');
+            if (earnings.length === 0) {
+                payTable.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">No payout records.</td></tr>`;
+            } else {
+                let payHtml = '';
+                earnings.forEach(pay => {
+                    payHtml += `<tr>
+                        <td>${pay.date}</td>
+                        <td style="color:var(--success); font-weight:600;">+$${pay.amount.toFixed(2)}</td>
+                        <td><span style="background:#ecfdf5; color:var(--success); padding:2px 8px; border-radius:4px; font-size:11px;">${pay.status}</span></td>
+                    </tr>`;
+                });
+                payTable.innerHTML = payHtml;
+            }
+        }
+    </script>
+</body>
+</html>
