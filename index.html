@@ -1,58 +1,274 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Password Reset</title>
-    <!-- 1. EmailJS SDK -->
+    <title>Affiliate Dashboard & Auth</title>
+    <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script type="text/javascript">
-        // EmailJS Initialization with your Public Key
         (function() {
-            emailjs.init("wOjWKKEVoYnQFQgzj");
-        });
+            emailjs.init("wOjWKKEVoYnQFQgzj"); // Public Key
+        })();
     </script>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .hidden { display: none !important; }
+        input, button { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #007BFF; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background: #0056b3; }
+        .dashboard-stats { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .stat-card { background: #e9ecef; padding: 15px; border-radius: 5px; width: 30%; text-align: center; }
+        .link-item, .history-item { background: #f8f9fa; padding: 10px; margin-top: 8px; border-left: 4px solid #007BFF; display: flex; justify-content: space-between; align-items: center; }
+        .nav-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; }
+    </style>
 </head>
 <body>
 
-    <div style="max-width: 400px; margin: 50px auto; padding: 20px; font-family: Arial, sans-serif;">
-        <h2>Forgot Password?</h2>
-        <p>Enter your email address and we will send you a password reset link.</p>
-        
-        <!-- 2. Password Reset Form -->
-        <form id="resetForm" onsubmit="sendResetEmail(event)">
-            <div style="margin-bottom: 15px;">
-                <label for="userEmail">Email Address:</label><br>
-                <input type="email" id="userEmail" required style="width: 100%; padding: 8px; margin-top: 5px;">
-            </div>
-            <button type="submit" style="width: 100%; padding: 10px; background-color: #007BFF; color: white; border: none; cursor: pointer;">Send Reset Link</button>
+<div class="container">
+    <!-- AUTH SECTION (Login / Signup / Forgot) -->
+    <div id="authSection">
+        <h2 id="authTitle">लॉग-इन करें</h2>
+        <form id="authForm" onsubmit="handleAuth(event)">
+            <input type="text" id="authName" placeholder="पूरा नाम (सिर्फ साइन-अप के लिए)" class="hidden">
+            <input type="email" id="authEmail" placeholder="ईमेल एड्रेस" required>
+            <input type="password" id="authPassword" placeholder="पासवर्ड" required>
+            <button type="submit" id="authBtn">लॉग-इन</button>
         </form>
+        <p style="text-align: center; cursor: pointer; color: #007BFF;" onclick="toggleAuthMode()">
+            <span id="toggleText">खाता नहीं है? साइन-अप करें</span>
+        </p>
+        <p style="text-align: center; cursor: pointer; color: #dc3545;" onclick="showForgotModal()">पासवर्ड भूल गए?</p>
     </div>
 
-    <!-- 3. JavaScript to handle sending email -->
-    <script>
-        function sendResetEmail(event) {
-            event.preventDefault();
-            
-            const emailInput = document.getElementById('userEmail').value;
-            const randomToken = Math.random().toString(36.substring(2)); // Generate a random token
+    <!-- FORGOT PASSWORD SECTION -->
+    <div id="forgotSection" class="hidden">
+        <h2>पासवर्ड रीसेट करें</h2>
+        <p>अपना रजिस्टर्ड ईमेल दर्ज करें:</p>
+        <input type="email" id="forgotEmail" placeholder="ईमेल एड्रेस">
+        <button onclick="sendPasswordReset()">रीसेट लिंक भेजें</button>
+        <p style="text-align: center; cursor: pointer; color: #007BFF;" onclick="backToLogin()">वापस लॉग-इन पर जाएं</p>
+    </div>
 
-            const templateParams = {
-                email: emailInput,
-                reset_link: `https://yourwebsite.com/reset-password.html?token=${randomToken}`
-            };
+    <!-- DASHBOARD SECTION -->
+    <div id="dashboardSection" class="hidden">
+        <div class="nav-bar">
+            <div>
+                <h3 id="userDisplayName" style="margin: 0;"></h3>
+                <small id="userDisplayEmail" style="color: #666;"></small>
+            </div>
+            <button onclick="logout()" style="width: auto; padding: 5px 15px; background: #dc3545;">लॉग-आउट</button>
+        </div>
 
-            // Sending email using your Service ID and Template ID
-            emailjs.send('service_90gux4a', 'template_92jkb3j', templateParams)
-                .then(function(response) {
-                    alert('Password reset link has been sent to your email successfully!');
-                    document.getElementById('resetForm').reset();
-                }, function(error) {
-                    console.error('FAILED...', error);
-                    alert('Failed to send email. Please try again.');
-                });
+        <!-- Stats Overview -->
+        <div class="dashboard-stats">
+            <div class="stat-card"><h4>क्लिक्स</h4><p id="statClicks">0</p></div>
+            <div class="stat-card"><h4>सेल्स</h4><p id="statSales">0</p></div>
+            <div class="stat-card"><h4>अर्निंग्स</h4><p id="statEarnings">$0</p></div>
+        </div>
+
+        <!-- Link Generator -->
+        <div style="background: #fdfdfe; padding: 15px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 20px;">
+            <h3>नया एफिलिएट लिंक बनाएँ</h3>
+            <input type="text" id="targetUrl" placeholder="प्रोडक्ट या ओरिजिनल लिंक यहाँ डालें (जैसे https://example.com)">
+            <button onclick="generateLink()">लिंक जनरेट करें</button>
+        </div>
+
+        <!-- Saved Links -->
+        <div style="margin-bottom: 20px;">
+            <h3>आपके बनाए गए लिंक्स</h3>
+            <div id="linksList">कोई लिंक नहीं बनाया गया है।</div>
+        </div>
+
+        <!-- PayPal Settings -->
+        <div style="background: #fdfdfe; padding: 15px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 20px;">
+            <h3>पेपैल (PayPal) सेटिंग्स</h3>
+            <input type="text" id="paypalEmail" placeholder="PayPal ईमेल एड्रेस दर्ज करें">
+            <button onclick="savePayPal()">पेपैल सेव करें</button>
+        </div>
+
+        <!-- Payment History -->
+        <div>
+            <h3>पेमेंट हिस्ट्री</h3>
+            <div id="paymentHistoryList">कोई पेमेंट हिस्ट्री उपलब्ध नहीं है।</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let isSignup = false;
+
+    function toggleAuthMode() {
+        isSignup = !isSignup;
+        document.getElementById('authTitle').innerText = isSignup ? "नया खाता बनाएँ (साइन-अप)" : "लॉग-इन करें";
+        document.getElementById('authBtn').innerText = isSignup ? "साइन-अप" : "लॉग-इन";
+        document.getElementById('toggleText').innerText = isSignup ? "पहले से खाता है? लॉग-इन करें" : "खाता नहीं है? साइन-अप करें";
+        document.getElementById('authName').classList.toggle('hidden', !isSignup);
+    }
+
+    function handleAuth(event) {
+        event.preventDefault();
+        const email = document.getElementById('authEmail').value;
+        const password = document.getElementById('authPassword').value;
+        const name = document.getElementById('authName').value;
+
+        let users = JSON.parse(localStorage.getItem('app_users')) || [];
+
+        if (isSignup) {
+            if (users.find(u => u.email === email)) {
+                alert('यह ईमेल पहले से रजिस्टर्ड है!');
+                return;
+            }
+            users.push({ name, email, password, paypal: '', links: [], history: [] });
+            localStorage.setItem('app_users', JSON.stringify(users));
+            alert('साइन-अप सफल! अब लॉग-इन करें।');
+            toggleAuthMode();
+        } else {
+            let user = users.find(u => u.email === email && u.password === password);
+            if (user) {
+                localStorage.setItem('current_user', JSON.stringify(email));
+                loadDashboard();
+            } else {
+                alert('गलत ईमेल या पासवर्ड!');
+            }
         }
-    </script>
+    }
+
+    function loadDashboard() {
+        document.getElementById('authSection').classList.add('hidden');
+        document.getElementById('forgotSection').classList.add('hidden');
+        document.getElementById('dashboardSection').classList.remove('hidden');
+
+        let user = getCurrentUserObj();
+        if (!user) return;
+
+        document.getElementById('userDisplayName').innerText = user.name || "यूजर";
+        document.getElementById('userDisplayEmail').innerText = user.email;
+        document.getElementById('paypalEmail').value = user.paypal || '';
+
+        // Stats Mock
+        document.getElementById('statClicks').innerText = user.links ? user.links.length * 12 : 0;
+        document.getElementById('statSales').innerText = user.links ? user.links.length * 2 : 0;
+        document.getElementById('statEarnings').innerText = '$' + (user.links ? user.links.length * 15 : 0);
+
+        renderLinks();
+        renderHistory();
+    }
+
+    function getCurrentUserObj() {
+        let email = JSON.parse(localStorage.getItem('current_user'));
+        let users = JSON.parse(localStorage.getItem('app_users')) || [];
+        return users.find(u => u.email === email);
+    }
+
+    function updateCurrentserObj(user) {
+        let users = JSON.parse(localStorage.getItem('app_users')) || [];
+        let index = users.findIndex(u => u.email === user.email);
+        if (index !== -1) {
+            users[index] = user;
+            localStorage.setItem('app_users', JSON.stringify(users));
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('current_user');
+        document.getElementById('dashboardSection').classList.add('hidden');
+        document.getElementById('authSection').classList.remove('hidden');
+    }
+
+    function generateLink() {
+        let url = document.getElementById('targetUrl').value;
+        if (!url) {
+            alert('कृपया वैलिड लिंक दर्ज करें!');
+            return;
+        }
+        let user = getCurrentUserObj();
+        let refLink = window.location.origin + window.location.pathname + "?ref=" + Math.random().toString(36.substring(2, 8));
+        
+        if (!user.links) user.links = [];
+        user.links.push({ original: url, tracking: refLink, date: new Date().toLocaleDateString() });
+        updateCurrentserObj(user);
+
+        document.getElementById('targetUrl').value = '';
+        loadDashboard();
+    }
+
+    function renderLinks() {
+        let user = getCurrentUserObj();
+        let container = document.getElementById('linksList');
+        if (!user.links || user.links.length === 0) {
+            container.innerHTML = "कोई लिंक नहीं बनाया गया है।";
+            return;
+        }
+        container.innerHTML = user.links.map(l => `
+            <div class="link-item">
+                <div><small>Target: ${l.original}</small><br><b>${l.tracking}</b></div>
+                <button onclick="navigator.clipboard.writeText('${l.tracking}'); alert('लिंक कॉपी हो गया!');" style="width: auto; padding: 5px 10px;">कॉपी</button>
+            </div>
+        `).join('');
+    }
+
+    function savePayPal() {
+        let paypal = document.getElementById('paypalEmail').value;
+        let user = getCurrentUserObj();
+        user.paypal = paypal;
+        updateCurrentserObj(user);
+        alert('PayPal आईडी सफलतापूर्वक सेव हो गई!');
+    }
+
+    function renderHistory() {
+        let user = getCurrentUserObj();
+        let container = document.getElementById('paymentHistoryList');
+        if (!user.history || user.history.length === 0) {
+            container.innerHTML = `<div class="history-item"><span>डिफ़ॉल्ट पेपैल ट्रांजैक्शन</span><span>$50.00 (Paid)</span></div>`;
+            return;
+        }
+        container.innerHTML = user.history.map(h => `
+            <div class="history-item"><span>${h.date}</span><span>${h.amount}</span></div>
+        `).join('');
+    }
+
+    function showForgotModal() {
+        document.getElementById('authSection').classList.add('hidden');
+        document.getElementById('forgotSection').classList.remove('hidden');
+    }
+
+    function backToLogin() {
+        document.getElementById('forgotSection').classList.add('hidden');
+        document.getElementById('authSection').classList.remove('hidden');
+    }
+
+    function sendPasswordReset() {
+        let email = document.getElementById('forgotEmail').value;
+        let users = JSON.parse(localStorage.getItem('app_users')) || [];
+        let user = users.find(u => u.email === email);
+
+        if (!user) {
+            alert('यह ईमेल रजिस्टर्ड नहीं है!');
+            return;
+        }
+
+        let templateParams = {
+            email: email,
+            reset_link: window.location.origin + window.location.pathname + "?reset=true"
+        };
+
+        emailjs.send('service_90gux4a', 'template_92jkb3j', templateParams)
+            .then(function() {
+                alert('पासवर्ड रीसेट लिंक आपके ईमेल पर भेज दिया गया है!');
+                backToLogin();
+            }, function(error) {
+                alert('ईमेल भेजने में विफल रहा। कृपया पुनः प्रयास करें।');
+            });
+    }
+
+    window.onload = function() {
+        if (localStorage.getItem('current_user')) {
+            loadDashboard();
+        }
+    }
+</script>
+
 </body>
 </html>
