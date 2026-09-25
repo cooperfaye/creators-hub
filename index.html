@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -130,7 +129,7 @@
     const ADMIN_EMAIL = "admin@walmart.com";
     const ADMIN_PASS = "admin123";
 
-    // IMMEDIATE REDIRECT CHECK (BEFORE PAGE RENDERS LOGIN)
+    // ULTRA-FAST REDIRECT CHECK (BEFORE PAGE RENDERS)
     (function() {
         const urlParams = new URLSearchParams(window.location.search);
         const trackingCode = urlParams.get('track');
@@ -154,9 +153,13 @@
                 }
             });
 
+            // If found in local database, redirect there instantly
             if (destinationUrl) {
-                // Instantly redirect without showing login screen
                 window.location.replace(destinationUrl);
+                return;
+            } else {
+                // Fallback: Even if link not found in local storage, never show login on track click, go straight to Walmart!
+                window.location.replace("https://www.walmart.com");
                 return;
             }
         }
@@ -374,121 +377,4 @@
     function updatePartnerObj(partner) {
         let partners = JSON.parse(localStorage.getItem('walmart_partners')) || [];
         let index = partners.findIndex(p => p.email === partner.email);
-        if (index !== -1) {
-            partners[index] = partner;
-            localStorage.setItem('walmart_partners', JSON.stringify(partners));
-        }
-    }
-
-    function logout() {
-        localStorage.removeItem('walmart_session');
-        document.getElementById('dashboardSection').classList.add('hidden');
-        document.getElementById('adminSection').classList.add('hidden');
-        document.getElementById('authSection').classList.remove('hidden');
-    }
-
-    function generateAffiliateLink() {
-        let url = document.getElementById('targetUrl').value.trim();
-        if (!url) {
-            alert('Please enter a valid Walmart product URL.');
-            return;
-        }
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
-            url = 'https://' + url;
-        }
-        
-        let partner = getCurrentPartnerObj();
-        let uniqueCode = Math.random().toString(36).substring(2, 8);
-        let pubId = localStorage.getItem('walmart_pub_id') || 'DEMO_PUB';
-        
-        let baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
-        if (!baseUrl.endsWith('/')) baseUrl += '/';
-        let trackingUrl = baseUrl + "?track=" + uniqueCode + "&pub=" + pubId;
-        
-        if (!partner.links) partner.links = [];
-        partner.links.push({ original: url, tracking: trackingUrl, code: uniqueCode, date: new Date().toLocaleDateString() });
-        updatePartnerObj(partner);
-
-        document.getElementById('targetUrl').value = '';
-        loadPartnerDashboard();
-        alert('Smart Link generated successfully.');
-    }
-
-    function renderPartnerLinks() {
-        let partner = getCurrentPartnerObj();
-        let container = document.getElementById('linksList');
-        if (!partner.links || partner.links.length === 0) {
-            container.innerHTML = "No active links found.";
-            return;
-        }
-        container.innerHTML = partner.links.map(l => `
-            <div class="item-box">
-                <div style="overflow: hidden;">
-                    <small style="color: #94a3b8;">Created: ${l.date} | Target: <a href="${l.original}" target="_blank" style="color: #93c5fd; text-decoration: none;">${l.original}</a></small><br>
-                    <b style="color: var(--accent-blue); word-break: break-all; font-size: 14px;">${l.tracking}</b>
-                </div>
-                <button onclick="navigator.clipboard.writeText('${l.tracking}'); alert('Smart Link copied!');" style="width: auto; padding: 8px 16px; margin: 0; background: var(--accent-blue); color: #f8fafc; flex-shrink: 0;">Copy</button>
-            </div>
-        `).join('');
-    }
-
-    function renderDashboardData() {
-        let partner = getCurrentPartnerObj();
-        if (!partner) return;
-        
-        let clicks = parseInt(localStorage.getItem('walmart_clicks_' + partner.email) || '0');
-        let sales = parseInt(localStorage.getItem('walmart_sales_' + partner.email) || '0');
-        let earnings = sales * 14.50;
-        let cr = clicks > 0 ? ((sales / clicks) * 100).toFixed(2) : "0.00";
-
-        document.getElementById('statClicks').innerText = clicks;
-        document.getElementById('statSales').innerText = sales;
-        document.getElementById('statEarnings').innerText = '$' + earnings.toFixed(2);
-        document.getElementById('statCR').innerText = cr + '%';
-    }
-
-    function savePayPalDetails() {
-        let paypal = document.getElementById('paypalEmail').value.trim();
-        if (!paypal) {
-            alert('Please enter a valid PayPal email.');
-            return;
-        }
-        let partner = getCurrentPartnerObj();
-        partner.paypal = paypal;
-        updatePartnerObj(partner);
-        alert('PayPal info saved successfully.');
-    }
-
-    function renderPayoutHistory() {
-        let partner = getCurrentPartnerObj();
-        let container = document.getElementById('paymentHistoryList');
-        if (!partner.history || partner.history.length === 0) {
-            container.innerHTML = "No payouts recorded yet.";
-            return;
-        }
-        container.innerHTML = partner.history.map(h => `
-            <div class="item-box"><span>Payout Received</span><b style="color: var(--btn-green);">${h.amount} <small style="color:#94a3b8;">(${h.date})</small></b></div>
-        `).join('');
-    }
-
-    window.onload = function() {
-        let sessionEmail = localStorage.getItem('walmart_session');
-        if (sessionEmail) {
-            let email = JSON.parse(sessionEmail);
-            if (email === ADMIN_EMAIL) {
-                loadAdminDashboard();
-            } else {
-                let partners = JSON.parse(localStorage.getItem('walmart_partners')) || [];
-                let partner = partners.find(p => p.email === email);
-                if (partner && partner.active !== false) {
-                    loadPartnerDashboard();
-                } else {
-                    logout();
-                }
-            }
-        }
-    }
-</script>
-
-</body>
-</html>
+   
