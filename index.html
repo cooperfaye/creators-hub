@@ -358,14 +358,14 @@
 
         <!-- Link Generator Box -->
         <div class="card-box">
-            <h2>🔗 Advanced Link Shortener</h2>
+            <h2>🔗 Mavely-Style Smart Link Shortener</h2>
             <div class="input-group">
                 <input type="text" id="longUrl" placeholder="Paste your product link here (e.g., Walmart, Amazon)...">
                 <button class="btn" onclick="generateLink()">Generate</button>
             </div>
             <div class="result-box" id="resultBox">
                 <div class="result-text">
-                    <strong>Short Link:</strong><br>
+                    <strong>Smart Link:</strong><br>
                     <span id="shortLinkOutput"></span>
                 </div>
                 <button class="copy-btn" onclick="copyShortLink()">Copy Link</button>
@@ -379,7 +379,7 @@
                 <thead>
                     <tr>
                         <th>Original Link</th>
-                        <th>Short Code</th>
+                        <th>Smart Code</th>
                         <th>Clicks</th>
                     </tr>
                 </thead>
@@ -552,140 +552,4 @@
                         userObj.password = newPass;
                         localStorage.setItem('creators_user_' + email, JSON.stringify(userObj));
                         alert('Password successfully reset!');
-                    }
-                } else {
-                    alert('No account found with this email.');
-                }
-            }
-        }
-
-        function checkLoginState() {
-            let loggedInEmail = localStorage.getItem('creators_logged_in');
-            let authBtn = document.getElementById('authBtn');
-            if (loggedInEmail) {
-                let userObj = JSON.parse(localStorage.getItem('creators_user_' + loggedInEmail) || '{}');
-                let displayName = userObj.name || loggedInEmail;
-                authBtn.innerText = 'Logout (' + displayName + ')';
-            } else {
-                authBtn.innerText = 'Login / Sign Up';
-            }
-        }
-
-        function closeModal() {
-            document.getElementById('authModal').style.display = 'none';
-        }
-
-        function openSettings() {
-            let loggedInEmail = localStorage.getItem('creators_logged_in');
-            if (!loggedInEmail) {
-                alert('Please log in first to access settings.');
-                handleAuthClick();
-                return;
-            }
-            let userObj = JSON.parse(localStorage.getItem('creators_user_' + loggedInEmail) || '{}');
-            document.getElementById('settingsInfo').innerHTML = `<strong>Name:</strong> ${userObj.name || 'N/A'}<br><strong>Email:</strong> ${loggedInEmail}`;
-            document.getElementById('paypalEmailInput').value = userObj.paypalEmail || '';
-            document.getElementById('settingsModal').style.display = 'flex';
-        }
-
-        function closeSettings() {
-            document.getElementById('settingsModal').style.display = 'none';
-        }
-
-        function savePayPalEmail() {
-            let loggedInEmail = localStorage.getItem('creators_logged_in');
-            let userObj = JSON.parse(localStorage.getItem('creators_user_' + loggedInEmail) || '{}');
-            let paypalEmail = document.getElementById('paypalEmailInput').value.trim();
-            userObj.paypalEmail = paypalEmail;
-            localStorage.setItem('creators_user_' + loggedInEmail, JSON.stringify(userObj));
-            alert('PayPal email saved successfully!');
-            closeSettings();
-        }
-
-        function changePasswordPrompt() {
-            let loggedInEmail = localStorage.getItem('creators_logged_in');
-            let userObj = JSON.parse(localStorage.getItem('creators_user_' + loggedInEmail));
-            let currentP = prompt('Enter your current password:');
-            if (currentP === userObj.password) {
-                let newP = prompt('Enter your new password:');
-                if (newP) {
-                    userObj.password = newP;
-                    localStorage.setItem('creators_user_' + loggedInEmail, JSON.stringify(userObj));
-                    alert('Password changed successfully!');
-                    closeSettings();
-                }
-            } else {
-                alert('Incorrect current password!');
-            }
-        }
-
-        function generateLink() {
-            let urlInput = document.getElementById('longUrl').value.trim();
-            if(!urlInput) {
-                alert('Please paste a product link first!');
-                return;
-            }
-            
-            if (!urlInput.startsWith('http://') && !urlInput.startsWith('https://')) {
-                urlInput = 'https://' + urlInput;
-            }
-            
-            const randomCode = 'L' + Math.random().toString(36).substring(2, 8);
-            
-            let savedLinks = JSON.parse(localStorage.getItem('creators_links') || '{}');
-            savedLinks[randomCode] = urlInput;
-            localStorage.setItem('creators_links', JSON.stringify(savedLinks));
-
-            let linkHistory = JSON.parse(localStorage.getItem('creators_history') || '[]');
-            linkHistory.unshift({ original: urlInput, code: randomCode, clicks: 0 });
-            localStorage.setItem('creators_history', JSON.stringify(linkHistory));
-
-            generatedUrlText = window.location.origin + window.location.pathname + '#' + randomCode;
-
-            const resultBox = document.getElementById('resultBox');
-            const shortLinkOutput = document.getElementById('shortLinkOutput');
-            shortLinkOutput.innerHTML = `<a href="${generatedUrlText}" target="_blank">${generatedUrlText}</a>`;
-            resultBox.style.display = 'flex';
-
-            loadDashboardData();
-        }
-
-        function copyShortLink() {
-            if(!generatedUrlText) return;
-            navigator.clipboard.writeText(generatedUrlText).then(() => {
-                alert('Short link copied to clipboard!');
-            }).catch(err => {
-                alert('Failed to copy link.');
-            });
-        }
-
-        function loadDashboardData() {
-            let linkHistory = JSON.parse(localStorage.getItem('creators_history') || '[]');
-            let tableBody = document.getElementById('linkTableBody');
-            
-            let totalClicksCount = 0;
-            linkHistory.forEach(item => {
-                totalClicksCount += (item.clicks || 0);
-            });
-
-            document.getElementById('totalClicks').innerText = totalClicksCount;
-            document.getElementById('activeLinks').innerText = linkHistory.length;
-
-            if (linkHistory.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted);">No links created yet.</td></tr>`;
-            } else {
-                let html = '';
-                linkHistory.forEach(item => {
-                    let fullShortUrl = window.location.origin + window.location.pathname + '#' + item.code;
-                    html += `<tr>
-                        <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.original}</td>
-                        <td><a href="${fullShortUrl}" target="_blank" style="color: var(--accent); font-weight: 600;">#${item.code}</a></td>
-                        <td>${item.clicks || 0}</td>
-                    </tr>`;
-                });
-                tableBody.innerHTML = html;
-            }
-        }
-    </script>
-</body>
-</html>
+      
