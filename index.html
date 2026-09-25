@@ -13,15 +13,16 @@
         })();
     </script>
     <style>
-        :root { --bg-color: #0f172a; --card-bg: #1e293b; --text-color: #f8fafc; --accent-blue: #0071dc; --border-color: #334155; --btn-green: #10b981; --btn-danger: #ef4444; }
+        :root { --bg-color: #0f172a; --card-bg: #1e293b; --text-color: #f8fafc; --accent-blue: #0071dc; --border-color: #334155; --btn-green: #10b981; --btn-danger: #ef4444; --btn-warning: #f59e0b; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg-color); margin: 0; padding: 20px; color: var(--text-color); }
-        .container { max-width: 850px; margin: 0 auto; background: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
+        .container { max-width: 900px; margin: 0 auto; background: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
         .hidden { display: none !important; }
         input, select, button { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; background: #0f172a; border: 1px solid var(--border-color); border-radius: 6px; color: #f8fafc; font-size: 14px; }
         input:focus, select:focus { border-color: var(--accent-blue); outline: none; }
         button { background: var(--btn-green); color: white; border: none; cursor: pointer; font-weight: bold; transition: opacity 0.2s; }
         button:hover { opacity: 0.9; }
         .btn-danger { background: var(--btn-danger); }
+        .btn-warning { background: var(--btn-warning); }
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
         .stat-card { background: #0f172a; padding: 18px; border-radius: 8px; border: 1px solid var(--border-color); text-align: center; }
         .stat-card h4 { margin: 0 0 8px 0; font-size: 12px; color: #94a3b8; text-transform: uppercase; }
@@ -123,13 +124,13 @@
         <div class="nav-bar">
             <div>
                 <h3 style="margin: 0; color: var(--accent-blue);">👑 CEO Admin Control Panel</h3>
-                <small style="color: #94a3b8;">Manage all registered platform creators</small>
+                <small style="color: #94a3b8;">Manage creators, earnings & account status</small>
             </div>
             <button onclick="logout()" class="btn-danger" style="width: auto; padding: 6px 14px; margin:0;">Sign Out</button>
         </div>
 
         <div class="section-block">
-            <h3>All Registered Creators</h3>
+            <h3>All Registered Creators & Analytics</h3>
             <div id="adminCreatorsList">Loading creators...</div>
         </div>
     </div>
@@ -176,13 +177,17 @@
                 alert('An account with this email already exists.');
                 return;
             }
-            partners.push({ name, email, password, paypal: '', links: [], history: [] });
+            partners.push({ name, email, password, active: true, paypal: '', links: [], history: [] });
             localStorage.setItem('walmart_partners', JSON.stringify(partners));
             alert('Registration successful! Please sign in.');
             toggleAuthMode();
         } else {
             let partner = partners.find(p => p.email === email && p.password === password);
             if (partner) {
+                if (partner.active === false) {
+                    alert('Your account has been deactivated by the administrator.');
+                    return;
+                }
                 localStorage.setItem('walmart_session', JSON.stringify(email));
                 loadPartnerDashboard();
             } else {
@@ -222,15 +227,38 @@
             container.innerHTML = "No creators registered yet.";
             return;
         }
-        container.innerHTML = partners.map(p => `
-            <div class="item-box">
-                <div>
-                    <b>${p.name}</b> (${p.email})<br>
-                    <small style="color: #94a3b8;">Links created: ${p.links ? p.links.length : 0} | PayPal: ${p.paypal || 'Not set'}</small>
+
+        container.innerHTML = partners.map(p => {
+            let clicks = parseInt(localStorage.getItem('walmart_clicks_' + p.email) || '0');
+            let sales = parseInt(localStorage.getItem('walmart_sales_' + p.email) || '0');
+            let earnings = (sales * 14.50).toFixed(2);
+            let isActive = p.active !== false;
+
+            return `
+                <div class="item-box" style="flex-direction: column; align-items: flex-start;">
+                    <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <b>${p.name}</b> (${p.email}) <span style="font-size: 11px; padding: 2px 6px; border-radius: 4px; background: ${isActive ? '#10b981' : '#ef4444'}; color: white;">${isActive ? 'Active' : 'Deactivated'}</span><br>
+                            <small style="color: #94a3b8;">Clicks: ${clicks} | Sales: ${sales} | Earnings: <b style="color: var(--accent-blue);">$${earnings}</b> | PayPal: ${p.paypal || 'Not set'}</small>
+                        </div>
+                        <div style="display: flex; gap: 6px;">
+                            <button onclick="toggleCreatorStatus('${p.email}')" class="${isActive ? 'btn-warning' : ''}" style="width: auto; padding: 6px 10px; margin: 0; background: ${isActive ? '#f59e0b' : '#10b981'};">${isActive ? 'Deactivate' : 'Activate'}</button>
+                            <button onclick="deleteCreatorAccount('${p.email}')" class="btn-danger" style="width: auto; padding: 6px 10px; margin: 0;">Delete</button>
+                        </div>
+                    </div>
                 </div>
-                <button onclick="deleteCreatorAccount('${p.email}')" class="btn-danger" style="width: auto; padding: 6px 12px; margin: 0;">Delete Account</button>
-            </div>
-        `).join('');
+            `;
+        }).join('');
+    }
+
+    function toggleCreatorStatus(email) {
+        let partners = JSON.parse(localStorage.getItem('walmart_partners')) || [];
+        let partner = partners.find(p => p.email === email);
+        if (partner) {
+            partner.active = partner.active === false ? true : false;
+            localStorage.setItem('walmart_partners', JSON.stringify(partners));
+            renderAdminCreators();
+        }
     }
 
     function deleteCreatorAccount(email) {
@@ -393,7 +421,7 @@
             partners.forEach(p => {
                 if (p.links) {
                     let matchedLink = p.links.find(l => l.code === trackingCode);
-                    if (matchedLink) {
+                    if (matchedLink && p.active !== false) {
                         destinationUrl = matchedLink.original;
                         let currentClicks = parseInt(localStorage.getItem('walmart_clicks_' + p.email) || '0') + 1;
                         localStorage.setItem('walmart_clicks_' + p.email, currentClicks);
@@ -416,7 +444,13 @@
             if (email === ADMIN_EMAIL) {
                 loadAdminDashboard();
             } else {
-                loadPartnerDashboard();
+                let partners = JSON.parse(localStorage.getItem('walmart_partners')) || [];
+                let partner = partners.find(p => p.email === email);
+                if (partner && partner.active !== false) {
+                    loadPartnerDashboard();
+                } else {
+                    logout();
+                }
             }
         }
     }
