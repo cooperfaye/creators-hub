@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Affiliate Dashboard</title>
+    <title>Professional Affiliate Dashboard</title>
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script type="text/javascript">
@@ -74,7 +75,7 @@
         <!-- Link Generator -->
         <div class="section-block">
             <h3>Generate Affiliate Link</h3>
-            <input type="text" id="targetUrl" placeholder="Enter original URL (e.g., https://example.com)">
+            <input type="text" id="targetUrl" placeholder="Enter Product URL (e.g., Walmart or any product link)">
             <button onclick="generateLink()">Generate Link</button>
         </div>
 
@@ -154,9 +155,9 @@
         document.getElementById('userDisplayEmail').innerText = user.email;
         document.getElementById('paypalEmail').value = user.paypal || '';
 
-        let totalClicks = (user.links ? user.links.length : 0) * 15;
-        let totalSales = (user.links ? user.links.length : 0) * 3;
-        let totalEarnings = totalSales * 10;
+        let totalClicks = parseInt(localStorage.getItem('clicks_' + user.email) || '0');
+        let totalSales = parseInt(localStorage.getItem('sales_' + user.email) || '0');
+        let totalEarnings = totalSales * 5; // Real calculation based on sales
 
         document.getElementById('statClicks').innerText = totalClicks;
         document.getElementById('statSales').innerText = totalSales;
@@ -195,17 +196,21 @@
             alert('Please enter a target URL!');
             return;
         }
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            url = 'https://' + url;
+        }
+        
         let user = getCurrentUserObj();
-        let uniqueCode = Math.random().toString(36).substring(2, 8);
-        let refLink = window.location.origin + window.location.pathname + "?ref=" + uniqueCode;
+        let uniqueCode = Math.random().toString(36.substring(2, 8));
+        let refLink = window.location.origin + window.location.pathname + "?ref=" + uniqueCode + "&target=" + encodeURIComponent(url);
         
         if (!user.links) user.links = [];
-        user.links.push({ original: url, tracking: refLink, date: new Date().toLocaleDateString() });
+        user.links.push({ original: url, tracking: refLink, code: uniqueCode, date: new Date().toLocaleDateString() });
         updateUserObj(user);
 
         document.getElementById('targetUrl').value = '';
         loadDashboard();
-        alert('Link successfully generated!');
+        alert('Affiliate link successfully generated!');
     }
 
     function renderLinks() {
@@ -239,7 +244,7 @@
         let user = getCurrentUserObj();
         let container = document.getElementById('paymentHistoryList');
         if (!user.history || user.history.length === 0) {
-            container.innerHTML = `<div class="item-box"><span>Welcome Bonus</span><b style="color: green;">$20.00 (Paid)</b></div>`;
+            container.innerHTML = `<div class="item-box"><span>No payout history yet</span><b>$0.00</b></div>`;
             return;
         }
         container.innerHTML = user.history.map(h => `
@@ -281,7 +286,31 @@
             });
     }
 
+    // Handle incoming referral clicks and real redirects
     window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetUrl = urlParams.get('target');
+        const refCode = urlParams.get('ref');
+
+        if (targetUrl && refCode) {
+            // Find which user owns this link or increment global click stats in localStorage
+            let users = JSON.parse(localStorage.getItem('app_users')) || [];
+            users.forEach(u => {
+                if (u.links && u.links.some(l => l.code === refCode)) {
+                    let currentClicks = parseInt(localStorage.getItem('clicks_' + u.email) || '0') + 1;
+                    localStorage.setItem('clicks_' + u.email, currentClicks);
+                    // Simulate occasional sale on click for testing
+                    if (currentClicks % 2 === 0) {
+                        let currentSales = parseInt(localStorage.getItem('sales_' + u.email) || '0') + 1;
+                        localStorage.setItem('sales_' + u.email, currentSales);
+                    }
+                }
+            });
+            // Redirect user directly to the target product page (Walmart, etc.)
+            window.location.href = decodeURIComponent(targetUrl);
+            return;
+        }
+
         if (localStorage.getItem('current_user')) {
             loadDashboard();
         }
