@@ -128,14 +128,14 @@
             successMessage.classList.add('hidden');
 
             if (!email) {
-                errorMessage.innerText = "Please enter your email address above to reset your password.";
+                errorMessage.innerText = "Please enter your email address above first to reset your password.";
                 errorMessage.classList.remove('hidden');
                 return;
             }
 
             try {
                 await sendPasswordResetEmail(auth, email);
-                successMessage.innerText = "Password reset link sent to your email!";
+                successMessage.innerText = "Password reset link sent to your email! Please check your inbox.";
                 successMessage.classList.remove('hidden');
             } catch (error) {
                 errorMessage.innerText = error.message;
@@ -155,9 +155,7 @@
             } else {
                 authCard.classList.remove('hidden');
                 dashboardView.classList.add('hidden');
-                emailInput.value = '';
                 passwordInput.value = '';
-                nameInput.value = '';
             }
         });
 
@@ -178,7 +176,7 @@
                 return;
             }
             // Generate custom tracked short link format
-            const uniqueId = Math.random().toString(36.substring(2, 8));
+            const uniqueId = Math.random().toString(36).substring(2, 8);
             const shortLink = `https://cooperfaye.github.io/r?id=${uniqueId}`;
             
             generatedLinkOutput.value = shortLink;
@@ -231,8 +229,8 @@
                     <input type="password" id="passwordInput" placeholder="Enter your password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
                 </div>
 
-                <div class="flex justify-between items-center text-sm">
-                    <button id="forgotPasswordBtn" class="text-purple-600 hover:underline hidden">Forgot Password?</button>
+                <div class="flex justify-end items-center text-sm">
+                    <button id="forgotPasswordBtn" type="button" class="text-purple-600 hover:underline hidden font-medium">Forgot Password?</button>
                 </div>
 
                 <button type="submit" id="submitBtn" class="w-full py-2 bg-purple-700 text-white font-semibold rounded-lg hover:bg-purple-800 transition">Sign Up</button>
@@ -240,7 +238,7 @@
 
             <div class="mt-4 text-center text-sm text-gray-600">
                 <span id="toggleText">Already have an account?</span>
-                <button id="toggleBtn" class="text-purple-700 font-semibold ml-1 hover:underline">Log In</button>
+                <button id="toggleBtn" type="button" class="text-purple-700 font-semibold ml-1 hover:underline">Log In</button>
             </div>
         </div>
     </div>
@@ -358,7 +356,7 @@
     <div id="linkResultModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div class="bg-white w-full max-w-sm p-6 rounded-2xl shadow-xl space-y-4 relative">
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-lg font-bold text-gray-800">Your Shortened Link</h3>
+                <h3 class="text-lg font-bold text-gray-800">Your Generated Link</h3>
                 <button id="closeLinkModal" class="text-gray-500 hover:text-black font-bold text-lg">✕</button>
             </div>
             
