@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creator Hub Sign Up</title>
+    <title>Creators Hub - Portal</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -20,14 +20,14 @@
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            width: 320px;
+            width: 350px;
             text-align: center;
         }
         h2 { margin-bottom: 20px; color: #333; }
         input {
             width: 100%;
             padding: 12px;
-            margin: 10px 0;
+            margin: 8px 0;
             border: 1px solid #ccc;
             border-radius: 5px;
             box-sizing: border-box;
@@ -35,7 +35,7 @@
         button {
             width: 100%;
             padding: 12px;
-            margin: 10px 0;
+            margin: 8px 0;
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -43,28 +43,52 @@
         }
         .btn-signup { background-color: #7c3aed; color: white; }
         .btn-login { background-color: #222; color: white; }
-        .btn-forgot { background-color: #4f46e5; color: white; }
+        .btn-paypal { background-color: #0070ba; color: white; }
+        .btn-stripe { background-color: #635bff; color: white; }
+        .hidden { display: none; }
+        .settings-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h2>Creator Hub Sign Up</h2>
+    <!-- Main Portal Card -->
+    <div class="card" id="authCard">
+        <h2>Creators Hub Sign Up</h2>
         
+        <input type="text" id="fullName" placeholder="Full Name">
         <input type="email" id="email" placeholder="Email address">
         <input type="password" id="password" placeholder="Password">
+        <input type="text" id="fbGroup" placeholder="Facebook Group Link">
         
-        <button class="btn-signup" onclick="handleSignUp()">Sign Up</button>
-        <button class="btn-login" onclick="window.location.href='login.html'">Already have an account? Log In</button>
-        <button class="btn-forgot" onclick="handleForgotPassword()">Forgot Password?</button>
+        <button class="btn-signup" onclick="handleSignUp()">Sign Up & Request Approval</button>
+        <button class="btn-login" onclick="alert('Login feature will check admin approval status.')">Already have an account? Log In</button>
     </div>
 
+    <!-- Dashboard (Hidden initially, shown after login/approval) -->
+    <div class="card hidden" id="dashboardCard">
+        <div class="settings-icon" onclick="toggleSettings()">⚙️</div>
+        <h2>Welcome, <span id="displayName">User</span></h2>
+        <p><strong>Email:</strong> <span id="displayEmail"></span></p>
+        <p><strong>FB Group:</strong> <span id="displayFb"></span></p>
+        <hr style="margin: 20px 0;">
+        <h3>Upgrade / Payment Options</h3>
+        <button class="btn-paypal" onclick="alert('Redirecting to PayPal...')">Pay with PayPal</button>
+        <button class="btn-stripe" onclick="alert('Redirecting to Stripe...')">Pay with Stripe</button>
+    </div>
+
+    <!-- Firebase Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyCgRGUpFz7Y0waNmJgqYf7YF...",
+            apiKey: "AIzaSyCgRGUpFz7Y0waNmJgqYf7YF-e52054",
             authDomain: "creators-hub-2eOfd.firebaseapp.com",
             projectId: "creators-hub-2eOfd",
             storageBucket: "creators-hub-2eOfd.appspot.com",
@@ -76,37 +100,28 @@
         const auth = getAuth(app);
 
         window.handleSignUp = function() {
+            const name = document.getElementById('fullName').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const fbGroup = document.getElementById('fbGroup').value;
 
-            if (!email || !password) {
-                alert("Please enter both email and password!");
+            if (!name || !email || !password || !fbGroup) {
+                alert("Please fill in all fields including your Facebook Group link!");
                 return;
             }
 
             createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    alert("Account successfully created!");
+                .then(() => {
+                    alert("Account created successfully! Your request is pending admin approval. You will be able to log in once approved.");
+                    // Yahan aap data ko database me bhej sakte hain
                 })
                 .catch((error) => {
                     alert("Error: " + error.message);
                 });
         };
 
-        window.handleForgotPassword = function() {
-            const email = document.getElementById('email').value;
-            if (!email) {
-                alert("Please enter your email address in the email field first!");
-                return;
-            }
-
-            sendPasswordResetEmail(auth, email)
-                .then(() => {
-                    alert("Password reset email sent! Check your inbox.");
-                })
-                .catch((error) => {
-                    alert("Error: " + error.message);
-                });
+        window.toggleSettings = function() {
+            alert("Settings panel: Profile details management.");
         };
     </script>
 </body>
