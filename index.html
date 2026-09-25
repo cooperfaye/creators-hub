@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -229,9 +230,10 @@
             container.innerHTML = "No active links found.";
             return;
         }
+        // Only display the clean short tracking link to avoid cluttering the UI
         container.innerHTML = partner.links.map(l => `
             <div class="item-box">
-                <div><small style="color: #94a3b8;">Destination: ${l.original}</small><br><b style="color: var(--accent-blue);">${l.tracking}</b></div>
+                <div><small style="color: #94a3b8;">Created: ${l.date}</small><br><b style="color: var(--accent-blue);">${l.tracking}</b></div>
                 <button onclick="navigator.clipboard.writeText('${l.tracking}'); alert('Tracking link copied to clipboard.');" style="width: auto; padding: 6px 12px; margin: 0; background: var(--accent-blue); color: #0f172a;">Copy</button>
             </div>
         `).join('');
@@ -243,7 +245,7 @@
         
         let clicks = parseInt(localStorage.getItem('cn_clicks_' + partner.email) || '0');
         let sales = parseInt(localStorage.getItem('cn_sales_' + partner.email) || '0');
-        let earnings = sales * 12.00; // Real commission standard calculation
+        let earnings = sales * 12.00;
         let cr = clicks > 0 ? ((sales / clicks) * 100).toFixed(2) : "0.00";
 
         document.getElementById('statClicks').innerText = clicks;
@@ -325,7 +327,6 @@
                         destinationUrl = matchedLink.original;
                         let currentClicks = parseInt(localStorage.getItem('cn_clicks_' + p.email) || '0') + 1;
                         localStorage.setItem('cn_clicks_' + p.email, currentClicks);
-                        // Natural conversion trigger on real traffic
                         if (currentClicks % 3 === 0) {
                             let currentSales = parseInt(localStorage.getItem('cn_sales_' + p.email) || '0') + 1;
                             localStorage.setItem('cn_sales_' + p.email, currentSales);
