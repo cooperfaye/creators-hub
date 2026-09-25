@@ -168,7 +168,7 @@
             settingsModal.classList.add('hidden');
         });
 
-        // Bulletproof Link Generator (Outputs clean direct trackable link without 404)
+        // Direct Link Formatter (Outputs clean final link instantly without 404 errors)
         generateLinkBtn.addEventListener('click', () => {
             let longUrl = urlInput.value.trim();
             if (!longUrl) {
@@ -179,13 +179,8 @@
                 longUrl = 'https://' + longUrl;
             }
             
-            // Generates a unique tracking code stored safely
-            const uniqueId = Math.random().toString(36).substring(2, 8);
-            
-            // Clean direct hash format that GitHub Pages supports natively without 404
-            const smartLink = `https://cooperfaye.github.io/#to=${encodeURIComponent(longUrl)}`;
-            
-            generatedLinkOutput.value = smartLink;
+            // Instantly gives back the clean formatted affiliate/product link ready to use
+            generatedLinkOutput.value = longUrl;
             linkResultModal.classList.remove('hidden');
         });
 
@@ -199,17 +194,6 @@
         closeLinkModal.addEventListener('click', () => {
             linkResultModal.classList.add('hidden');
             urlInput.value = '';
-        });
-
-        // Auto-Redirect handler using Hash routing (GitHub 100% compatible, zero 404 errors)
-        window.addEventListener('DOMContentLoaded', () => {
-            const hash = window.location.hash;
-            if (hash.startsWith('#to=')) {
-                const targetUrl = decodeURIComponent(hash.replace('#to=', ''));
-                if (targetUrl.startsWith('http')) {
-                    window.location.replace(targetUrl);
-                }
-            }
         });
 
         // Logout Handler
@@ -373,7 +357,7 @@
     <div id="linkResultModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div class="bg-white w-full max-w-sm p-6 rounded-2xl shadow-xl space-y-4 relative">
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-lg font-bold text-gray-800">Your Smart Link</h3>
+                <h3 class="text-lg font-bold text-gray-800">Your Ready Link</h3>
                 <button id="closeLinkModal" class="text-gray-500 hover:text-black font-bold text-lg">✕</button>
             </div>
             
