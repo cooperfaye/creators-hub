@@ -1,102 +1,100 @@
-
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Affiliate Dashboard</title>
+    <title>Affiliate Dashboard</title>
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script type="text/javascript">
         (function() {
-            emailjs.init("wOjWKKEVoYnQFQgzj"); // Public Key
+            emailjs.init("wOjWKKEVoYnQFQgzj");
         })();
     </script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 650px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        body { font-family: Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .hidden { display: none !important; }
-        input, button { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
-        button { background: #007BFF; color: white; border: none; cursor: pointer; font-weight: bold; transition: background 0.3s; }
+        input, button { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        button { background: #007BFF; color: white; border: none; cursor: pointer; font-weight: bold; }
         button:hover { background: #0056b3; }
-        .dashboard-stats { display: flex; justify-content: space-between; margin-bottom: 20px; gap: 10px; }
-        .stat-card { background: #e9ecef; padding: 15px; border-radius: 8px; width: 33%; text-align: center; }
-        .stat-card h4 { margin: 0 0 5px 0; color: #555; font-size: 14px; }
-        .stat-card p { margin: 0; font-size: 18px; font-weight: bold; color: #007BFF; }
-        .link-item, .history-item { background: #f8f9fa; padding: 12px; margin-top: 10px; border-left: 5px solid #007BFF; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; gap: 10px; word-break: break-all; }
-        .nav-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 12px; margin-bottom: 20px; }
-        .section-box { background: #fdfdfe; padding: 15px; border: 1px solid #e1e4e8; border-radius: 8px; margin-bottom: 20px; }
-        .section-box h3 { margin-top: 0; font-size: 16px; color: #333; }
+        .stats-box { display: flex; justify-content: space-between; margin-bottom: 20px; gap: 10px; }
+        .stat-card { background: #e9ecef; padding: 15px; border-radius: 6px; width: 33%; text-align: center; }
+        .stat-card h4 { margin: 0 0 5px 0; font-size: 13px; color: #555; }
+        .stat-card p { margin: 0; font-size: 16px; font-weight: bold; color: #007BFF; }
+        .item-box { background: #f8f9fa; padding: 10px; margin-top: 8px; border-left: 4px solid #007BFF; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; word-break: break-all; }
+        .nav-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
+        .section-block { background: #fafbfc; padding: 15px; border: 1px solid #e1e4e8; border-radius: 6px; margin-bottom: 15px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- AUTH SECTION (Login / Signup) -->
+    <!-- AUTH SECTION -->
     <div id="authSection">
-        <h2 id="authTitle" style="text-align: center; color: #333;">लॉग-इन करें</h2>
+        <h2 id="authTitle" style="text-align: center;">Login to Account</h2>
         <form id="authForm" onsubmit="handleAuth(event)">
-            <input type="text" id="authName" placeholder="पूरा नाम (सिर्फ साइन-अप के लिए)" class="hidden">
-            <input type="email" id="authEmail" placeholder="ईमेल एड्रेस" required>
-            <input type="password" id="authPassword" placeholder="पासवर्ड" required>
-            <button type="submit" id="authBtn">लॉग-इन</button>
+            <input type="text" id="authName" placeholder="Full Name (For Signup)" class="hidden">
+            <input type="email" id="authEmail" placeholder="Email Address" required>
+            <input type="password" id="authPassword" placeholder="Password" required>
+            <button type="submit" id="authBtn">Login</button>
         </form>
         <p style="text-align: center; cursor: pointer; color: #007BFF;" onclick="toggleAuthMode()">
-            <span id="toggleText">खाता नहीं है? साइन-अप करें</span>
+            <span id="toggleText">Don't have an account? Sign up</span>
         </p>
-        <p style="text-align: center; cursor: pointer; color: #dc3545;" onclick="showForgotModal()">पासवर्ड भूल गए?</p>
+        <p style="text-align: center; cursor: pointer; color: #dc3545;" onclick="showForgot()">Forgot Password?</p>
     </div>
 
     <!-- FORGOT PASSWORD SECTION -->
     <div id="forgotSection" class="hidden">
-        <h2>पासवर्ड रीसेट करें</h2>
-        <p>अपना रजिस्टर्ड ईमेल दर्ज करें:</p>
-        <input type="email" id="forgotEmail" placeholder="ईमेल एड्रेस">
-        <button onclick="sendPasswordReset()">रीसेट लिंक भेजें</button>
-        <p style="text-align: center; cursor: pointer; color: #007BFF;" onclick="backToLogin()">वापस लॉग-इन पर जाएं</p>
+        <h2>Reset Password</h2>
+        <p>Enter your registered email address:</p>
+        <input type="email" id="forgotEmail" placeholder="Email Address">
+        <button onclick="sendResetEmail()">Send Reset Link</button>
+        <p style="text-align: center; cursor: pointer; color: #007BFF;" onclick="backToLogin()">Back to Login</p>
     </div>
 
     <!-- DASHBOARD SECTION -->
     <div id="dashboardSection" class="hidden">
         <div class="nav-bar">
             <div>
-                <h3 id="userDisplayName" style="margin: 0; color: #333;"></h3>
+                <h3 id="userDisplayName" style="margin: 0;"></h3>
                 <small id="userDisplayEmail" style="color: #666;"></small>
             </div>
-            <button onclick="logout()" style="width: auto; padding: 8px 15px; background: #dc3545;">लॉग-आउट</button>
+            <button onclick="logout()" style="width: auto; padding: 6px 12px; background: #dc3545;">Logout</button>
         </div>
 
-        <!-- Stats Overview -->
-        <div class="dashboard-stats">
-            <div class="stat-card"><h4>क्लिक्स</h4><p id="statClicks">0</p></div>
-            <div class="stat-card"><h4>सेल्स</h4><p id="statSales">0</p></div>
-            <div class="stat-card"><h4>अर्निंग्स</h4><p id="statEarnings">$0.00</p></div>
+        <!-- Stats -->
+        <div class="stats-box">
+            <div class="stat-card"><h4>Clicks</h4><p id="statClicks">0</p></div>
+            <div class="stat-card"><h4>Sales</h4><p id="statSales">0</p></div>
+            <div class="stat-card"><h4>Earnings</h4><p id="statEarnings">$0.00</p></div>
         </div>
 
         <!-- Link Generator -->
-        <div class="section-box">
-            <h3>नया एफिलिएट लिंक बनाएँ</h3>
-            <input type="text" id="targetUrl" placeholder="प्रोडक्ट या ओरिजिनल लिंक यहाँ डालें (जैसे https://example.com)">
-            <button onclick="generateLink()">लिंक जनरेट करें</button>
+        <div class="section-block">
+            <h3>Generate Affiliate Link</h3>
+            <input type="text" id="targetUrl" placeholder="Enter original URL (e.g., https://example.com)">
+            <button onclick="generateLink()">Generate Link</button>
         </div>
 
         <!-- Saved Links -->
-        <div class="section-box">
-            <h3>आपके बनाए गए लिंक्स</h3>
-            <div id="linksList">कोई लिंक नहीं बनाया गया है।</div>
+        <div class="section-block">
+            <h3>Your Generated Links</h3>
+            <div id="linksList">No links generated yet.</div>
         </div>
 
         <!-- PayPal Settings -->
-        <div class="section-box">
-            <h3>पेपैल (PayPal) सेटिंग्स</h3>
-            <input type="text" id="paypalEmail" placeholder="PayPal ईमेल एड्रेस दर्ज करें">
-            <button onclick="savePayPal()">पेपैल सेव करें</button>
+        <div class="section-block">
+            <h3>PayPal Settings</h3>
+            <input type="text" id="paypalEmail" placeholder="Enter PayPal Email Address">
+            <button onclick="savePayPal()">Save PayPal</button>
         </div>
 
         <!-- Payment History -->
-        <div class="section-box">
-            <h3>पेमेंट हिस्ट्री</h3>
-            <div id="paymentHistoryList">कोई पेमेंट हिस्ट्री उपलब्ध नहीं है।</div>
+        <div class="section-block">
+            <h3>Payment History</h3>
+            <div id="paymentHistoryList">No payment history available.</div>
         </div>
     </div>
 </div>
@@ -106,9 +104,9 @@
 
     function toggleAuthMode() {
         isSignup = !isSignup;
-        document.getElementById('authTitleinnerText = isSignup ? "नया खाता बनाएँ (साइन-अप)" : "लॉग-इन करें";
-        document.getElementById('authBtn').innerText = isSignup ? "साइन-अप" : "लॉग-इन";
-        document.getElementById('toggleText').innerText = isSignup ? "पहले से खाता है? लॉग-इन करें" : "खाता नहीं है? साइन-अप करें";
+        document.getElementById('authTitle').innerText = isSignup ? "Create Account (Sign Up)" : "Login to Account";
+        document.getElementById('authBtn').innerText = isSignup ? "Sign Up" : "Login";
+        document.getElementById('toggleText').innerText = isSignup ? "Already have an account? Login" : "Don't have an account? Sign up";
         document.getElementById('authName').classList.toggle('hidden', !isSignup);
     }
 
@@ -122,16 +120,16 @@
 
         if (isSignup) {
             if (!name) {
-                alert('कृपया अपना नाम दर्ज करें!');
+                alert('Please enter your name!');
                 return;
             }
             if (users.find(u => u.email === email)) {
-                alert('यह ईमेल पहले से रजिस्टर्ड है!');
+                alert('This email is already registered!');
                 return;
             }
             users.push({ name, email, password, paypal: '', links: [], history: [] });
             localStorage.setItem('app_users', JSON.stringify(users));
-            alert('साइन-अप सफल! अब लॉग-इन करें।');
+            alert('Signup successful! Please login now.');
             toggleAuthMode();
         } else {
             let user = users.find(u => u.email === email && u.password === password);
@@ -139,7 +137,7 @@
                 localStorage.setItem('current_user', JSON.stringify(email));
                 loadDashboard();
             } else {
-                alert('गलत ईमेल या पासवर्ड!');
+                alert('Invalid email or password!');
             }
         }
     }
@@ -152,14 +150,13 @@
         let user = getCurrentUserObj();
         if (!user) return;
 
-        document.getElementById('userDisplayName').innerText = user.name || "यूजर";
+        document.getElementById('userDisplayName').innerText = user.name || "User";
         document.getElementById('userDisplayEmail').innerText = user.email;
         document.getElementById('paypalEmail').value = user.paypal || '';
 
-        // Dynamic Stats calculation based on generated links
-        let totalClicks = (user.links ? user.links.length : 0) * 14;
+        let totalClicks = (user.links ? user.links.length : 0) * 15;
         let totalSales = (user.links ? user.links.length : 0) * 3;
-        let totalEarnings = totalSales * 12.5;
+        let totalEarnings = totalSales * 10;
 
         document.getElementById('statClicks').innerText = totalClicks;
         document.getElementById('statSales').innerText = totalSales;
@@ -177,7 +174,7 @@
         return users.find(u => u.email === email);
     }
 
-    function updateCurrentserObj(user) {
+    function updateUserObj(user) {
         let users = JSON.parse(localStorage.getItem('app_users')) || [];
         let index = users.findIndex(u => u.email === user.email);
         if (index !== -1) {
@@ -195,7 +192,7 @@
     function generateLink() {
         let url = document.getElementById('targetUrl').value.trim();
         if (!url) {
-            alert('कृपया वैलिड लिंक दर्ज करें!');
+            alert('Please enter a target URL!');
             return;
         }
         let user = getCurrentUserObj();
@@ -204,24 +201,24 @@
         
         if (!user.links) user.links = [];
         user.links.push({ original: url, tracking: refLink, date: new Date().toLocaleDateString() });
-        updateCurrentserObj(user);
+        updateUserObj(user);
 
         document.getElementById('targetUrl').value = '';
         loadDashboard();
-        alert('एफिलिएट लिंक सफलतापूर्वक जनरेट हो गया!');
+        alert('Link successfully generated!');
     }
 
     function renderLinks() {
         let user = getCurrentUserObj();
         let container = document.getElementById('linksList');
         if (!user.links || user.links.length === 0) {
-            container.innerHTML = "कोई लिंक नहीं बनाया गया है।";
+            container.innerHTML = "No links generated yet.";
             return;
         }
         container.innerHTML = user.links.map(l => `
-            <div class="link-item">
+            <div class="item-box">
                 <div><small style="color: #666;">Target: ${l.original}</small><br><b>${l.tracking}</b></div>
-                <button onclick="navigator.clipboard.writeText('${l.tracking}'); alert('लिंक कॉपी हो गया!');" style="width: auto; padding: 6px 12px; margin: 0;">कॉपी</button>
+                <button onclick="navigator.clipboard.writeText('${l.tracking}'); alert('Link copied to clipboard!');" style="width: auto; padding: 6px 10px; margin: 0;">Copy</button>
             </div>
         `).join('');
     }
@@ -229,28 +226,28 @@
     function savePayPal() {
         let paypal = document.getElementById('paypalEmail').value.trim();
         if (!paypal) {
-            alert('कृपया वैध पेपैल ईमेल दर्ज करें!');
+            alert('Please enter a valid PayPal email!');
             return;
         }
         let user = getCurrentUserObj();
         user.paypal = paypal;
-        updateCurrentserObj(user);
-        alert('PayPal आईडी सफलतापूर्वक सेव हो गई!');
+        updateUserObj(user);
+        alert('PayPal email saved successfully!');
     }
 
     function renderHistory() {
         let user = getCurrentUserObj();
         let container = document.getElementById('paymentHistoryList');
         if (!user.history || user.history.length === 0) {
-            container.innerHTML = `<div class="history-item"><span>वेलकम बोनस पेपैल ट्रांजैक्शन (${new Date().toLocaleDateString()})</span><b style="color: green;">$25.00 (Paid)</b></div>`;
+            container.innerHTML = `<div class="item-box"><span>Welcome Bonus</span><b style="color: green;">$20.00 (Paid)</b></div>`;
             return;
         }
         container.innerHTML = user.history.map(h => `
-            <div class="history-item"><span>${h.date}</span><b>${h.amount} (${h.status})</b></div>
+            <div class="item-box"><span>${h.date}</span><b>${h.amount}</b></div>
         `).join('');
     }
 
-    function showForgotModal() {
+    function showForgot() {
         document.getElementById('authSection').classList.add('hidden');
         document.getElementById('forgotSection').classList.remove('hidden');
     }
@@ -260,13 +257,13 @@
         document.getElementById('authSection').classList.remove('hidden');
     }
 
-    function sendPasswordReset() {
+    function sendResetEmail() {
         let email = document.getElementById('forgotEmail').value.trim();
         let users = JSON.parse(localStorage.getItem('app_users')) || [];
         let user = users.find(u => u.email === email);
 
         if (!user) {
-            alert('यह ईमेल हमारे डेटाबेस में रजिस्टर्ड नहीं है!');
+            alert('This email is not registered!');
             return;
         }
 
@@ -277,10 +274,10 @@
 
         emailjs.send('service_90gux4a', 'template_92jkb3j', templateParams)
             .then(function() {
-                alert('पासवर्ड रीसेट लिंक आपके ईमेल पर सफलतापूर्वक भेज दिया गया है!');
+                alert('Password reset link sent to your email!');
                 backToLogin();
             }, function(error) {
-                alert('ईमेल भेजने में विफल रहा। कृपया पुनः प्रयास करें।');
+                alert('Failed to send email. Please try again.');
             });
     }
 
