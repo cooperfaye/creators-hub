@@ -22,6 +22,7 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             width: 350px;
             text-align: center;
+            position: relative;
         }
         h2 { margin-bottom: 20px; color: #333; }
         input {
@@ -43,49 +44,62 @@
         }
         .btn-signup { background-color: #7c3aed; color: white; }
         .btn-login { background-color: #222; color: white; }
+        .btn-forgot { background-color: #4f46e5; color: white; }
         .btn-paypal { background-color: #0070ba; color: white; }
         .btn-stripe { background-color: #635bff; color: white; }
         .hidden { display: none; }
         .settings-icon {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 24px;
+            top: 15px;
+            right: 15px;
+            font-size: 22px;
             cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <!-- Main Portal Card -->
+    <!-- Main Auth Card -->
     <div class="card" id="authCard">
-        <h2>Creators Hub Sign Up</h2>
+        <h2>Creators Hub</h2>
         
         <input type="text" id="fullName" placeholder="Full Name">
         <input type="email" id="email" placeholder="Email address">
         <input type="password" id="password" placeholder="Password">
         <input type="text" id="fbGroup" placeholder="Facebook Group Link">
         
-        <button class="btn-signup" onclick="handleSignUp()">Sign Up & Request Approval</button>
-        <button class="btn-login" onclick="alert('Login feature will check admin approval status.')">Already have an account? Log In</button>
+        <button class="btn-signup" onclick="handleSignUp()">Sign Up</button>
+        <button class="btn-login" onclick="handleLogin()">Log In</button>
+        <button class="btn-forgot" onclick="handleForgotPassword()">Forgot Password?</button>
     </div>
 
-    <!-- Dashboard (Hidden initially, shown after login/approval) -->
+    <!-- Dashboard Card (Shown after login) -->
     <div class="card hidden" id="dashboardCard">
-        <div class="settings-icon" onclick="toggleSettings()">⚙️</div>
+        <div class="settings-icon" onclick="openSettings()">⚙️</div>
         <h2>Welcome, <span id="displayName">User</span></h2>
-        <p><strong>Email:</strong> <span id="displayEmail"></span></p>
-        <p><strong>FB Group:</strong> <span id="displayFb"></span></p>
+        <p style="text-align: left;"><strong>Email:</strong> <span id="displayEmail"></span></p>
+        <p style="text-align: left;"><strong>FB Group:</strong> <a href="#" id="displayFb" target="_blank">View Link</a></p>
         <hr style="margin: 20px 0;">
-        <h3>Upgrade / Payment Options</h3>
+        <h3>Upgrade / Payment</h3>
         <button class="btn-paypal" onclick="alert('Redirecting to PayPal...')">Pay with PayPal</button>
         <button class="btn-stripe" onclick="alert('Redirecting to Stripe...')">Pay with Stripe</button>
+        <button class="btn-login" onclick="handleLogout()" style="margin-top: 15px; background-color: #dc2626;">Log Out</button>
     </div>
 
-    <!-- Firebase Script -->
+    <!-- Settings Modal / View -->
+    <div class="card hidden" id="settingsCard">
+        <h2>Profile Settings</h2>
+        <p style="text-align: left;"><strong>Name:</strong> <span id="settingsName"></span></p>
+        <p style="text-align: left;"><strong>Email:</strong> <span id="settingsEmail"></span></p>
+        <p style="text-align: left;"><strong>FB Group:</strong> <span id="settingsFb"></span></p>
+        <button class="btn-login" onclick="closeSettings()" style="margin-top: 15px;">Back to Dashboard</button>
+    </div>
+
+    <!-- Firebase SDK Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCgRGUpFz7Y0waNmJgqYf7YF-e52054",
@@ -98,30 +112,123 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        window.handleSignUp = function() {
+        // Sign Up Function
+        window.handleSignUp = async function() {
             const name = document.getElementById('fullName').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const fbGroup = document.getElementById('fbGroup').value;
 
             if (!name || !email || !password || !fbGroup) {
-                alert("Please fill in all fields including your Facebook Group link!");
+                alert("Please fill in all fields!");
                 return;
             }
 
-            createUserWithEmailAndPassword(auth, email, password)
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // Save user details to Firestore with status: pending
+                await setDoc(doc(db, "users", user.uid), {
+                    fullName: name,
+                    email: email,
+                    fbGroup: fbGroup,
+                    status: "pending",
+                    createdAt: new Date().toISOString()
+                });
+
+                alert("Account created successfully! Your account is pending admin approval.");
+            } catch (error) {
+                alert("Error: " + error.message);
+            }
+        };
+
+        // Login Function with Admin Approval Check
+        window.handleLogin = async function() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                alert("Please enter email and password to log in!");
+                return;
+            }
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // Check approval status from Firestore
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    if (userData.status === "approved") {
+                        // Show Dashboard & Display Name
+                        document.getElementById('authCard').classList.add('hidden');
+                        document.getElementById('dashboardCard').classList.remove('hidden');
+                        document.getElementById('displayName').innerText = userData.fullName;
+                        document.getElementById('displayEmail').innerText = userData.email;
+                        document.getElementById('displayFb').innerText = userData.fbGroup;
+                        document.getElementById('displayFb').href = userData.fbGroup;
+                    } else {
+                        alert("Your account is still pending admin approval. Please wait for activation.");
+                        signOut(auth);
+                    }
+                } else {
+                    alert("User data not found in database!");
+                    signOut(auth);
+                }
+            } catch (error) {
+                alert("Login Error: " + error.message);
+            }
+        };
+
+        // Forgot Password Function
+        window.handleForgotPassword = function() {
+            const email = document.getElementById('email').value;
+            if (!email) {
+                alert("Please enter your email address in the email field first!");
+                return;
+            }
+
+            sendPasswordResetEmail(auth, email)
                 .then(() => {
-                    alert("Account created successfully! Your request is pending admin approval. You will be able to log in once approved.");
-                    // Yahan aap data ko database me bhej sakte hain
+                    alert("Password reset email sent! Check your inbox.");
                 })
                 .catch((error) => {
                     alert("Error: " + error.message);
                 });
         };
 
-        window.toggleSettings = function() {
-            alert("Settings panel: Profile details management.");
+        // Settings Modal Toggle
+        window.openSettings = async function() {
+            const user = auth.currentUser;
+            if (user) {
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    document.getElementById('settingsName').innerText = data.fullName;
+                    document.getElementById('settingsEmail').innerText = data.email;
+                    document.getElementById('settingsFb').innerText = data.fbGroup;
+                    
+                    document.getElementById('dashboardCard').classList.add('hidden');
+                    document.getElementById('settingsCard').classList.remove('hidden');
+                }
+            }
+        };
+
+        window.closeSettings = function() {
+            document.getElementById('settingsCard').classList.add('hidden');
+            document.getElementById('dashboardCard').classList.remove('hidden');
+        };
+
+        window.handleLogout = function() {
+            signOut(auth).then(() => {
+                document.getElementById('dashboardCard').classList.add('hidden');
+                document.getElementById('authCard').classList.remove('hidden');
+                alert("Logged out successfully.");
+            });
         };
     </script>
 </body>
