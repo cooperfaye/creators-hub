@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,7 +44,7 @@
         </div>
         <form id="authForm" onsubmit="handleAuth(event)">
             <input type="text" id="authName" placeholder="Full Name (For Registration)" class="hidden">
-            <input type="email" id="authEmail" placeholder="Email Address (Use admin email for CEO login)" required>
+            <input type="email" id="authEmail" placeholder="Email Address" required>
             <input type="password" id="authPassword" placeholder="Password" required>
             <button type="submit" id="authBtn">Sign In</button>
         </form>
@@ -136,7 +137,8 @@
 
 <script>
     let isSignup = false;
-    const ADMIN_EMAIL = "admin@walmart.com"; // अपनी सीईओ एडमिन आईडी
+    const ADMIN_EMAIL = "admin@walmart.com";
+    const ADMIN_PASS = "admin123";
 
     function toggleAuthMode() {
         isSignup = !isSignup;
@@ -148,20 +150,15 @@
 
     function handleAuth(event) {
         event.preventDefault();
-        const email = document.getElementById('authEmail').value.trim();
+        const email = document.getElementById('authEmail').value.trim().toLowerCase();
         const password = document.getElementById('authPassword').value;
         const name = document.getElementById('authName').value.trim();
 
-        // अगर एडमिन लॉगिन कर रहा है
-        if (!isSignup && email === ADMIN_EMAIL) {
-            if (password === "admin123" || password === "admin") { // डिफ़ॉल्ट एडमिन पासवर्ड
-                localStorage.setItem('walmart_session', JSON.stringify(email));
-                loadAdminDashboard();
-                return;
-            } else {
-                alert('Invalid Admin Password.');
-                return;
-            }
+        // एडमिन लॉगिन चेक
+        if (!isSignup && email === ADMIN_EMAIL && password === ADMIN_PASS) {
+            localStorage.setItem('walmart_session', JSON.stringify(email));
+            loadAdminDashboard();
+            return;
         }
 
         let partners = JSON.parse(localStorage.getItem('walmart_partners')) || [];
@@ -287,7 +284,7 @@
         let trackingUrl = window.location.origin + window.location.pathname.replace('index.html', '') + "?track=" + uniqueCode;
         
         if (!partner.links) partner.links = [];
-        partner.links.log = partner.links.push({ original: url, tracking: trackingUrl, code: uniqueCode, date: new Date().toLocaleDateString() });
+        partner.links.push({ original: url, tracking: trackingUrl, code: uniqueCode, date: new Date().toLocaleDateString() });
         updatePartnerObj(partner);
 
         document.getElementById('targetUrl').value = '';
@@ -403,4 +400,27 @@
                         if (currentClicks % 3 === 0) {
                             let currentSales = parseInt(localStorage.getItem('walmart_sales_' + p.email) || '0') + 1;
                             localStorage.setItem('walmart_sales_' + p.email, currentSales);
-                  
+                        }
+                    }
+                }
+            });
+            if (destinationUrl) {
+                window.location.replace(destinationUrl);
+                return;
+            }
+        }
+
+        let sessionEmail = localStorage.getItem('walmart_session');
+        if (sessionEmail) {
+            let email = JSON.parse(sessionEmail);
+            if (email === ADMIN_EMAIL) {
+                loadAdminDashboard();
+            } else {
+                loadPartnerDashboard();
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
