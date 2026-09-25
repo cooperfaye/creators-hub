@@ -25,7 +25,7 @@
         .stat-card { background: #0f172a; padding: 18px; border-radius: 8px; border: 1px solid var(--border-color); text-align: center; }
         .stat-card h4 { margin: 0 0 8px 0; font-size: 12px; color: #94a3b8; text-transform: uppercase; }
         .stat-card p { margin: 0; font-size: 20px; font-weight: bold; color: var(--accent-blue); }
-        .item-box { background: #0f172a; padding: 14px; margin-top: 10px; border: 1px solid var(--border-color); border-radius: 6px; display: flex; justify-content: space-between; align-items: center; word-break: break-all; }
+        .item-box { background: #0f172a; padding: 14px; margin-top: 10px; border: 1px solid var(--border-color); border-radius: 6px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
         .nav-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 25px; }
         .section-block { background: #1e293b; padding: 20px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 20px; }
         .brand-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
@@ -244,8 +244,11 @@
         }
         container.innerHTML = partner.links.map(l => `
             <div class="item-box">
-                <div><small style="color: #94a3b8;">Created: ${l.date}</small><br><b style="color: var(--accent-blue);">${l.tracking}</b></div>
-                <button onclick="navigator.clipboard.writeText('${l.tracking}'); alert('Tracking link copied to clipboard.');" style="width: auto; padding: 6px 12px; margin: 0; background: var(--accent-blue); color: #f8fafc;">Copy</button>
+                <div style="overflow: hidden;">
+                    <small style="color: #94a3b8;">Created: ${l.date} | Target: <a href="${l.original}" target="_blank" style="color: #93c5fd; text-decoration: none;">${l.original}</a></small><br>
+                    <b style="color: var(--accent-blue); word-break: break-all; font-size: 13px;">${l.tracking}</b>
+                </div>
+                <button onclick="navigator.clipboard.writeText('${l.tracking}'); alert('Tracking link copied to clipboard.');" style="width: auto; padding: 8px 16px; margin: 0; background: var(--accent-blue); color: #f8fafc; flex-shrink: 0;">Copy</button>
             </div>
         `).join('');
     }
