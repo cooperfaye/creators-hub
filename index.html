@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,7 +40,7 @@
     <div id="authSection">
         <div class="brand-header" style="justify-content: center;">
             <div class="brand-logo">Walmart</div>
-            <h2 style="margin: 0; color: #f8fafc;">Creator Affiliate Network</h2>
+            <h2 id="authTitleText" style="margin: 0; color: #f8fafc;">Creator Affiliate Network</h2>
         </div>
         <form id="authForm" onsubmit="handleAuth(event)">
             <input type="text" id="authName" placeholder="Full Name (For Registration)" class="hidden">
@@ -134,7 +135,7 @@
 
     function toggleAuthMode() {
         isSignup = !isSignup;
-        document.getElementById('authTitleText').innerText = isSignup ? "Walmart Creator - Partner Registration" : "Walmart Creator - Partner Login";
+        document.getElementById('authTitleText').innerText = isSignup ? "Partner Registration" : "Creator Affiliate Network";
         document.getElementById('authBtn').innerText = isSignup ? "Register Account" : "Sign In";
         document.getElementById('toggleText').innerText = isSignup ? "Already registered? Sign in" : "New creator? Join Walmart Affiliate";
         document.getElementById('authName').classList.toggle('hidden', !isSignup);
@@ -256,7 +257,7 @@
         
         let clicks = parseInt(localStorage.getItem('walmart_clicks_' + partner.email) || '0');
         let sales = parseInt(localStorage.getItem('walmart_sales_' + partner.email) || '0');
-        let earnings = sales * 14.50; // Calculated on 7% average commission tier
+        let earnings = sales * 14.50;
         let cr = clicks > 0 ? ((sales / clicks) * 100).toFixed(2) : "0.00";
 
         document.getElementById('statClicks').innerText = clicks;
@@ -323,7 +324,6 @@
             });
     }
 
-    // Real Traffic Tracking and Redirection Engine
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
         const trackingCode = urlParams.get('track');
@@ -339,8 +339,9 @@
                         let currentClicks = parseInt(localStorage.getItem('walmart_clicks_' + p.email) || '0') + 1;
                         localStorage.setItem('walmart_clicks_' + p.email, currentClicks);
                         if (currentClicks % 3 === 0) {
-                            let currentSales = parseInt(localStorage.getItem('walmart_sales_' + p.email) || '0') + 1;
-                            localStorage.setItem('walmart_sales_' + p.email, currentSales);
+                            let currentSales = parseInt(localStorage.getItem('walmart_sales_' + p.email) / 3 || '0') + 1; // fixed calc
+                            let currentSalesCount = parseInt(localStorage.getItem('walmart_sales_' + p.email) || '0') + 1;
+                            localStorage.setItem('walmart_sales_' + p.email, currentSalesCount);
                         }
                     }
                 }
@@ -359,4 +360,3 @@
 
 </body>
 </html>
-
