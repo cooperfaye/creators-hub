@@ -104,6 +104,15 @@
             <button onclick="logout()" class="btn-danger" style="width: auto; padding: 6px 14px; margin:0;">Sign Out</button>
         </div>
 
+        <!-- WALMART API & AFFILIATE CONFIGURATION SECTION -->
+        <div class="section-block" style="border: 1px dashed var(--accent-blue);">
+            <h3 style="margin-top:0; color: var(--accent-blue);">🔗 Walmart Creator API & Affiliate Configuration</h3>
+            <small style="color: #94a3b8;">Enter your official Walmart Publisher ID / API Key once approved to sync real tracking.</small>
+            <input type="text" id="ceoWalmartPublisherId" placeholder="Enter Walmart Publisher ID / Tracking ID (e.g., WM-123456)">
+            <input type="text" id="ceoWalmartApiKey" placeholder="Enter Walmart API Key / Token (Optional for automated feeds)">
+            <button onclick="saveWalmartApiConfig()" style="background: var(--accent-blue);">Save API Settings</button>
+        </div>
+
         <div class="stats-grid">
             <div class="stat-card"><h4>Total Creators</h4><p id="ceoTotalCreators">0</p></div>
             <div class="stat-card"><h4>Deactivated Accounts</h4><p id="ceoDeactivatedCreators">0</p></div>
@@ -136,7 +145,6 @@
         const password = document.getElementById('authPassword').value;
         const name = document.getElementById('authName').value.trim();
 
-        // Admin login check
         if (!isSignup && email === ADMIN_EMAIL && password === ADMIN_PASS) {
             localStorage.setItem('walmart_session', JSON.stringify(email));
             loadAdminDashboard();
@@ -198,7 +206,21 @@
         document.getElementById('authSection').classList.add('hidden');
         document.getElementById('dashboardSection').classList.add('hidden');
         document.getElementById('adminSection').classList.remove('hidden');
+        
+        // Load saved API configuration
+        document.getElementById('ceoWalmartPublisherId').value = localStorage.getItem('walmart_pub_id') || '';
+        document.getElementById('ceoWalmartApiKey').value = localStorage.getItem('walmart_api_key') || '';
+
         renderAdminCreators();
+    }
+
+    function saveWalmartApiConfig() {
+        let pubId = document.getElementById('ceoWalmartPublisherId').value.trim();
+        let apiKey = document.getElementById('ceoWalmartApiKey').value.trim();
+        
+        localStorage.setItem('walmart_pub_id', pubId);
+        localStorage.setItem('walmart_api_key', apiKey);
+        alert('Walmart API & Publisher ID settings saved successfully!');
     }
 
     function renderAdminCreators() {
@@ -347,7 +369,10 @@
         
         let partner = getCurrentPartnerObj();
         let uniqueCode = Math.random().toString(36).substring(2, 9);
-        let trackingUrl = window.location.origin + window.location.pathname.replace('index.html', '') + "?track=" + uniqueCode;
+        let pubId = localStorage.getItem('walmart_pub_id') || 'DEMO_PUB';
+        
+        // Append official Publisher ID if available
+        let trackingUrl = window.location.origin + window.location.pathname.replace('index.html', '') + "?track=" + uniqueCode + "&pub=" + pubId;
         
         if (!partner.links) partner.links = [];
         partner.links.push({ original: url, tracking: trackingUrl, code: uniqueCode, date: new Date().toLocaleDateString() });
@@ -355,7 +380,7 @@
 
         document.getElementById('targetUrl').value = '';
         loadPartnerDashboard();
-        alert('Tracking link generated successfully.');
+        alert('Tracking link generated successfully with your Publisher configuration.');
     }
 
     function renderPartnerLinks() {
