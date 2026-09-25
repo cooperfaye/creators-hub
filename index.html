@@ -1,309 +1,304 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Walmart Creator Affiliate Network - CEO & Creator Portal</title>
+    <title>Walmart Creator & Affiliate Network</title>
     <style>
-        :root { --bg-color: #0f172a; --card-bg: #1e293b; --text-color: #f8fafc; --accent-blue: #0071dc; --border-color: #334155; --btn-green: #10b981; --btn-danger: #ef4444; --btn-warning: #f59e0b; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg-color); margin: 0; padding: 20px; color: var(--text-color); }
-        .container { max-width: 900px; margin: 0 auto; background: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
+        :root { --bg: #090d16; --panel: #131b2e; --text: #f1f5f9; --primary: #0071dc; --border: #1e293b; --success: #10b981; --danger: #ef4444; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .box { max-width: 850px; margin: 0 auto; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .hidden { display: none !important; }
-        input, select, button { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; background: #0f172a; border: 1px solid var(--border-color); border-radius: 6px; color: #f8fafc; font-size: 14px; }
-        input:focus, select:focus { border-color: var(--accent-blue); outline: none; }
-        button { background: var(--btn-green); color: white; border: none; cursor: pointer; font-weight: bold; transition: opacity 0.2s; }
-        button:hover { opacity: 0.9; }
-        .btn-danger { background: var(--btn-danger); }
-        .btn-warning { background: var(--btn-warning); }
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
-        .stat-card { background: #0f172a; padding: 18px; border-radius: 8px; border: 1px solid var(--border-color); text-align: center; }
-        .stat-card h4 { margin: 0 0 8px 0; font-size: 12px; color: #94a3b8; text-transform: uppercase; }
-        .stat-card p { margin: 0; font-size: 20px; font-weight: bold; color: var(--accent-blue); }
-        .item-box { background: #0f172a; padding: 14px; margin-top: 10px; border: 1px solid var(--border-color); border-radius: 6px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-        .nav-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 25px; }
-        .section-block { background: #1e293b; padding: 20px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 20px; }
-        .brand-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-        .brand-logo { background: #0071dc; color: white; font-weight: bold; padding: 8px 14px; border-radius: 6px; font-size: 18px; letter-spacing: 0.5px; }
+        input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid var(--border); background: #090d16; color: white; font-size: 14px; box-sizing: border-box; }
+        input:focus { border-color: var(--primary); outline: none; }
+        button { background: var(--primary); border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button:hover { opacity: 0.85; }
+        .btn-red { background: var(--danger); }
+        .btn-green { background: var(--success); }
+        .card { background: #090d16; border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-top: 12px; }
+        .flex { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
+        .stat-box { background: #090d16; border: 1px solid var(--border); padding: 15px; border-radius: 8px; text-align: center; }
+        .stat-box h4 { margin: 0 0 5px 0; font-size: 11px; color: #94a3b8; text-transform: uppercase; }
+        .stat-box p { margin: 0; font-size: 18px; font-weight: bold; color: var(--primary); }
     </style>
 </head>
 <body>
 
-<div class="container" id="mainContainer">
-    <!-- AUTH SECTION -->
-    <div id="authSection">
-        <div class="brand-header" style="justify-content: center;">
-            <div class="brand-logo">Walmart</div>
-            <h2 id="authTitleText" style="margin: 0; color: #f8fafc;">Creator Affiliate Portal</h2>
+<div class="box" id="app">
+    <!-- LOGIN / REGISTER VIEW -->
+    <div id="authView">
+        <div style="text-align: center; margin-bottom: 25px;">
+            <h1 style="color: var(--primary); margin: 0;">Walmart</h1>
+            <h3 id="authHeaderTitle" style="margin: 5px 0 0 0;">Creator Affiliate Portal</h3>
+            <p style="color: #94a3b8; font-size: 13px;">Login with admin@walmart.com / admin123 for Admin Panel</p>
         </div>
-        <form id="authForm" onsubmit="handleAuth(event)">
-            <input type="text" id="authName" placeholder="Full Name (For Registration)" class="hidden">
-            <input type="email" id="authEmail" placeholder="Email Address (CEO: admin@walmart.com)" required>
+        
+        <form id="authForm" onsubmit="processAuth(event)">
+            <input type="text" id="regName" placeholder="Full Name (Only for Registration)" class="hidden">
+            <input type="email" id="authEmail" placeholder="Email Address" required>
             <input type="password" id="authPassword" placeholder="Password" required>
-            <button type="submit" id="authBtn">Sign In</button>
+            <button type="submit" id="authSubmitBtn">Sign In</button>
         </form>
-        <p style="text-align: center; cursor: pointer; color: var(--accent-blue);" onclick="toggleAuthMode()">
-            <span id="toggleText">New creator? Register here</span>
+        <p style="text-align: center; cursor: pointer; color: var(--primary); font-size: 13px;" onclick="switchAuthMode()">
+            <span id="switchText">New user? Click here to Register</span>
         </p>
     </div>
 
-    <!-- DASHBOARD SECTION (CREATOR) -->
-    <div id="dashboardSection" class="hidden">
-        <div class="nav-bar">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div class="brand-logo" style="padding: 6px 10px; font-size: 14px;">Walmart</div>
-                <div>
-                    <h3 id="userDisplayName" style="margin: 0; color: var(--accent-blue);"></h3>
-                    <small id="userDisplayEmail" style="color: #94a3b8;"></small>
-                </div>
+    <!-- PARTNER DASHBOARD -->
+    <div id="partnerView" class="hidden">
+        <div class="flex" style="border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px;">
+            <div>
+                <h3 id="pName" style="margin: 0; color: var(--primary);"></h3>
+                <small id="pEmail" style="color: #94a3b8;"></small>
             </div>
-            <button onclick="logout()" class="btn-danger" style="width: auto; padding: 6px 14px; margin:0;">Sign Out</button>
+            <button onclick="doLogout()" class="btn-red" style="width: auto; padding: 8px 16px; margin:0;">Sign Out</button>
         </div>
 
-        <div style="background: rgba(0, 113, 220, 0.1); border: 1px solid var(--accent-blue); padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 13px; color: #93c5fd;">
-            ⭐ <b>Walmart Creator Program:</b> Generate your custom smart links and earn commissions on qualifying sales.
+        <div class="grid-3">
+            <div class="stat-box"><h4>Clicks</h4><p id="pClicks">0</p></div>
+            <div class="stat-box"><h4>Sales</h4><p id="pSales">0</p></div>
+            <div class="stat-box"><h4>Earnings</h4><p id="pEarnings">$0.00</p></div>
         </div>
 
-        <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr);">
-            <div class="stat-card"><h4>Total Clicks</h4><p id="statClicks">0</p></div>
-            <div class="stat-card"><h4>Total Sales</h4><p id="statSales">0</p></div>
-            <div class="stat-card"><h4>Earnings</h4><p id="statEarnings">$0.00</p></div>
-            <div class="stat-card"><h4>Conversion</h4><p id="statCR">0.00%</p></div>
-        </div>
-
-        <div class="section-block">
-            <h3>Generate Smart Short Link</h3>
+        <div class="card">
+            <h3 style="margin-top:0;">Generate Smart Link</h3>
             <input type="text" id="targetUrl" placeholder="Paste Walmart Product URL (e.g., https://www.walmart.com/ip/...)">
-            <button onclick="generateAffiliateLink()">Create Smart Link</button>
+            <button onclick="generateLink()" class="btn-green">Create Affiliate Link</button>
         </div>
 
-        <div class="section-block">
-            <h3>Active Smart Links</h3>
-            <div id="linksList">No active links found.</div>
+        <div class="card">
+            <h3 style="margin-top:0;">Your Links</h3>
+            <div id="partnerLinksList">No links created yet.</div>
         </div>
 
-        <div class="section-block">
-            <h3>PayPal Payout Settings</h3>
-            <input type="text" id="paypalEmail" placeholder="Enter PayPal Email">
-            <button onclick="savePayPalDetails()">Save PayPal Info</button>
-        </div>
-
-        <div class="section-block">
-            <h3>Payout History</h3>
-            <div id="paymentHistoryList">No payouts recorded yet.</div>
+        <div class="card">
+            <h3 style="margin-top:0;">PayPal Payout Settings</h3>
+            <input type="text" id="pPaypal" placeholder="Enter PayPal Email">
+            <button onclick="savePayPal()">Save PayPal Info</button>
         </div>
     </div>
 
-    <!-- ADMIN PANEL SECTION (CEO) -->
-    <div id="adminSection" class="hidden">
-        <div class="nav-bar">
+    <!-- ADMIN PANEL -->
+    <div id="adminView" class="hidden">
+        <div class="flex" style="border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px;">
             <div>
-                <h3 style="margin: 0; color: var(--accent-blue);">👑 CEO Master Control & Payout Center</h3>
-                <small style="color: #94a3b8;">Centralized management and manual PayPal disbursement</small>
+                <h3 style="margin: 0; color: var(--primary);">👑 Admin Master Control Panel</h3>
+                <small style="color: #94a3b8;">Manage all creator accounts & payouts</small>
             </div>
-            <button onclick="logout()" class="btn-danger" style="width: auto; padding: 6px 14px; margin:0;">Sign Out</button>
+            <button onclick="doLogout()" class="btn-red" style="width: auto; padding: 8px 16px; margin:0;">Sign Out</button>
         </div>
 
-        <div class="section-block" style="border: 1px dashed var(--accent-blue);">
-            <h3 style="margin-top:0; color: var(--accent-blue);">🔗 Walmart Creator API & Affiliate Configuration</h3>
-            <small style="color: #94a3b8;">Enter your official Walmart Publisher ID / API Key once approved to sync real tracking.</small>
-            <input type="text" id="ceoWalmartPublisherId" placeholder="Enter Walmart Publisher ID / Tracking ID (e.g., WM-123456)">
-            <input type="text" id="ceoWalmartApiKey" placeholder="Enter Walmart API Key / Token (Optional for automated feeds)">
-            <button onclick="saveWalmartApiConfig()" style="background: var(--accent-blue);">Save API Settings</button>
+        <div class="grid-3">
+            <div class="stat-box"><h4>Total Creators</h4><p id="aTotalUsers">0</p></div>
+            <div class="stat-box"><h4>Blocked Accounts</h4><p id="aBlockedUsers">0</p></div>
+            <div class="stat-box"><h4>Retained Revenue</h4><p id="aRetained">$0.00</p></div>
         </div>
 
-        <div class="stats-grid">
-            <div class="stat-card"><h4>Total Creators</h4><p id="ceoTotalCreators">0</p></div>
-            <div class="stat-card"><h4>Deactivated Accounts</h4><p id="ceoDeactivatedCreators">0</p></div>
-            <div class="stat-card"><h4>Master Retained Revenue</h4><p id="ceoRetainedRevenue">$0.00</p></div>
-        </div>
-
-        <div class="section-block">
-            <h3>Creator Accounts & Payout Center</h3>
-            <div id="adminCreatorsList">Loading creators...</div>
+        <div class="card">
+            <h3 style="margin-top:0;">All Registered Creators</h3>
+            <div id="adminUsersList">Loading users...</div>
         </div>
     </div>
 </div>
 
 <script>
-    let isSignup = false;
+    let isRegisterMode = false;
     const ADMIN_EMAIL = "admin@walmart.com";
     const ADMIN_PASS = "admin123";
 
-    // ULTRA-FAST REDIRECT CHECK (BEFORE PAGE RENDERS)
+    // Instant Redirect Handler for Tracking Links
     (function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const trackingCode = urlParams.get('track');
-
-        if (trackingCode) {
-            let partners = JSON.parse(localStorage.getItem('walmart_partners')) || [];
-            let destinationUrl = "";
-            
-            partners.forEach(p => {
-                if (p.links) {
-                    let matchedLink = p.links.find(l => l.code === trackingCode);
-                    if (matchedLink && p.active !== false) {
-                        destinationUrl = matchedLink.original;
-                        let currentClicks = parseInt(localStorage.getItem('walmart_clicks_' + p.email) || '0') + 1;
-                        localStorage.setItem('walmart_clicks_' + p.email, currentClicks);
-                        if (currentClicks % 3 === 0) {
-                            let currentSales = parseInt(localStorage.getItem('walmart_sales_' + p.email) || '0') + 1;
-                            localStorage.setItem('walmart_sales_' + p.email, currentSales);
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('track');
+        if (code) {
+            let users = JSON.parse(localStorage.getItem('wm_users')) || [];
+            let target = "";
+            users.forEach(u => {
+                if (u.links) {
+                    let found = u.links.find(l => l.code === code);
+                    if (found && u.active !== false) {
+                        target = found.url;
+                        let clicks = parseInt(localStorage.getItem('wm_clicks_' + u.email) || '0') + 1;
+                        localStorage.setItem('wm_clicks_' + u.email, clicks);
+                        if (clicks % 3 === 0) {
+                            let sales = parseInt(localStorage.getItem('wm_sales_' + u.email) || '0') + 1;
+                            localStorage.setItem('wm_sales_' + u.email, sales);
                         }
                     }
                 }
             });
-
-            // If found in local database, redirect there instantly
-            if (destinationUrl) {
-                window.location.replace(destinationUrl);
-                return;
-            } else {
-                // Fallback: Even if link not found in local storage, never show login on track click, go straight to Walmart!
-                window.location.replace("https://www.walmart.com");
-                return;
-            }
+            window.location.replace(target ? target : "https://www.walmart.com");
         }
     })();
 
-    function toggleAuthMode() {
-        isSignup = !isSignup;
-        document.getElementById('authTitleText').innerText = isSignup ? "Creator Registration" : "Creator Affiliate Portal";
-        document.getElementById('authBtn').innerText = isSignup ? "Register Account" : "Sign In";
-        document.getElementById('toggleText').innerText = isSignup ? "Already registered? Sign in" : "New creator? Register here";
-        document.getElementById('authName').classList.toggle('hidden', !isSignup);
+    function switchAuthMode() {
+        isRegisterMode = !isRegisterMode;
+        document.getElementById('authHeaderTitle').innerText = isRegisterMode ? "Creator Registration" : "Creator Affiliate Portal";
+        document.getElementById('authSubmitBtn').innerText = isRegisterMode ? "Register Account" : "Sign In";
+        document.getElementById('switchText').innerText = isRegisterMode ? "Already have an account? Sign in" : "New user? Click here to Register";
+        document.getElementById('regName').classList.toggle('hidden', !isRegisterMode);
     }
 
-    function handleAuth(event) {
-        event.preventDefault();
-        const email = document.getElementById('authEmail').value.trim().toLowerCase();
-        const password = document.getElementById('authPassword').value;
-        const name = document.getElementById('authName').value.trim();
+    function processAuth(e) {
+        e.preventDefault();
+        let email = document.getElementById('authEmail').value.trim().toLowerCase();
+        let pass = document.getElementById('authPassword').value;
+        let name = document.getElementById('regName').value.trim();
 
-        if (!isSignup && email === ADMIN_EMAIL && password === ADMIN_PASS) {
-            localStorage.setItem('walmart_session', JSON.stringify(email));
-            loadAdminDashboard();
+        // Check Admin Login
+        if (!isRegisterMode && email === ADMIN_EMAIL && pass === ADMIN_PASS) {
+            localStorage.setItem('wm_session', JSON.stringify({ email: ADMIN_EMAIL, role: 'admin' }));
+            loadApp();
             return;
         }
 
-        let partners = JSON.parse(localStorage.getItem('walmart_partners')) || [];
+        let users = JSON.parse(localStorage.getItem('wm_users')) || [];
 
-        if (isSignup) {
-            if (!name) {
-                alert('Please enter your full name.');
-                return;
-            }
-            if (email === ADMIN_EMAIL) {
-                alert('This email is reserved for Admin.');
-                return;
-            }
-            if (partners.find(p => p.email === email)) {
-                alert('An account with this email already exists.');
-                return;
-            }
-            partners.push({ name, email, password, active: true, paypal: '', links: [], history: [] });
-            localStorage.setItem('walmart_partners', JSON.stringify(partners));
-            alert('Registration successful! Please sign in now.');
-            toggleAuthMode();
+        if (isRegisterMode) {
+            if (!name) { alert('Please enter your name.'); return; }
+            if (email === ADMIN_EMAIL) { alert('This email is reserved.'); return; }
+            if (users.find(u => u.email === email)) { alert('Account already exists with this email!'); return; }
+
+            users.push({ name, email, pass, active: true, paypal: '', links: [], history: [] });
+            localStorage.setItem('wm_users', JSON.stringify(users));
+            alert('Registration successful! Please sign in.');
+            switchAuthMode();
         } else {
-            let partner = partners.find(p => p.email === email && p.password === password);
-            if (partner) {
-                if (partner.active === false) {
-                    alert('Your account has been deactivated by the administrator.');
-                    return;
-                }
-                localStorage.setItem('walmart_session', JSON.stringify(email));
-                loadPartnerDashboard();
+            let user = users.find(u => u.email === email && u.pass === pass);
+            if (user) {
+                if (user.active === false) { alert('Your account is blocked by admin.'); return; }
+                localStorage.setItem('wm_session', JSON.stringify({ email: user.email, role: 'partner' }));
+                loadApp();
             } else {
-                alert('Invalid email address or password. If you are new, please register first.');
+                alert('Invalid email or password. If new, please register first.');
             }
         }
     }
 
-    function loadPartnerDashboard() {
-        document.getElementById('authSection').classList.add('hidden');
-        document.getElementById('adminSection').classList.add('hidden');
-        document.getElementById('dashboardSection').classList.remove('hidden');
+    function loadApp() {
+        let session = JSON.parse(localStorage.getItem('wm_session'));
+        if (!session) {
+            document.getElementById('authView').classList.remove('hidden');
+            document.getElementById('partnerView').classList.add('hidden');
+            document.getElementById('adminView').classList.add('hidden');
+            return;
+        }
 
-        let partner = getCurrentPartnerObj();
-        if (!partner) return;
+        document.getElementById('authView').classList.add('hidden');
 
-        document.getElementById('userDisplayName').innerText = partner.name || "Creator Partner";
-        document.getElementById('userDisplayEmail').innerText = partner.email;
-        document.getElementById('paypalEmail').value = partner.paypal || '';
-
-        renderDashboardData();
-        renderPartnerLinks();
-        renderPayoutHistory();
+        if (session.role === 'admin') {
+            document.getElementById('adminView').classList.remove('hidden');
+            renderAdmin();
+        } else {
+            document.getElementById('partnerView').classList.remove('hidden');
+            renderPartner(session.email);
+        }
     }
 
-    function loadAdminDashboard() {
-        document.getElementById('authSection').classList.add('hidden');
-        document.getElementById('dashboardSection').classList.add('hidden');
-        document.getElementById('adminSection').classList.remove('hidden');
-        
-        document.getElementById('ceoWalmartPublisherId').value = localStorage.getItem('walmart_pub_id') || '';
-        document.getElementById('ceoWalmartApiKey').value = localStorage.getItem('walmart_api_key') || '';
-
-        renderAdminCreators();
+    function doLogout() {
+        localStorage.removeItem('wm_session');
+        loadApp();
     }
 
-    function saveWalmartApiConfig() {
-        let pubId = document.getElementById('ceoWalmartPublisherId').value.trim();
-        let apiKey = document.getElementById('ceoWalmartApiKey').value.trim();
-        
-        localStorage.setItem('walmart_pub_id', pubId);
-        localStorage.setItem('walmart_api_key', apiKey);
-        alert('Walmart API & Publisher ID settings saved successfully!');
+    function renderPartner(email) {
+        let users = JSON.parse(localStorage.getItem('wm_users')) || [];
+        let user = users.find(u => u.email === email);
+        if (!user) { doLogout(); return; }
+
+        document.getElementById('pName').innerText = user.name;
+        document.getElementById('pEmail').innerText = user.email;
+        document.getElementById('pPaypal').value = user.paypal || '';
+
+        let clicks = parseInt(localStorage.getItem('wm_clicks_' + email) || '0');
+        let sales = parseInt(localStorage.getItem('wm_sales_' + email) || '0');
+        document.getElementById('pClicks').innerText = clicks;
+        document.getElementById('pSales').innerText = sales;
+        document.getElementById('pEarnings').innerText = '$' + (sales * 14.50).toFixed(2);
+
+        let listContainer = document.getElementById('partnerLinksList');
+        if (!user.links || user.links.length === 0) {
+            listContainer.innerHTML = "No links created yet.";
+            return;
+        }
+
+        listContainer.innerHTML = user.links.map(l => `
+            <div class="card" style="margin-top:8px;">
+                <small style="color:#94a3b8;">Original: ${l.url}</small><br>
+                <b style="color:var(--primary); word-break:break-all;">${l.tracking}</b>
+                <button onclick="navigator.clipboard.writeText('${l.tracking}'); alert('Copied!');" style="margin-top:8px; padding:6px;">Copy Link</button>
+            </div>
+        `).join('');
     }
 
-    function renderAdminCreators() {
-        let partners = JSON.parse(localStorage.getItem('walmart_partners')) || [];
-        let container = document.getElementById('adminCreatorsList');
-        
-        let totalCreators = partners.length;
-        let deactivatedCount = partners.filter(p => p.active === false).length;
-        let retainedRevenue = 0;
+    function generateLink() {
+        let url = document.getElementById('targetUrl').value.trim();
+        if (!url) { alert('Enter valid URL'); return; }
+        if (!url.startsWith('http')) url = 'https://' + url;
 
-        partners.forEach(p => {
-            let sales = parseInt(localStorage.getItem('walmart_sales_' + p.email) || '0');
-            let totalEarnings = sales * 14.50;
-            let paidOut = p.history ? p.history.reduce((sum, h) => sum + parseFloat(h.rawAmount || 0), 0) : 0;
-            let unpaidEarnings = totalEarnings - paidOut;
+        let session = JSON.parse(localStorage.getItem('wm_session'));
+        let users = JSON.parse(localStorage.getItem('wm_users')) || [];
+        let user = users.find(u => u.email === session.email);
 
-            if (p.active === false) {
-                retainedRevenue += unpaidEarnings;
-            }
-        });
+        let code = Math.random().toString(36.substr(2, 6));
+        let base = window.location.origin + window.location.pathname.replace('index.html', '');
+        if (!base.endsWith('/')) base += '/';
+        let tracking = base + "?track=" + code;
 
-        document.getElementById('ceoTotalCreators').innerText = totalCreators;
-        document.getElementById('ceoDeactivatedCreators').innerText = deactivatedCount;
-        document.getElementById('ceoRetainedRevenue').innerText = '$' + retainedRevenue.toFixed(2);
+        if (!user.links) user.links = [];
+        user.links.push({ url, tracking, code });
 
-        if (partners.length === 0) {
+        let idx = users.findIndex(u => u.email === user.email);
+        users[idx] = user;
+        localStorage.setItem('wm_users', JSON.stringify(users));
+
+        document.getElementById('targetUrl').value = '';
+        renderPartner(user.email);
+        alert('Smart link generated successfully!');
+    }
+
+    function savePayPal() {
+        let paypal = document.getElementById('pPaypal').value.trim();
+        if (!paypal) { alert('Enter PayPal email'); return; }
+
+        let session = JSON.parse(localStorage.getItem('wm_session'));
+        let users = JSON.parse(localStorage.getItem('wm_users')) || [];
+        let user = users.find(u => u.email === session.email);
+        user.paypal = paypal;
+
+        let idx = users.findIndex(u => u.email === user.email);
+        users[idx] = user;
+        localStorage.setItem('wm_users', JSON.stringify(users));
+        alert('PayPal email saved!');
+    }
+
+    function renderAdmin() {
+        let users = JSON.parse(localStorage.getItem('wm_users')) || [];
+        document.getElementById('aTotalUsers').innerText = users.length;
+        document.getElementById('aBlockedUsers').innerText = users.filter(u => u.active === false).length;
+        document.getElementById('aRetained').innerText = '$0.00';
+
+        let container = document.getElementById('adminUsersList');
+        if (users.length === 0) {
             container.innerHTML = "No creators registered yet.";
             return;
         }
 
-        container.innerHTML = partners.map(p => {
-            let clicks = parseInt(localStorage.getItem('walmart_clicks_' + p.email) || '0');
-            let sales = parseInt(localStorage.getItem('walmart_sales_' + p.email) || '0');
-            let totalEarnings = sales * 14.50;
-            let paidOut = p.history ? p.history.reduce((sum, h) => sum + parseFloat(h.rawAmount || 0), 0) : 0;
-            let unpaidEarnings = Math.max(0, totalEarnings - paidOut);
-            let isActive = p.active !== false;
-
+        container.innerHTML = users.map(u => {
+            let clicks = parseInt(localStorage.getItem('wm_clicks_' + u.email) || '0');
+            let sales = parseInt(localStorage.getItem('wm_sales_' + u.email) || '0');
+            let active = u.active !== false;
             return `
-                <div class="item-box" style="flex-direction: column; align-items: flex-start;">
-                    <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                <div class="card">
+                    <div class="flex">
                         <div>
-                            <b>${p.name}</b> (${p.email}) <span style="font-size: 11px; padding: 2px 6px; border-radius: 4px; background: ${isActive ? '#10b981' : '#ef4444'}; color: white;">${isActive ? 'Active' : 'Deactivated'}</span><br>
-                            <small style="color: #94a3b8;">Clicks: ${clicks} | Sales: ${sales} | Total: <b style="color: var(--accent-blue);">$${totalEarnings.toFixed(2)}</b> | Unpaid Due: <b style="color: ${unpaidEarnings > 0 ? '#f59e0b' : '#10b981'};">$${unpaidEarnings.toFixed(2)}</b></small><br>
-                            <small style="color: #93c5fd;">PayPal: ${p.paypal || '<span style="color:#ef4444;">Not set</span>'}</small>
+                            <b>${u.name}</b> (${u.email}) <span style="color:${active?'var(--success)':'var(--danger)'};">${active?'Active':'Blocked'}</span><br>
+                            <small style="color:#94a3b8;">Clicks: ${clicks} | Sales: ${sales} | PayPal: ${u.paypal || 'Not set'}</small>
                         </div>
-                        <div style="display: flex; gap: 6px; align-items: center;">
-                            <button onclick="payCreatorManually('${p.email}')" style="width: auto; padding: 6px 12px; margin: 0; background: var(--btn-green);">Pay via PayPal</button>
-                            <button onclick="toggleCreatorStatus('${p.email}')" style="width: auto; padding: 6px 10px; margin: 0; background: ${isActive ? '#f59e0b' : '#10b981'};">${isActive ? 'Deactivate' : 'Activate'}</button>
-                            <button onclick="deleteCreatorAccount('${p.email}')" class="btn-danger" style="width: auto; padding: 6px 10px; margin: 0;">Delete</button>
+                        <div style="display:flex; gap:6px;">
+                            <button onclick="toggleUser('${u.email}')" class="${active?'btn-red':'btn-green'}" style="width:auto; padding:6px 10px; margin:0;">${active?'Block':'Unblock'}</button>
+                            <button onclick="deleteUser('${u.email}')" class="btn-red" style="width:auto; padding:6px 10px; margin:0;">Delete</button>
                         </div>
                     </div>
                 </div>
@@ -311,70 +306,29 @@
         }).join('');
     }
 
-    function payCreatorManually(email) {
-        let partners = JSON.parse(localStorage.getItem('walmart_partners')) || [];
-        let partner = partners.find(p => p.email === email);
-        if (!partner) return;
-
-        if (!partner.paypal) {
-            alert('Cannot pay: Creator has not configured their PayPal email.');
-            return;
-        }
-
-        let sales = parseInt(localStorage.getItem('walmart_sales_' + email) || '0');
-        let totalEarnings = sales * 14.50;
-        let paidOut = partner.history ? partner.history.reduce((sum, h) => sum + parseFloat(h.rawAmount || 0), 0) : 0;
-        let unpaidEarnings = Math.max(0, totalEarnings - paidOut);
-
-        if (unpaidEarnings <= 0) {
-            alert('No unpaid earnings remaining for this creator.');
-            return;
-        }
-
-        if (confirm(`Send manual payout of $${unpaidEarnings.toFixed(2)} to ${partner.paypal}?`)) {
-            if (!partner.history) partner.history = [];
-            partner.history.push({
-                date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
-                amount: '$' + unpaidEarnings.toFixed(2),
-                rawAmount: unpaidEarnings
-            });
-            updatePartnerObj(partner);
-            renderAdminCreators();
-            alert(`Payout of $${unpaidEarnings.toFixed(2)} sent successfully!`);
+    function toggleUser(email) {
+        let users = JSON.parse(localStorage.getItem('wm_users')) || [];
+        let u = users.find(x => x.email === email);
+        if (u) {
+            u.active = u.active === false ? true : false;
+            localStorage.setItem('wm_users', JSON.stringify(users));
+            renderAdmin();
         }
     }
 
-    function toggleCreatorStatus(email) {
-        let partners = JSON.parse(localStorage.getItem('walmart_partners')) || [];
-        let partner = partners.find(p => p.email === email);
-        if (partner) {
-            partner.active = partner.active === false ? true : false;
-            localStorage.setItem('walmart_partners', JSON.stringify(partners));
-            renderAdminCreators();
+    function deleteUser(email) {
+        if (confirm('Delete this user?')) {
+            let users = JSON.parse(localStorage.getItem('wm_users')) || [];
+            users = users.filter(x => x.email !== email);
+            localStorage.setItem('wm_users', JSON.stringify(users));
+            renderAdmin();
         }
     }
 
-    function deleteCreatorAccount(email) {
-        if (confirm('Delete this creator account?')) {
-            let partners = JSON.parse(localStorage.getItem('walmart_partners')) || [];
-            partners = partners.filter(p => p.email !== email);
-            localStorage.setItem('walmart_partners', JSON.stringify(partners));
-            localStorage.removeItem('walmart_clicks_' + email);
-            localStorage.removeItem('walmart_sales_' + email);
-            renderAdminCreators();
-            alert('Account deleted successfully.');
-        }
+    window.onload = function() {
+        loadApp();
     }
+</script>
 
-    function getCurrentPartnerObj() {
-        let sessionEmail = localStorage.getItem('walmart_session');
-        if (!sessionEmail) return null;
-        let email = JSON.parse(sessionEmail);
-        let partners = JSON.parse(localStorage.getItem('walmart_partners')) || [];
-        return partners.find(p => p.email === email);
-    }
-
-    function updatePartnerObj(partner) {
-        let partners = JSON.parse(localStorage.getItem('walmart_partners')) || [];
-        let index = partners.findIndex(p => p.email === partner.email);
-   
+</body>
+</html>
