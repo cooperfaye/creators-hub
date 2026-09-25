@@ -102,14 +102,12 @@
             padding: 0 15px;
         }
 
-        /* Welcome text */
         .welcome-header {
             font-size: 22px;
             font-weight: 700;
             margin-bottom: 20px;
         }
 
-        /* Quick Stats Card */
         .stats-card-box {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -141,13 +139,10 @@
             padding: 5px 10px;
             font-size: 12px;
             font-weight: 600;
-            color: var(--text-muted);
+            color: var(--primary);
             cursor: pointer;
             border-radius: 6px;
-        }
-        .time-btn.active {
             background: #ffffff;
-            color: var(--primary);
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
@@ -174,7 +169,6 @@
             color: var(--text-main);
         }
 
-        /* Result Link Box */
         .result-box {
             background: #f5f3ff;
             border: 1px solid #ddd6fe;
@@ -203,7 +197,6 @@
             white-space: nowrap;
         }
 
-        /* Trending Brands Section */
         .section-box {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -233,7 +226,7 @@
         .brand-circle {
             width: 45px;
             height: 45px;
-            background: #0047ab;
+            background: #0071dc;
             color: white;
             border-radius: 50%;
             display: flex;
@@ -254,7 +247,6 @@
             font-weight: 700;
         }
 
-        /* Tables */
         .table-container {
             overflow-x: auto;
         }
@@ -275,7 +267,6 @@
             font-weight: 600;
         }
 
-        /* Modals (Account, Settings, Auth) */
         .modal {
             display: none;
             position: fixed;
@@ -363,7 +354,6 @@
 </head>
 <body>
 
-    <!-- Mavely Navbar with URL shortener -->
     <div class="mavely-nav">
         <div class="nav-left">
             <div class="menu-icon" onclick="toggleSidebar()">☰</div>
@@ -375,7 +365,6 @@
         </div>
     </div>
 
-    <!-- Sidebar Menu -->
     <div class="sidebar-menu" id="sidebarMenu">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <h3 id="sidebarUserName">My Account</h3>
@@ -389,10 +378,8 @@
 
     <div class="container">
         
-        <!-- Welcome Greeting -->
         <div class="welcome-header" id="welcomeText">Welcome, Creator!</div>
 
-        <!-- Result Box -->
         <div class="result-box" id="resultBox">
             <div>
                 <span style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 2px;">Smart Link Generated:</span>
@@ -401,12 +388,11 @@
             <button class="copy-btn" onclick="copyShortLink()">Copy Link</button>
         </div>
 
-        <!-- Quick Stats Widget -->
         <div class="stats-card-box">
             <div class="stats-top">
                 <h2>Quick Stats</h2>
                 <div class="time-filters">
-                    <button class="time-btn active">MTD</button>
+                    <button class="time-btn">MTD</button>
                 </div>
             </div>
             <div class="stats-grid">
@@ -429,7 +415,6 @@
             </div>
         </div>
 
-        <!-- Trending Brands -->
         <div class="section-box">
             <h3>Trending Brands</h3>
             <div class="brands-flex">
@@ -439,9 +424,9 @@
                     <span>Up to 10%</span>
                 </div>
                 <div class="brand-pill">
-                    <div class="brand-circle" style="background:#0071dc;">WM</div>
-                    <p>Walmart</p>
-                    <span>$60 / $7 Com.</span>
+                    <div class="brand-circle">WM</div>
+                    <p>Walmart Affiliate</p>
+                    <span>$7.00 Com.</span>
                 </div>
                 <div class="brand-pill">
                     <div class="brand-circle" style="background:#0284c7;">COL</div>
@@ -451,7 +436,6 @@
             </div>
         </div>
 
-        <!-- Link Performance History -->
         <div class="section-box" id="linksSection">
             <h3>Link History</h3>
             <div class="table-container">
@@ -470,7 +454,6 @@
             </div>
         </div>
 
-        <!-- Payment History -->
         <div class="section-box" id="paymentSection">
             <h3>Payment History</h3>
             <div class="table-container">
@@ -491,13 +474,14 @@
 
     </div>
 
-    <!-- Auth Modal (Sign Up & Login) -->
-    <div class="modal" id="authModal" style="display: flex;">
+    <!-- Auth Modal -->
+    <div class="modal" id="authModal">
         <div class="modal-content">
             <h2 id="authTitle">Create Account</h2>
-            <div class="form-group">
+            
+            <div class="form-group" id="nameGroup">
                 <label>Full Name</label>
-                <input type="text" id="authName" placeholder="Jockey Jockey">
+                <input type="text" id="authName" placeholder="Prem Chand">
             </div>
             <div class="form-group">
                 <label>Email Address</label>
@@ -507,8 +491,27 @@
                 <label>Password</label>
                 <input type="password" id="authPassword" placeholder="••••••••">
             </div>
-            <button class="btn-main" onclick="submitAuth()">Get Started</button>
-            <p style="text-align: center; margin-top: 12px; font-size: 13px; color: var(--text-muted); cursor: pointer;" onclick="toggleAuthMode()" id="authSwitchText">Already have an account? Login</p>
+
+            <button class="btn-main" id="authSubmitBtn" onclick="submitAuth()">Get Started</button>
+            
+            <div style="display: flex; justify-content: space-between; margin-top: 12px; font-size: 13px;">
+                <span style="color: var(--primary); cursor: pointer;" onclick="toggleAuthMode()" id="authSwitchText">Already have an account? Login</span>
+                <span style="color: var(--text-muted); cursor: pointer;" id="forgotPassText" onclick="openForgotModal()">Forgot Password?</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div class="modal" id="forgotModal">
+        <div class="modal-content">
+            <h2>Reset Password</h2>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">Enter your registered email address to receive a password reset link.</p>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="forgotEmail" placeholder="name@gmail.com">
+            </div>
+            <button class="btn-main" onclick="sendResetLink()">Send Reset Link</button>
+            <button class="btn-main" onclick="closeForgotModal()" style="background: #e2e8f0; color: var(--text-main); margin-top: 8px;">Cancel</button>
         </div>
     </div>
 
@@ -545,7 +548,6 @@
         let generatedUrlText = '';
 
         window.onload = function() {
-            // Check redirect/click handling
             const hash = window.location.hash.substring(1);
             if (hash) {
                 let savedLinks = JSON.parse(localStorage.getItem('creators_links') || '{}');
@@ -567,180 +569,34 @@
             isLoginMode = !isLoginMode;
             let title = document.getElementById('authTitle');
             let switchText = document.getElementById('authSwitchText');
-            let nameField = document.getElementById('authName').parentElement;
+            let nameGroup = document.getElementById('nameGroup');
+            let submitBtn = document.getElementById('authSubmitBtn');
+            let forgotText = document.getElementById('forgotPassText');
 
             if (isLoginMode) {
                 title.innerText = "Welcome Back";
                 switchText.innerText = "Don't have an account? Sign Up";
-                nameField.style.display = "none";
+                nameGroup.style.display = "none";
+                submitBtn.innerText = "Login";
+                forgotText.style.display = "block";
             } else {
                 title.innerText = "Create Account";
                 switchText.innerText = "Already have an account? Login";
-                nameField.style.display = "block";
+                nameGroup.style.display = "block";
+                submitBtn.innerText = "Get Started";
+                forgotText.style.display = "none";
             }
         }
 
-        function submitAuth() {
-            let email = document.getElementById('authEmail').value.trim();
-            let password = document.getElementById('authPassword').value.trim();
-            let name = document.getElementById('authName').value.trim();
-
-            if (!email || !password) {
-                alert('Please fill in email and password!');
-                return;
-            }
-
-            if (!isLoginMode && !name) {
-                name = email.split('@')[0];
-            }
-
-            let userData = {
-                name: name || email.split('@')[0],
-                email: email,
-                password: password,
-                paypal: ''
-            };
-
-            localStorage.setItem('creators_session', email);
-            localStorage.setItem('creators_user_' + email, JSON.stringify(userData));
-
+        function openForgotModal() {
             document.getElementById('authModal').style.display = 'none';
-            checkUserSession();
-            loadDashboard();
+            document.getElementById('forgotModal').style.display = 'flex';
         }
 
-        function checkUserSession() {
-            let session = localStorage.getItem('creators_session');
-            if (!session) {
-                document.getElementById('authModal').style.display = 'flex';
-            } else {
-                let user = JSON.parse(localStorage.getItem('creators_user_' + session) || '{}');
-                document.getElementById('welcomeText').innerText = 'Welcome, ' + (user.name || 'Creator') + '!';
-                document.getElementById('sidebarUserName').innerText = user.name || 'My Account';
-            }
+        function closeForgotModal() {
+            document.getElementById('forgotModal').style.display = 'none';
+            document.getElementById('authModal').style.display = 'flex';
         }
 
-        function toggleSidebar() {
-            document.getElementById('sidebarMenu').classList.toggle('open');
-        }
-
-        function openAccountSettings() {
-            toggleSidebar();
-            let session = localStorage.getItem('creators_session');
-            let user = JSON.parse(localStorage.getItem('creators_user_' + session) || '{}');
-            
-            document.getElementById('settingsFirstName').value = user.name || '';
-            document.getElementById('settingsEmail').value = user.email || session;
-            document.getElementById('settingsPaypal').value = user.paypal || '';
-            document.getElementById('settingsModal').style.display = 'flex';
-        }
-
-        function closeAccountSettings() {
-            document.getElementById('settingsModal').style.display = 'none';
-        }
-
-        function saveAccountSettings() {
-            let session = localStorage.getItem('creators_session');
-            let user = JSON.parse(localStorage.getItem('creators_user_' + session) || '{}');
-            
-            user.name = document.getElementById('settingsFirstName').value;
-            user.paypal = document.getElementById('settingsPaypal').value;
-
-            localStorage.setItem('creators_user_' + session, JSON.stringify(user));
-            alert('Settings saved successfully!');
-            closeAccountSettings();
-            checkUserSession();
-        }
-
-        function handleLogout() {
-            localStorage.removeItem('creators_session');
-            location.reload();
-        }
-
-        function scrollToSection(id) {
-            toggleSidebar();
-            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function generateLink() {
-            let urlInput = document.getElementById('longUrl').value.trim();
-            if(!urlInput) {
-                alert('Please enter a link to shorten!');
-                return;
-            }
-            if (!urlInput.startsWith('http')) urlInput = 'https://' + urlInput;
-
-            let code = 'm-' + Math.random().toString(36.substring(2), 7);
-            
-            let links = JSON.parse(localStorage.getItem('creators_links') || '{}');
-            links[code] = urlInput;
-            localStorage.setItem('creators_links', JSON.stringify(links));
-
-            let history = JSON.parse(localStorage.getItem('creators_history') || '[]');
-            history.unshift({ original: urlInput, code: code, clicks: 0 });
-            localStorage.setItem('creators_history', JSON.stringify(history));
-
-            // Add $7 Walmart-style commission instantly
-            let earnings = JSON.parse(localStorage.getItem('creators_earnings') || '[]');
-            earnings.unshift({ date: new Date().toLocaleDateString(), amount: 7.00, status: 'Completed' });
-            localStorage.setItem('creators_earnings', JSON.stringify(earnings));
-
-            generatedUrlText = window.location.origin + window.location.pathname + '#' + code;
-            document.getElementById('shortLinkOutput').innerHTML = `<a href="${generatedUrlText}" target="_blank">${generatedUrlText}</a>`;
-            document.getElementById('resultBox').style.display = 'flex';
-
-            loadDashboard();
-        }
-
-        function copyShortLink() {
-            if(!generatedUrlText) return;
-            navigator.clipboard.writeText(generatedUrlText);
-            alert('Link copied to clipboard!');
-        }
-
-        function loadDashboard() {
-            let history = JSON.parse(localStorage.getItem('creators_history') || '[]');
-            let earnings = JSON.parse(localStorage.getItem('creators_earnings') || '[]');
-            
-            let totalClicks = history.reduce((sum, item) => sum + (item.clicks || 0), 0);
-            let totalCommission = earnings.reduce((sum, item) => sum + item.amount, 0);
-
-            document.getElementById('totalClicks').innerText = totalClicks;
-            document.getElementById('totalCommission').innerText = '$' + totalCommission.toFixed(2);
-
-            // Links Table
-            let linkTable = document.getElementById('linkTableBody');
-            if (history.length === 0) {
-                linkTable.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">No links created yet.</td></tr>`;
-            } else {
-                let html = '';
-                history.forEach(item => {
-                    let shortUrl = window.location.origin + window.location.pathname + '#' + item.code;
-                    html += `<tr>
-                        <td style="max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.original}</td>
-                        <td><a href="${shortUrl}" target="_blank" style="color:var(--primary); font-weight:600;">#${item.code}</a></td>
-                        <td>${item.clicks || 0}</td>
-                    </tr>`;
-                });
-                linkTable.innerHTML = html;
-            }
-
-            // Payment Table
-            let payTable = document.getElementById('paymentTableBody');
-            if (earnings.length === 0) {
-                payTable.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">No payout records.</td></tr>`;
-            } else {
-                let payHtml = '';
-                earnings.forEach(pay => {
-                    payHtml += `<tr>
-                        <td>${pay.date}</td>
-                        <td style="color:var(--success); font-weight:600;">+$${pay.amount.toFixed(2)}</td>
-                        <td><span style="background:#ecfdf5; color:var(--success); padding:2px 8px; border-radius:4px; font-size:11px;">${pay.status}</span></td>
-                    </tr>`;
-                });
-                payTable.innerHTML = payHtml;
-            }
-        }
-    </script>
-</body>
-</html>
+        function sendResetLink() {
+          
