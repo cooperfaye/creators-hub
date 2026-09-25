@@ -168,7 +168,7 @@
             settingsModal.classList.add('hidden');
         });
 
-        // Direct Link Formatter (Outputs clean final link instantly without 404 errors)
+        // Local Storage Link Generator & Redirect Handler
         generateLinkBtn.addEventListener('click', () => {
             let longUrl = urlInput.value.trim();
             if (!longUrl) {
@@ -179,8 +179,16 @@
                 longUrl = 'https://' + longUrl;
             }
             
-            // Instantly gives back the clean formatted affiliate/product link ready to use
-            generatedLinkOutput.value = longUrl;
+            // Generate a unique short ID
+            const uniqueId = Math.random().toString(36).substring(2, 8);
+            
+            // Save mapping in browser's localStorage
+            localStorage.setItem('red_' + uniqueId, longUrl);
+            
+            // Construct the clean redirect link using hash routing to avoid 404
+            const smartLink = `https://cooperfaye.github.io/#id=${uniqueId}`;
+            
+            generatedLinkOutput.value = smartLink;
             linkResultModal.classList.remove('hidden');
         });
 
@@ -194,6 +202,18 @@
         closeLinkModal.addEventListener('click', () => {
             linkResultModal.classList.add('hidden');
             urlInput.value = '';
+        });
+
+        // Auto-Redirect check when page loads with a specific ID
+        window.addEventListener('DOMContentLoaded', () => {
+            const hash = window.location.hash;
+            if (hash.startsWith('#id=')) {
+                const linkId = hash.replace('#id=', '');
+                const targetUrl = localStorage.getItem('red_' + linkId);
+                if (targetUrl) {
+                    window.location.replace(targetUrl);
+                }
+            }
         });
 
         // Logout Handler
@@ -357,12 +377,12 @@
     <div id="linkResultModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div class="bg-white w-full max-w-sm p-6 rounded-2xl shadow-xl space-y-4 relative">
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-lg font-bold text-gray-800">Your Ready Link</h3>
+                <h3 class="text-lg font-bold text-gray-800">Your Smart Short Link</h3>
                 <button id="closeLinkModal" class="text-gray-500 hover:text-black font-bold text-lg">✕</button>
             </div>
             
             <div class="space-y-2">
-                <label class="block text-xs text-gray-500">Copy your link below:</label>
+                <label class="block text-xs text-gray-500">Copy your smart link below:</label>
                 <input type="text" id="generatedLinkOutput" readonly class="w-full p-2 border rounded-lg bg-gray-50 text-sm font-mono text-gray-700 select-all">
             </div>
 
