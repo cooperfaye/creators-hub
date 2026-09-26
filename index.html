@@ -1,1 +1,502 @@
-ji
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creators Hub - Complete App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        body {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 480px;
+        }
+        .hidden {
+            display: none !important;
+        }
+
+        /* Auth Cards (Login / Signup) */
+        .auth-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+        .logo-title {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .logo-title h1 {
+            font-size: 24px;
+            color: #0f172a;
+            font-weight: 700;
+        }
+        .logo-title p {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 5px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: #4f46e5;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+        .btn-primary:hover {
+            background: #4338ca;
+        }
+        .alert-msg {
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            text-align: center;
+            display: none;
+        }
+        .alert-error { background: #fee2e2; color: #991b1b; }
+        .alert-success { background: #dcfce7; color: #166534; }
+        .auth-footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #64748b;
+        }
+        .auth-footer a {
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .auth-footer a:hover { text-decoration: underline; }
+
+        /* Dashboard Styles */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ffffff;
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+        }
+        .dashboard-header h3 {
+            font-size: 16px;
+            color: #0f172a;
+        }
+        .logout-btn {
+            background: #fee2e2;
+            color: #991b1b;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .quick-stats-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .card-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .time-filters {
+            display: flex;
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 3px;
+        }
+        .filter-btn {
+            background: transparent;
+            border: none;
+            padding: 5px 9px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+        .filter-btn.active {
+            background: #ffffff;
+            color: #4f46e5;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .stats-grid-2x2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        .stat-sub-box {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .stat-label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .stat-sub-box .label {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .stat-sub-box .value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .help-icon {
+            width: 18px;
+            height: 18px;
+            background: #0f172a;
+            color: #ffffff;
+            border-radius: 50%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .generator-section {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+        .generator-section h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #0f172a;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+        .input-group input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #4f46e5;
+        }
+        .gen-btn {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 0 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        #resultContainer {
+            margin-top: 12px;
+            font-size: 13px;
+            color: #334155;
+            word-break: break-all;
+            display: none;
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- GLOBAL ALERTS -->
+        <div id="errorAlert" class="alert-msg alert-error"></div>
+        <div id="successAlert" class="alert-msg alert-success"></div>
+
+        <!-- 1. SIGNUP VIEW -->
+        <div id="signupView" class="auth-card">
+            <div class="logo-title">
+                <h1>🚀 Creators Hub</h1>
+                <p>Create your account</p>
+            </div>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="signupName" placeholder="Premchand / Your Name">
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="signupEmail" placeholder="name@example.com">
+            </div>
+            <div class="form-group">
+                <label>Password (Any password allowed)</label>
+                <input type="password" id="signupPassword" placeholder="Enter password">
+            </div>
+            <button class="btn-primary" onclick="handleSignup()">Create Account</button>
+            <div class="auth-footer">
+                Already have an account? <a href="#" onclick="switchView('loginView')">Login here</a>
+            </div>
+        </div>
+
+        <!-- 2. LOGIN VIEW -->
+        <div id="loginView" class="auth-card hidden">
+            <div class="logo-title">
+                <h1>🚀 Creators Hub</h1>
+                <p>Login to your dashboard</p>
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="loginEmail" placeholder="name@example.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter password">
+            </div>
+            <button class="btn-primary" onclick="handleLogin()">Login</button>
+            <div class="auth-footer">
+                Don't have an account? <a href="#" onclick="switchView('signupView')">Create Account</a>
+            </div>
+        </div>
+
+        <!-- 3. DASHBOARD VIEW (Quick Stats as requested) -->
+        <div id="dashboardView" class="hidden">
+            <div class="dashboard-header">
+                <h3 id="welcomeUser">Welcome, User</h3>
+                <button class="logout-btn" onclick="handleLogout()">Logout</button>
+            </div>
+
+            <!-- Quick Stats Card -->
+            <div class="quick-stats-card">
+                <div class="card-header">
+                    <h2>Quick Stats</h2>
+                    <div class="time-filters">
+                        <button class="filter-btn" onclick="setActiveFilter(this)">1d</button>
+                        <button class="filter-btn" onclick="setActiveFilter(this)">1w</button>
+                        <button class="filter-btn" onclick="setActiveFilter(this)">1m</button>
+                        <button class="filter-btn active" onclick="setActiveFilter(this)">MTD</button>
+                    </div>
+                </div>
+
+                <div class="stats-grid-2x2">
+                    <div class="stat-sub-box">
+                        <div class="label">Sales</div>
+                        <div class="value">$753.80</div>
+                    </div>
+                    <div class="stat-sub-box">
+                        <div class="label">Commission</div>
+                        <div class="value">$21.45</div>
+                    </div>
+                    <div class="stat-sub-box">
+                        <div class="stat-label-row">
+                            <span class="label">Clicks</span>
+                            <span class="help-icon" title="Total referral link clicks">?</span>
+                        </div>
+                        <div class="value">233</div>
+                    </div>
+                    <div class="stat-sub-box">
+                        <div class="label">Conversion</div>
+                        <div class="value">3.00%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Link Generator Box -->
+            <div class="generator-section">
+                <h3>Quick Link Generator</h3>
+                <div class="input-group">
+                    <input type="text" id="targetLink" placeholder="Paste product link...">
+                    <button class="gen-btn" onclick="makeLink()">Generate</button>
+                </div>
+                <div id="resultContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check session on page load
+        window.onload = function() {
+            const activeSession = localStorage.getItem('creators_hub_session');
+            if (activeSession) {
+                showDashboard(activeSession);
+            }
+        };
+
+        function switchView(viewId) {
+            document.getElementById('signupView').classList.add('hidden');
+            document.getElementById('loginView').classList.add('hidden');
+            document.getElementById('dashboardView').classList.add('hidden');
+            
+            document.getElementById('errorAlert').style.display = 'none';
+            document.getElementById('successAlert').style.display = 'none';
+
+            document.getElementById(viewId).classList.remove('hidden');
+        }
+
+        function showError(msg) {
+            const err = document.getElementById('errorAlert');
+            err.innerText = msg;
+            err.style.display = 'block';
+            document.getElementById('successAlert').style.display = 'none';
+        }
+
+        function showSuccess(msg) {
+            const suc = document.getElementById('successAlert');
+            suc.innerText = msg;
+            suc.style.display = 'block';
+            document.getElementById('errorAlert').style.display = 'none';
+        }
+
+        // Signup Logic
+        function handleSignup() {
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value.trim();
+
+            if (!name || !email || !password) {
+                showError('Please fill in all fields.');
+                return;
+            }
+
+            const existing = localStorage.getItem('creators_user_' + email);
+            if (existing) {
+                showError('Email already registered! Please login.');
+                return;
+            }
+
+            const userData = { name, email, password };
+            localStorage.setItem('creators_user_' + email, JSON.stringify(userData));
+
+            showSuccess('Account created successfully! Please login.');
+            setTimeout(() => {
+                switchView('loginView');
+            }, 1200);
+        }
+
+        // Login Logic
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+
+            if (!email || !password) {
+                showError('Please enter email and password.');
+                return;
+            }
+
+            const userStr = localStorage.getItem('creators_user_' + email);
+            if (!userStr) {
+                showError('Account not found. Please sign up first.');
+                return;
+            }
+
+            const user = JSON.parse(userStr);
+            if (user.password !== password) {
+                showError('Incorrect password.');
+                return;
+            }
+
+            localStorage.setItem('creators_hub_session', email);
+            showDashboard(email);
+        }
+
+        // Show Dashboard
+        function showDashboard(email) {
+            const userStr = localStorage.getItem('creators_user_' + email);
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                document.getElementById('welcomeUser').innerText = 'Welcome, ' + user.name;
+            }
+            document.getElementById('signupView').classList.add('hidden');
+            document.getElementById('loginView').classList.add('hidden');
+            document.getElementById('errorAlert').style.display = 'none';
+            document.getElementById('successAlert').style.display = 'none';
+            document.getElementById('dashboardView').classList.remove('hidden');
+        }
+
+        // Logout Logic
+        function handleLogout() {
+            localStorage.removeItem('creators_hub_session');
+            switchView('loginView');
+            showSuccess('Logged out successfully.');
+        }
+
+        // Filter buttons toggle
+        function setActiveFilter(btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        // Link Generator
+        function makeLink() {
+            const url = document.getElementById('targetLink').value.trim();
+            const res = document.getElementById('resultContainer');
+            if(!url) {
+                alert('Please enter a link first!');
+                return;
+            }
+            const code = Math.random().toString(36).substring(2, 8);
+            const final = `https://creatorshub.site/ref?id=${code}`;
+            res.style.display = 'block';
+            res.innerHTML = `Your Link: <a href="${final}" target="_blank">${final}</a>`;
+        }
+    </script>
+</body>
+</html>
