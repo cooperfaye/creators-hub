@@ -1,103 +1,301 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard & Link Creator</title>
+    <title>Affiliate Network - CEO & Creator Portal</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #0b0f19; color: #f8fafc; margin: 0; padding: 20px; }
-        .container { max-width: 550px; margin: 0 auto; background: #1e293b; padding: 25px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
+        body { font-family: Arial, sans-serif; background: #0b0f19; color: #f8fafc; margin: 0; padding: 15px; }
+        .container { max-width: 600px; margin: 0 auto; background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
         h2 { color: #38bdf8; margin-top: 0; text-align: center; }
-        .tab-menu { display: flex; justify-content: center; margin-bottom: 20px; border-bottom: 1px solid #334155; padding-bottom: 10px; }
-        .tab-btn { background: #334155; color: white; border: none; padding: 8px 16px; margin: 0 5px; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold; }
-        .tab-btn.active { background: #2563eb; }
-        .form-section { display: none; }
-        .form-section.active { display: block; }
-        label { display: block; margin-top: 15px; font-weight: bold; font-size: 13px; color: #cbd5e1; }
+        .hidden { display: none !important; }
+        label { display: block; margin-top: 12px; font-weight: bold; font-size: 13px; color: #cbd5e1; }
         input[type="text"], input[type="email"], input[type="password"] { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #475569; background: #0f172a; color: white; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
-        .action-btn { background: #2563eb; color: white; border: none; padding: 12px 20px; width: 100%; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 12px rgba(37,99,235,0.4); }
+        .action-btn { background: #2563eb; color: white; border: none; padding: 12px 20px; width: 100%; font-size: 15px; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 15px; box-shadow: 0 4px 12px rgba(37,99,235,0.4); }
         .action-btn:hover { background: #1d4ed8; }
-        .result-box { margin-top: 15px; background: #0f172a; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 13px; color: #4ade80; border: 1px solid #334155; word-break: break-all; display: none; }
-        a { color: #38bdf8; text-decoration: none; }
-        a:hover { text-decoration: underline; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 10px; margin-bottom: 15px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 15px; }
+        .stat-card { background: #0f172a; padding: 10px; border-radius: 8px; border: 1px solid #334155; text-align: center; }
+        .stat-value { font-size: 16px; font-weight: bold; color: #38bdf8; margin-top: 5px; }
+        .link-box { background: #0f172a; padding: 10px; border-radius: 6px; margin-top: 8px; border: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+        .copy-btn { background: #059669; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
+        .copy-btn:hover { background: #047857; }
+        .tab-menu { display: flex; gap: 5px; margin-bottom: 15px; }
+        .tab-btn { background: #334155; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; flex: 1; }
+        .tab-btn.active { background: #2563eb; }
+        .admin-table { width: 100%; margin-top: 10px; border-collapse: collapse; font-size: 12px; }
+        .admin-table th, .admin-table td { border: 1px solid #334155; padding: 8px; text-align: left; }
+        .admin-table th { background: #0f172a; color: #38bdf8; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>🚀 Dashboard & Link Creator</h2>
-    
-    <!-- Tab Navigation -->
-    <div class="tab-menu">
-        <button class="tab-btn active" onclick="switchTab('authTab', this)">Sign Up / Login</button>
-        <button class="tab-btn" onclick="switchTab('linkTab', this)">Link Creator</button>
-    </div>
+    <h2>🚀 DealHub Affiliate Network</h2>
 
-    <!-- Section 1: Sign Up / Account Creation -->
-    <div id="authTab" class="form-section active">
-        <label>Your Name / Username:</label>
-        <input type="text" id="userName" placeholder="Enter your name...">
+    <!-- LOGIN / SIGNUP SCREEN -->
+    <div id="loginScreen">
+        <p style="text-align: center; color: #94a3b8; font-size: 13px;">Login as Creator or CEO Admin</p>
+        
+        <label>Your Name:</label>
+        <input type="text" id="loginName" placeholder="Enter name...">
 
-        <label>Email Address:</label>
-        <input type="email" id="userEmail" placeholder="Enter your email...">
+        <label>Email Address (Use 'ceo@dealhub.com' for CEO Panel):</label>
+        <input type="email" id="loginEmail" placeholder="Enter email...">
 
         <label>Password:</label>
-        <input type="password" id="userPass" placeholder="Create a password...">
+        <input type="password" id="loginPass" placeholder="Enter password...">
 
-        <button class="action-btn" onclick="handleAccountAction()">Create Account / Sign Up</button>
-        <div class="result-box" id="authResult"></div>
+        <button class="action-btn" onclick="handleLogin()">Login / Register</button>
     </div>
 
-    <!-- Section 2: Link Creator & Management -->
-    <div id="linkTab" class="form-section">
-        <label>Original Long URL (Product/Deal Link):</label>
-        <input type="text" id="longUrl" placeholder="https://www.walmart.com/ip/...">
+    <!-- CREATOR DASHBOARD -->
+    <div id="creatorDashboard" class="hidden">
+        <div class="top-bar">
+            <div>
+               <h3 id="welcomeUser" style="color: #4ade80; margin: 0;">Welcome</h3>
+               <span id="userEmailDisplay" style="color: #94a3b8; font-size: 11px;"></span>
+            </div>
+            <button class="action-btn" style="background: #ef4444; width: auto; padding: 6px 12px; margin:0;" onclick="handleLogout()">Logout</button>
+        </div>
 
-        <label>Custom Link Alias / Keyword (Optional):</label>
-        <input type="text" id="customAlias" placeholder="walmart-mega-deal">
+        <div class="tab-menu">
+            <button class="tab-btn active" onclick="switchCreatorTab('statsTab', this)">Overview</button>
+            <button class="tab-btn" onclick="switchCreatorTab('settingsTab', this)">⚙️ Settings</button>
+        </div>
 
-        <button class="action-btn" onclick="generateShortLink()">Generate Short Trackable Link</button>
-        <div class="result-box" id="linkResult"></div>
+        <!-- STATS & LINKS TAB -->
+        <div id="statsTab" class="creator-tab">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div style="font-size: 10px; color: #94a3b8;">Clicks</div>
+                    <div class="stat-value" id="statClicks">0</div>
+                </div>
+                <div class="stat-card">
+                    <div style="font-size: 10px; color: #94a3b8;">Sales</div>
+                    <div class="stat-value" id="statSales">0</div>
+                </div>
+                <div class="stat-card">
+                    <div style="font-size: 10px; color: #94a3b8;">Earnings</div>
+                    <div class="stat-value" id="statEarnings">$0.00</div>
+                </div>
+            </div>
+
+            <label style="margin-top: 15px;">Create Deal / Product Link:</label>
+            <input type="text" id="targetUrl" placeholder="Paste Walmart/Product URL...">
+            <button class="action-btn" onclick="createLink()">Generate & Get Link</button>
+
+            <label style="margin-top: 15px;">Your Generated Links & Copy Hub:</label>
+            <div id="linksContainer" style="max-height: 130px; overflow-y: auto;">
+                <p style="color: #64748b; font-size: 12px; text-align: center;">No links created yet.</p>
+            </div>
+        </div>
+
+        <!-- SETTINGS TAB (PayPal Payout) -->
+        <div id="settingsTab" class="creator-tab hidden">
+            <label>Account Name:</label>
+            <input type="text" id="settingsName">
+
+            <label>PayPal Payout Email:</label>
+            <input type="email" id="settingsPaypal" placeholder="Enter PayPal email for payments...">
+
+            <button class="action-btn" style="background: #059669;" onclick="saveSettings()">Save Settings</button>
+        </div>
+    </div>
+
+    <!-- CEO / ADMIN DASHBOARD -->
+    <div id="ceoDashboard" class="hidden">
+        <div class="top-bar">
+            <h3 style="color: #f59e0b; margin: 0;">👑 CEO Admin Control Panel</h3>
+            <button class="action-btn" style="background: #ef4444; width: auto; padding: 6px 12px; margin:0;" onclick="handleLogout()">Logout</button>
+        </div>
+        <p style="color: #94a3b8; font-size: 12px;">Manage all registered creators, block accounts, or control payouts.</p>
+
+        <div style="overflow-x: auto; max-height: 300px;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Name / Email</th>
+                        <th>Earnings</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                Ref</thead>
+                <tbody id="ceoTableBody">
+                    <!-- Dynamic Users -->
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 <script>
-    function switchTab(tabId, btn) {
-        document.querySelectorAll('.form-section').forEach(sec => sec.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    function handleLogin() {
+        const name = document.getElementById('loginName').value.trim() || 'Creator';
+        const email = document.getElementById('loginEmail').value.trim();
+        const pass = document.getElementById('loginPass').value.trim();
+
+        if(!email || !pass) {
+            alert('Please enter email and password!');
+            return;
+        }
+
+        // CEO Login Check
+        if(email === 'ceo@dealhub.com' && pass === 'ceo123') {
+            localStorage.setItem('active_session', JSON.stringify({role: 'ceo', email: email}));
+            loadCeoDashboard();
+            return;
+        }
+
+        // Creator Login
+        let users = JSON.parse(localStorage.getItem('dealhub_users')) || {};
+        if(!users[email]) {
+            users[email] = {
+                name: name,
+                email: email,
+                pass: pass,
+                clicks: Math.floor(Math.random() * 100 + 10),
+                sales: Math.floor(Math.random() * 10 + 1),
+                earnings: (Math.random() * 200 + 20).toFixed(2),
+                paypal: '',
+                status: 'Active',
+                links: []
+            };
+        } else {
+            if(users[email].status === 'Blocked') {
+                alert('Your account has been blocked by the CEO!');
+                return;
+            }
+        }
+        localStorage.setItem('dealhub_users', JSON.stringify(users));
+        localStorage.setItem('active_session', JSON.stringify({role: 'creator', email: email}));
+        loadCreatorDashboard(email);
+    }
+
+    function loadCreatorDashboard(email) {
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('ceoDashboard').classList.add('hidden');
+        document.getElementById('creatorDashboard').classList.remove('hidden');
+
+        let users = JSON.parse(localStorage.getItem('dealhub_users'));
+        let user = users[email];
+
+        document.getElementById('welcomeUser').innerText = `Welcome, ${user.name}`;
+        document.getElementById('userEmailDisplay').innerText = `Email: ${user.email}`;
+        document.getElementById('statClicks').innerText = user.clicks;
+        document.getElementById('statSales').innerText = user.sales;
+        document.getElementById('statEarnings').innerText = `$${user.earnings}`;
         
-        document.getElementById(tabId).classList.add('active');
+        document.getElementById('settingsName').value = user.name;
+        document.getElementById('settingsPaypal').value = user.paypal || '';
+
+        renderLinks(user.links);
+    }
+
+    function loadCeoDashboard() {
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('creatorDashboard').classList.add('hidden');
+        document.getElementById('ceoDashboard').classList.remove('hidden');
+
+        let users = JSON.parse(localStorage.getItem('dealhub_users')) || {};
+        let tbody = document.getElementById('ceoTableBody');
+        tbody.innerHTML = '';
+
+        if(Object.keys(users).length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#94a3b8;">No creators registered yet.</td></tr>`;
+            return;
+        }
+
+        for(let email in users) {
+            let u = users[email];
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><b>${u.name}</b><br><small>${u.email}</small></td>
+                <td>$${u.earnings}</td>
+                <td style="color: ${u.status === 'Active' ? '#4ade80' : '#ef4444'};">${u.status}</td>
+                <td>
+                    <button onclick="toggleBlock('${email}')" style="background: ${u.status === 'Active' ? '#ef4444' : '#059669'}; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">
+                        ${u.status === 'Active' ? 'Block' : 'Unblock'}
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        }
+    }
+
+    function toggleBlock(email) {
+        let users = JSON.parse(localStorage.getItem('dealhub_users'));
+        if(users[email]) {
+            users[email].status = users[email].status === 'Active' ? 'Blocked' : 'Active';
+            localStorage.setItem('dealhub_users', JSON.stringify(users));
+            loadCeoDashboard();
+        }
+    }
+
+    function createLink() {
+        const urlInput = document.getElementById('targetUrl');
+        const longUrl = urlInput.value.trim();
+        if(!longUrl) { alert('Please enter product URL!'); return; }
+
+        let session = JSON.parse(localStorage.getItem('active_session'));
+        let users = JSON.parse(localStorage.getItem('dealhub_users'));
+        let user = users[session.email];
+
+        const shortCode = 'deal-' + Math.floor(Math.random() * 90000 + 10000);
+        user.links.push({ short: `https://deal-hub.ly/${shortCode}`, original: longUrl });
+        
+        localStorage.setItem('dealhub_users', JSON.stringify(users));
+        urlInput.value = '';
+        renderLinks(user.links);
+    }
+
+    function renderLinks(links) {
+        const container = document.getElementById('linksContainer');
+        if(links.length === 0) {
+            container.innerHTML = `<p style="color: #64748b; font-size: 12px; text-align: center;">No links created yet.</p>`;
+            return;
+        }
+        container.innerHTML = '';
+        links.forEach(item => {
+            let div = document.createElement('div');
+            div.className = 'link-box';
+            div.innerHTML = `
+                <span style="color: #38bdf8; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:280px;">${item.short}</span>
+                <button class="copy-btn" onclick="copyLink('${item.short}')">Copy</button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function copyLink(text) {
+        navigator.clipboard.writeText(text).then(() => alert('Link copied successfully!'));
+    }
+
+    function saveSettings() {
+        let session = JSON.parse(localStorage.getItem('active_session'));
+        let users = JSON.parse(localStorage.getItem('dealhub_users'));
+        let user = users[session.email];
+
+        user.name = document.getElementById('settingsName').value.trim();
+        user.paypal = document.getElementById('settingsPaypal').value.trim();
+        
+        localStorage.setItem('dealhub_users', JSON.stringify(users));
+        alert('Settings saved successfully!');
+    }
+
+    function switchCreatorTab(tabId, btn) {
+        document.querySelectorAll('.creator-tab').forEach(t => t.classList.add('hidden'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.remove('hidden');
         btn.classList.add('active');
     }
 
-    function handleAccountAction() {
-        const name = document.getElementById('userName').value.trim();
-        const email = document.getElementById('userEmail').value.trim();
-        const pass = document.getElementById('userPass').value.trim();
-        const resultBox = document.getElementById('authResult');
-
-        if(!name || !email || !pass) {
-            alert('Please fill in all fields to sign up!');
-            return;
-        }
-
-        resultBox.style.display = 'block';
-        resultBox.innerHTML = `[Success]: Account created successfully for <b>${name} (${email})</b>!<br>[Status]: Session active and ready.`;
-    }
-
-    function generateShortLink() {
-        const longUrl = document.getElementById('longUrl').value.trim();
-        const alias = document.getElementById('customAlias').value.trim() || 'deal-' + Math.floor(Math.random() * 9000 + 1000);
-        const resultBox = document.getElementById('linkResult');
-
-        if(!longUrl) {
-            alert('Please enter a valid URL first!');
-            return;
-        }
-
-        resultBox.style.display = 'block';
-        // यहाँ हमने लिंक को डायरेक्ट क्लिक करने योग्य बना दिया है ताकि बिना किसी एरर के सीधे वॉल्मार्ट खुले
-        resultBox.innerHTML = `[Generated Successfully]:<br><b>Original:</b> <a href="${longUrl}" target="_blank">${longUrl}</a><br><b>Clickable Redirect Link:</b> <a href="${longUrl}" target="_blank" style="color: #4ade80; font-size: 15px; font-weight: bold;">https://deal-hub.ly/${alias} (Click to open Walmart)</a>`;
+    function handleLogout() {
+        localStorage.removeItem('active_session');
+        document.getElementById('creatorDashboard').classList.add('hidden');
+        document.getElementById('ceoDashboard').classList.add('hidden');
+        document.getElementById('loginScreen').classList.remove('hidden');
     }
 </script>
 
