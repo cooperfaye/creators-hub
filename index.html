@@ -98,7 +98,7 @@
 
             <label style="margin-top: 20px;">Create Walmart / Product Deal Link:</label>
             <input type="text" id="targetUrl" placeholder="https://www.walmart.com/ip/your-product...">
-            <button class="action-btn" onclick="createAffiliateLink()">Generate Short Link</button>
+            <button class="action-btn" onclick="createAffiliateLink()">Generate Direct Smart Link</button>
 
             <label style="margin-top: 20px;">Your Generated Links & Copy Hub:</label>
             <div id="linksContainer" style="max-height: 180px; overflow-y: auto; margin-top: 5px;">
@@ -291,9 +291,9 @@
         let user = users[session.email];
 
         const uniqueCode = 'deal-' + Math.floor(Math.random() * 90000 + 10000);
-        const shortLink = `https://creator-github.io/${uniqueCode}`;
+        const currentDomain = window.location.href.split('?')[0];
+        const shortLink = `${currentDomain}?redirect=${encodeURIComponent(longUrl)}`;
 
-        // हम शॉर्ट लिंक के साथ ओरिजिनल वॉल्मार्ट लिंक को भी सेव कर रहे हैं
         user.links.push({ short: shortLink, original: longUrl });
         localStorage.setItem('creator_github_users', JSON.stringify(users));
 
@@ -322,10 +322,9 @@
         });
     }
 
-    // यहाँ केवल शॉर्ट लिंक ही कॉपी होगा, वॉल्मार्ट का लंबा यूआरएल नहीं
     function copyShortLink(shortText) {
         navigator.clipboard.writeText(shortText).then(() => {
-            alert('Short Link copied successfully: ' + shortText);
+            alert('Smart Link copied successfully!');
         }).catch(() => {
             alert('Failed to copy link.');
         });
@@ -356,6 +355,23 @@
         document.getElementById('ceoDashboard').classList.add('hidden');
         document.getElementById('loginScreen').classList.remove('hidden');
     }
+
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectUrl = urlParams.get('redirect');
+        if (redirectUrl) {
+            window.location.href = decodeURIComponent(redirectUrl);
+        } else {
+            let session = JSON.parse(localStorage.getItem('active_session'));
+            if(session) {
+                if(session.role === 'ceo') {
+                    loadCeoDashboard();
+                } else {
+                    loadCreatorDashboard(session.email);
+                }
+            }
+        }
+    };
 </script>
 
 </body>
