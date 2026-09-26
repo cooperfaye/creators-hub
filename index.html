@@ -4,552 +4,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creators Hub - Signup / Login</title>
+    <title>Affiliate & Link Dashboard Pro</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        body {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        .auth-container {
-            background: #ffffff;
-            width: 100%;
-            max-width: 420px;
-            padding: 40px 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-        }
-        .logo-area {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        .logo-area h1 {
-            font-size: 26px;
-            color: #1e293b;
-            font-weight: 700;
-        }
-        .logo-area p {
-            font-size: 14px;
-            color: #64748b;
-            margin-top: 5px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            color: #334155;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-        .form-group input:focus {
-            outline: none;
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
-        }
-        .btn {
-            width: 100%;
-            padding: 12px;
-            background: #4f46e5;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-        .btn:hover {
-            background: #4338ca;
-        }
-        .error-msg {
-            background: #fee2e2;
-            color: #991b1b;
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 13px;
-            margin-bottom: 20px;
-            text-align: center;
-            display: none;
-        }
-        .success-msg {
-            background: #dcfce7;
-            color: #166534;
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 13px;
-            margin-bottom: 20px;
-            text-align: center;
-            display: none;
-        }
-        .auth-footer {
-            margin-top: 25px;
-            text-align: center;
-            font-size: 14px;
-            color: #64748b;
-        }
-        .auth-footer a {
-            color: #4f46e5;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        .auth-footer a:hover {
-            text-decoration: underline;
-        }
-        .forgot-link {
-            text-align: right;
-            margin-top: -12px;
-            margin-bottom: 20px;
-        }
-        .forgot-link a {
-            font-size: 13px;
-            color: #64748b;
-            text-decoration: none;
-        }
-        .forgot-link a:hover {
-            color: #4f46e5;
-            text-decoration: underline;
-        }
-        .hidden {
-            display: none;
-        }
+        body { font-family: Arial, sans-serif; background: #0b0f19; color: #f8fafc; margin: 0; padding: 20px; }
+        .container { max-width: 550px; margin: 0 auto; background: #1e293b; padding: 25px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
+        h2 { color: #38bdf8; margin-top: 0; text-align: center; }
+        .tab-menu { display: flex; justify-content: center; margin-bottom: 20px; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+        .tab-btn { background: #334155; color: white; border: none; padding: 8px 16px; margin: 0 5px; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold; }
+        .tab-btn.active { background: #2563eb; }
+        .form-section { display: none; }
+        .form-section.active { display: block; }
+        label { display: block; margin-top: 15px; font-weight: bold; font-size: 13px; color: #cbd5e1; }
+        input[type="text"], input[type="email"], input[type="password"] { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #475569; background: #0f172a; color: white; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        .action-btn { background: #2563eb; color: white; border: none; padding: 12px 20px; width: 100%; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 12px rgba(37,99,235,0.4); }
+        .action-btn:hover { background: #1d4ed8; }
+        .result-box { margin-top: 15px; background: #0f172a; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 13px; color: #4ade80; border: 1px solid #334155; word-break: break-all; display: none; }
     </style>
 </head>
 <body>
 
-    <div class="auth-container">
-        <!-- Logo & Title Section -->
-        <div class="logo-area">
-            <h1>🚀 Creators Hub</h1>
-            <p>Manage your affiliate links & track earnings</p>
-        </div>
-
-        <!-- Global Alert Boxes -->
-        <div id="errorAlert" class="error-msg"></div>
-        <div id="successAlert" class="success-msg"></div>
-
-        <!-- 1. SIGNUP FORM (Default View) -->
-        <div id="signupView">
-            <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" id="signupName" placeholder="Premchand / Your Name">
-            </div>
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" id="signupEmail" placeholder="name@example.com">
-            </div>
-            <div class="form-group">
-                <label>Create Password</label>
-                <input type="password" id="signupPassword" placeholder="Enter your password">
-            </div>
-            <button class="btn" onclick="handleSignup()">Create Account</button>
-            <div class="auth-footer">
-                Already have an account? <a href="#" onclick="switchView('loginView')">Login here</a>
-            </div>
-        </div>
-
-        <!-- 2. LOGIN FORM -->
-        <div id="loginView" class="hidden">
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" id="loginEmail" placeholder="name@example.com">
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="loginPassword" placeholder="Enter your password">
-            </div>
-            <div class="forgot-link">
-                <a href="#" onclick="switchView('forgotView')">Forgot Password?</a>
-            </div>
-            <button class="btn" onclick="handleLogin()">Login to Dashboard</button>
-            <div class="auth-footer">
-                Don't have an account? <a href="#" onclick="switchView('signupView')">Create Account</a>
-            </div>
-        </div>
-
-        <!-- 3. FORGOT PASSWORD FORM -->
-        <div id="forgotView" class="hidden">
-            <div class="form-group">
-                <label>Enter your registered email</label>
-                <input type="email" id="forgotEmail" placeholder="name@example.com">
-            </div>
-            <button class="btn" onclick="handleForgotPassword()">Reset Password</button>
-            <div class="auth-footer">
-                Remember your password? <a href="#" onclick="switchView('loginView')">Back to Login</a>
-            </div>
-        </div>
+<div class="container">
+    <h2>🚀 Dashboard & Link Creator</h2>
+    
+    <!-- Tab Navigation -->
+    <div class="tab-menu">
+        <button class="tab-btn active" onclick="switchTab('authTab', this)">Sign Up / Login</button>
+        <button class="tab-btn" onclick="switchTab('linkTab', this)">Link Creator</button>
     </div>
 
-    <script>
-        function switchView(viewId) {
-            document.getElementById('loginView').classList.add('hidden');
-            document.getElementById('signupView').classList.add('hidden');
-            document.getElementById('forgotView').classList.add('hidden');
-            
-            document.getElementById('errorAlert').style.display = 'none';
-            document.getElementById('successAlert').style.display = 'none';
+    <!-- Section 1: Sign Up / Account Creation -->
+    <div id="authTab" class="form-section active">
+        <label>Your Name / Username:</label>
+        <input type="text" id="userName" placeholder="Enter your name...">
 
-            document.getElementById(viewId).classList.remove('hidden');
-        }
+        <label>Email Address:</label>
+        <input type="email" id="userEmail" placeholder="Enter your email...">
 
-        function showError(message) {
-            const errBox = document.getElementById('errorAlert');
-            errBox.innerText = message;
-            errBox.style.display = 'block';
-            document.getElementById('successAlert').style.display = 'none';
-        }
+        <label>Password:</label>
+        <input type="password" id="userPass" placeholder="Create a password...">
 
-        function showSuccess(message) {
-            const succBox = document.getElementById('successAlert');
-            succBox.innerText = message;
-            succBox.style.display = 'block';
-            document.getElementById('errorAlert').style.display = 'none';
-        }
-
-        // Handle Sign Up Logic
-        function handleSignup() {
-            const name = document.getElementById('signupName').value.trim();
-            const email = document.getElementById('signupEmail').value.trim();
-            const password = document.getElementById('signupPassword').value.trim();
-
-            if (!name || !email || !password) {
-                showError('Please fill in all fields.');
-                return;
-            }
-
-            const existingUser = localStorage.getItem('creators_hub_user_' + email);
-            if (existingUser) {
-                showError('Email is already registered. Please login.');
-                return;
-            }
-
-            const userData = { name, email, password };
-            localStorage.setItem('creators_hub_user_' + email, JSON.stringify(userData));
-            
-            showSuccess('Account created successfully! Please login.');
-            setTimeout(() => {
-                switchView('loginView');
-            }, 1500);
-        }
-
-        // Handle Login Logic
-        function handleLogin() {
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value.trim();
-
-            if (!email || !password) {
-                showError('Please enter both email and password.');
-                return;
-            }
-
-            const storedUserStr = localStorage.getItem('creators_hub_user_' + email);
-            if (!storedUserStr) {
-                showError('Account not found. Please sign up first.');
-                return;
-            }
-
-            const storedUser = JSON.parse(storedUserStr);
-            if (storedUser.password !== password) {
-                showError('Incorrect password. Please try again.');
-                return;
-            }
-
-            localStorage.setItem('creators_hub_session', email);
-            
-            showSuccess('Login successful! Welcome to Creators Hub...');
-            setTimeout(() => {
-                alert('Welcome back, ' + storedUser.name + '!');
-            }, 1000);
-        }
-
-        // Handle Forgot Password Logic
-        function handleForgotPassword() {
-            const email = document.getElementById('forgotEmail').value.trim();
-
-            if (!email) {
-                showError('Please enter your email address.');
-                return;
-            }
-
-            const storedUserStr = localStorage.getItem('creators_hub_user_' + email);
-            if (!storedUserStr) {
-                showError('This email is not registered with us.');
-                return;
-            }
-
-            const user = JSON.parse(storedUserStr);
-            showSuccess(`Password reset instructions sent to ${user.email} (Hint: Your password is ${user.password})`);
-        }
-    </script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creators Hub - Quick Stats Dashboard</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-        body {
-            background-color: #f1f5f9;
-            color: #0f172a;
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .dashboard-wrapper {
-            width: 100%;
-            max-width: 480px;
-        }
-        
-        /* Quick Stats Card Container */
-        .quick-stats-card {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e2e8f0;
-        }
-
-        /* Card Header */
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .card-header h2 {
-            font-size: 22px;
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        /* Time Filter Buttons (1d, 1w, 1m, MTD) */
-        .time-filters {
-            display: flex;
-            background: #f1f5f9;
-            border-radius: 8px;
-            padding: 3px;
-        }
-        .filter-btn {
-            background: transparent;
-            border: none;
-            padding: 6px 10px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #64748b;
-            cursor: pointer;
-            border-radius: 6px;
-            transition: all 0.2s ease;
-        }
-        .filter-btn.active {
-            background: #ffffff;
-            color: #4f46e5;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        }
-
-        /* 2x2 Stats Grid */
-        .stats-grid-2x2 {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
-
-        /* Individual Stat Sub-Box */
-        .stat-sub-box {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 16px;
-            position: relative;
-            transition: border-color 0.2s;
-        }
-        .stat-sub-box:hover {
-            border-color: #cbd5e1;
-        }
-        
-        .stat-label-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        .stat-sub-box .label {
-            font-size: 14px;
-            color: #64748b;
-            font-weight: 500;
-        }
-        .stat-sub-box .value {
-            font-size: 20px;
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        /* Question Mark Icon styling */
-        .help-icon {
-            width: 18px;
-            height: 18px;
-            background: #0f172a;
-            color: #ffffff;
-            border-radius: 50%;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        /* Link Generator Section below */
-        .generator-section {
-            margin-top: 20px;
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e2e8f0;
-        }
-        .generator-section h3 {
-            font-size: 16px;
-            margin-bottom: 12px;
-            color: #0f172a;
-        }
-        .input-group {
-            display: flex;
-            gap: 10px;
-        }
-        .input-group input {
-            flex: 1;
-            padding: 10px 14px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-        .input-group input:focus {
-            outline: none;
-            border-color: #4f46e5;
-        }
-        .gen-btn {
-            background: #4f46e5;
-            color: white;
-            border: none;
-            padding: 0 16px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        #resultContainer {
-            margin-top: 12px;
-            font-size: 13px;
-            color: #334155;
-            word-break: break-all;
-            display: none;
-            background: #f8fafc;
-            padding: 10px;
-            border-radius: 6px;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="dashboard-wrapper">
-        <!-- Quick Stats Card matching your image -->
-        <div class="quick-stats-card">
-            <div class="card-header">
-                <h2>Quick Stats</h2>
-                <div class="time-filters">
-                    <button class="filter-btn" onclick="setActiveFilter(this)">1d</button>
-                    <button class="filter-btn" onclick="setActiveFilter(this)">1w</button>
-                    <button class="filter-btn" onclick="setActiveFilter(this)">1m</button>
-                    <button class="filter-btn active" onclick="setActiveFilter(this)">MTD</button>
-                </div>
-            </div>
-
-            <div class="stats-grid-2x2">
-                <!-- Box 1: Sales -->
-                <div class="stat-sub-box">
-                    <div class="label">Sales</div>
-                    <div class="value">$753.80</div>
-                </div>
-
-                <!-- Box 2: Commission -->
-                <div class="stat-sub-box">
-                    <div class="label">Commission</div>
-                    <div class="value">$21.45</div>
-                </div>
-
-                <!-- Box 3: Clicks with Question Mark -->
-                <div class="stat-sub-box">
-                    <div class="stat-label-row">
-                        <span class="label">Clicks</span>
-                        <span class="help-icon" title="Total referral link clicks">?</span>
-                    </div>
-                    <div class="value">233</div>
-                </div>
-
-                <!-- Box 4: Conversion -->
-                <div class="stat-sub-box">
-                    <div class="label">Conversion</div>
-                    <div class="value">3.00%</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Link Generator Box -->
-        <div class="generator-section">
-            <h3>Quick Link Generator</h3>
-            <div class="input-group">
-                <input type="text" id="targetLink" placeholder="Paste product link...">
-                <button class="gen-btn" onclick="makeLink()">Generate</button>
-            </div>
-            <div id="resultContainer"></div>
-        </div>
+        <button class="action-btn" onclick="handleAccountAction()">Create Account / Sign Up</button>
+        <div class="result-box" id="authResult"></div>
     </div>
 
-    <script>
-        function setActiveFilter(btn) {
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+    <!-- Section 2: Link Creator & Management -->
+    <div id="linkTab" class="form-section">
+        <label>Original Long URL (Product/Deal Link):</label>
+        <input type="text" id="longUrl" placeholder="https://www.example.com/product/12345">
+
+        <label>Custom Link Alias / Keyword (Optional):</label>
+        <input type="text" id="customAlias" placeholder="walmart-mega-deal">
+
+        <button class="action-btn" onclick="generateShortLink()">Generate Short Trackable Link</button>
+        <div class="result-box" id="linkResult"></div>
+    </div>
+</div>
+
+<script>
+    function switchTab(tabId, btn) {
+        document.querySelectorAll('.form-section').forEach(sec => sec.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    function handleAccountAction() {
+        const name = document.getElementById('userName').value.trim();
+        const email = document.getElementById('userEmail').value.trim();
+        const pass = document.getElementById('userPass').value.trim();
+        const resultBox = document.getElementById('authResult');
+
+        if(!name || !email || !pass) {
+            alert('Please fill in all fields to sign up!');
+            return;
         }
 
-        function makeLink() {
-            const url = document.getElementById('targetLink').value.trim();
-            const res = document.getElementById('resultContainer');
-            if(!url) {
-                alert('Please enter a link');
-                return;
-            }
-            const code = Math.random().toString(36).substring(2, 8);
-            const final = `https://creatorshub.site/ref?id=${code}`;
-            res.style.display = 'block';
-            res.innerHTML = `Link: <a href="${final}" target="_blank">${final}</a>`;
+        resultBox.style.display = 'block';
+        resultBox.innerHTML = `[Success]: Account created successfully for <b>${name} (${email})</b>!<br>[Status]: Session active and ready.`;
+    }
+
+    function generateShortLink() {
+        const longUrl = document.getElementById('longUrl').value.trim();
+        const alias = document.getElementById('customAlias').value.trim() || Math.random().toString(36.substring(2, 8));
+        const resultBox = document.getElementById('linkResult');
+
+        if(!longUrl) {
+            alert('Please enter a valid URL first!');
+            return;
         }
-    </script>
+
+        const generatedLink = `https://deal-hub.ly/${alias}`;
+        resultBox.style.display = 'block';
+        resultBox.innerHTML = `[Generated Successfully]:<br><b>Original:</b> ${longUrl}<br><b>Short Track Link:</b> <span style="color: #38bdf8;">${generatedLink}</span>`;
+    }
+</script>
+
 </body>
 </html>
