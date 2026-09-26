@@ -2,673 +2,125 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name='impact-site-verification' value='6584d2d7-29ba-47f9-8eee-8b9451e68e39'>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creators Hub - Complete Dashboard & Settings</title>
+    <title>Creators Hub - CEO & Admin Portal</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-        body {
-            background-color: #f1f5f9;
-            color: #0f172a;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        .container {
-            width: 100%;
-            max-width: 480px;
-        }
-        .hidden {
-            display: none !important;
-        }
-
-        /* Auth Cards */
-        .auth-card {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e2e8f0;
-        }
-        .logo-title {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        .logo-title h1 {
-            font-size: 24px;
-            color: #0f172a;
-            font-weight: 700;
-        }
-        .logo-title p {
-            font-size: 14px;
-            color: #64748b;
-            margin-top: 5px;
-        }
-        .form-group {
-            margin-bottom: 16px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #334155;
-        }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 14px;
-            background: #fff;
-        }
-        .form-group input:focus, .form-group select:focus {
-            outline: none;
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
-        }
-        .btn-primary {
-            width: 100%;
-            padding: 12px;
-            background: #4f46e5;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: background 0.2s;
-        }
-        .btn-primary:hover {
-            background: #4338ca;
-        }
-        .alert-msg {
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 13px;
-            margin-bottom: 15px;
-            text-align: center;
-            display: none;
-        }
-        .alert-error { background: #fee2e2; color: #991b1b; }
-        .alert-success { background: #dcfce7; color: #166534; }
-        .auth-footer {
-            margin-top: 20px;
-            text-align: center;
-            font-size: 14px;
-            color: #64748b;
-        }
-        .auth-footer a {
-            color: #4f46e5;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        .auth-footer a:hover { text-decoration: underline; }
-
-        /* Dashboard & App Navigation Header */
-        .app-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #ffffff;
-            padding: 14px 20px;
-            border-radius: 12px;
-            margin-bottom: 16px;
-            border: 1px solid #e2e8f0;
-        }
-        .app-header h3 {
-            font-size: 15px;
-            color: #0f172a;
-        }
-        .nav-tabs {
-            display: flex;
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 6px;
-            margin-bottom: 16px;
-            border: 1px solid #e2e8f0;
-            gap: 6px;
-        }
-        .nav-btn {
-            flex: 1;
-            background: transparent;
-            border: none;
-            padding: 8px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #64748b;
-            cursor: pointer;
-            border-radius: 8px;
-            text-align: center;
-            transition: all 0.2s;
-        }
-        .nav-btn.active {
-            background: #4f46e5;
-            color: #ffffff;
-            box-shadow: 0 2px 6px rgba(79, 70, 229, 0.2);
-        }
-        .logout-btn {
-            background: #fee2e2;
-            color: #991b1b;
-            border: none;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        /* Quick Stats Card */
-        .quick-stats-card {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e2e8f0;
-            margin-bottom: 16px;
-        }
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .card-header h2 {
-            font-size: 18px;
-            font-weight: 700;
-            color: #0f172a;
-        }
-        .time-filters {
-            display: flex;
-            background: #f1f5f9;
-            border-radius: 8px;
-            padding: 3px;
-        }
-        .filter-btn {
-            background: transparent;
-            border: none;
-            padding: 4px 8px;
-            font-size: 11px;
-            font-weight: 600;
-            color: #64748b;
-            cursor: pointer;
-            border-radius: 6px;
-        }
-        .filter-btn.active {
-            background: #ffffff;
-            color: #4f46e5;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        }
-        .stats-grid-2x2 {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-        .stat-sub-box {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 14px;
-        }
-        .stat-label-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-        .stat-sub-box .label {
-            font-size: 13px;
-            color: #64748b;
-            font-weight: 500;
-        }
-        .stat-sub-box .value {
-            font-size: 18px;
-            font-weight: 700;
-            color: #0f172a;
-        }
-        .help-icon {
-            width: 16px;
-            height: 16px;
-            background: #0f172a;
-            color: #ffffff;
-            border-radius: 50%;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 10px;
-            font-weight: bold;
-        }
-
-        /* Link Generator Box */
-        .generator-section {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e2e8f0;
-        }
-        .generator-section h3 {
-            font-size: 15px;
-            margin-bottom: 10px;
-            color: #0f172a;
-        }
-        .input-group {
-            display: flex;
-            gap: 8px;
-        }
-        .input-group input {
-            flex: 1;
-            padding: 10px 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 13px;
-        }
-        .gen-btn {
-            background: #4f46e5;
-            color: white;
-            border: none;
-            padding: 0 14px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 13px;
-        }
-        #resultContainer {
-            margin-top: 10px;
-            font-size: 12px;
-            color: #334155;
-            word-break: break-all;
-            display: none;
-            background: #f8fafc;
-            padding: 8px;
-            border-radius: 6px;
-        }
-
-        /* Settings & Payout Section Container */
-        .content-card {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e2e8f0;
-        }
-        .content-card h2 {
-            font-size: 18px;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 16px;
-        }
-        
-        /* Payout Table */
-        .payout-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-        .payout-table th, .payout-table td {
-            padding: 10px 12px;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .payout-table th {
-            color: #64748b;
-            font-weight: 600;
-            background: #f8fafc;
-        }
-        .status-paid {
-            color: #166534;
-            background: #dcfce7;
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 600;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background-color: #f4f7f6; color: #333; }
+        header { background: #1e293b; color: #fff; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        header h1 { font-size: 24px; }
+        nav a { color: #fff; text-decoration: none; margin-left: 20px; font-size: 14px; }
+        .container { max-width: 1200px; margin: 30px auto; padding: 20px; }
+        .card { background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .card h2 { margin-bottom: 15px; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .stat-box { background: #3b82f6; color: #fff; padding: 20px; border-radius: 6px; text-align: center; }
+        .stat-box h3 { font-size: 28px; margin-bottom: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        table, th, td { border: 1px solid #cbd5e1; }
+        th, td { padding: 12px; text-align: left; font-size: 14px; }
+        th { background: #f1f5f9; }
+        .btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; color: #fff; }
+        .btn-active { background: #10b981; }
+        .btn-block { background: #ef4444; }
+        footer { text-align: center; padding: 20px; color: #64748b; font-size: 13px; }
     </style>
 </head>
 <body>
 
+    <header>
+        <h1>Creators Hub (CEO Dashboard)</h1>
+        <nav>
+            <a href="#dashboard">Dashboard</a>
+            <a href="#users">User Management</a>
+            <a href="#terms">Terms & Conditions</a>
+            <a href="#privacy">Privacy Policy</a>
+        </nav>
+    </header>
+
     <div class="container">
-        <!-- GLOBAL ALERTS -->
-        <div id="errorAlert" class="alert-msg alert-error"></div>
-        <div id="successAlert" class="alert-msg alert-success"></div>
-
-        <!-- 1. SIGNUP VIEW -->
-        <div id="signupView" class="auth-card">
-            <div class="logo-title">
-                <h1>🚀 Creators Hub</h1>
-                <p>Create your account</p>
-            </div>
-            <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" id="signupName" placeholder="Premchand / Your Name">
-            </div>
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" id="signupEmail" placeholder="name@example.com">
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="signupPassword" placeholder="Enter password">
-            </div>
-            <button class="btn-primary" onclick="handleSignup()">Create Account</button>
-            <div class="auth-footer">
-                Already have an account? <a href="#" onclick="switchAuthView('loginView')">Login here</a>
-            </div>
-        </div>
-
-        <!-- 2. LOGIN VIEW -->
-        <div id="loginView" class="auth-card hidden">
-            <div class="logo-title">
-                <h1>🚀 Creators Hub</h1>
-                <p>Login to your dashboard</p>
-            </div>
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" id="loginEmail" placeholder="name@example.com">
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="loginPassword" placeholder="Enter password">
-            </div>
-            <button class="btn-primary" onclick="handleLogin()">Login</button>
-            <div class="auth-footer">
-                Don't have an account? <a href="#" onclick="switchAuthView('signupView')">Create Account</a>
-            </div>
-        </div>
-
-        <!-- 3. MAIN DASHBOARD & TABS VIEW -->
-        <div id="mainAppView" class="hidden">
-            <!-- App Header -->
-            <div class="app-header">
-                <h3 id="welcomeUser">Welcome</h3>
-                <button class="logout-btn" onclick="handleLogout()">Logout</button>
-            </div>
-
-            <!-- Navigation Tabs -->
-            <div class="nav-tabs">
-                <button class="nav-btn active" onclick="switchTab('dashboardTab', this)">Dashboard</button>
-                <button class="nav-btn" onclick="switchTab('payoutsTab', this)">Payout History</button>
-                <button class="nav-btn" onclick="switchTab('settingsTab', this)">Settings</button>
-            </div>
-
-            <!-- TAB 1: DASHBOARD -->
-            <div id="dashboardTab" class="tab-content">
-                <!-- Quick Stats Card -->
-                <div class="quick-stats-card">
-                    <div class="card-header">
-                        <h2>Quick Stats</h2>
-                        <div class="time-filters">
-                            <button class="filter-btn" onclick="setActiveFilter(this)">1d</button>
-                            <button class="filter-btn" onclick="setActiveFilter(this)">1w</button>
-                            <button class="filter-btn" onclick="setActiveFilter(this)">1m</button>
-                            <button class="filter-btn active" onclick="setActiveFilter(this)">MTD</button>
-                        </div>
-                    </div>
-
-                    <div class="stats-grid-2x2">
-                        <div class="stat-sub-box">
-                            <div class="label">Sales</div>
-                            <div class="value">$753.80</div>
-                        </div>
-                        <div class="stat-sub-box">
-                            <div class="label">Commission</div>
-                            <div class="value">$21.45</div>
-                        </div>
-                        <div class="stat-sub-box">
-                            <div class="stat-label-row">
-                                <span class="label">Clicks</span>
-                                <span class="help-icon" title="Total referral link clicks">?</span>
-                            </div>
-                            <div class="value">233</div>
-                        </div>
-                        <div class="stat-sub-box">
-                            <div class="label">Conversion</div>
-                            <div class="value">3.00%</div>
-                        </div>
-                    </div>
+        
+        <!-- Dashboard Stats -->
+        <div id="dashboard" class="card">
+            <h2>CEO Overview & Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <h3>5,420</h3>
+                    <p>Total Active Users</p>
                 </div>
-
-                <!-- Link Generator Box -->
-                <div class="generator-section">
-                    <h3>Quick Link Generator</h3>
-                    <div class="input-group">
-                        <input type="text" id="targetLink" placeholder="Paste product link...">
-                        <button class="gen-btn" onclick="makeLink()">Generate</button>
-                    </div>
-                    <div id="resultContainer"></div>
+                <div class="stat-box" style="background: #10b981;">
+                    <h3>$12,450</h3>
+                    <p>Monthly Revenue</p>
                 </div>
-            </div>
-
-            <!-- TAB 2: PAYOUT HISTORY -->
-            <div id="payoutsTab" class="tab-content hidden">
-                <div class="content-card">
-                    <h2>Payout History</h2>
-                    <table class="payout-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                da  <td>15 Sep 2026</td>
-                                <td>$142.50</td>
-                                <td><span class="status-paid">Paid</span></td>
-                            </tr>
-                            <tr>
-                                <td>01 Sep 2026</td>
-                                <td>$89.20</td>
-                                <td><span class="status-paid">Paid</span></td>
-                            </tr>
-                            <tr>
-                                <td>15 Aug 2026</td>
-                                <td>$215.00</td>
-                                <td><span class="status-paid">Paid</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- TAB 3: SETTINGS (PayPal & Profile) -->
-            <div id="settingsTab" class="tab-content hidden">
-                <div class="content-card">
-                    <h2>Account Settings</h2>
-                    <div class="form-group">
-                        <label>Display Name</label>
-                        <input type="text" id="settingName">
-                    </div>
-                    <div class="form-group">
-                        <label>Account Email</label>
-                        <input type="email" id="settingEmail" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>PayPal Email (for Payouts)</label>
-                        <input type="email" id="settingPaypal" placeholder="your-paypal@domain.com">
-                    </div>
-                    <div class="form-group">
-                        <label>Default Currency</label>
-                        <select id="settingCurrency">
-                            <option value="USD">USD ($)</option>
-                            <option value="EUR">EUR (€)</option>
-                            <option value="INR">INR (₹)</option>
-                        </select>
-                    </div>
-                    <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
+                <div class="stat-box" style="background: #8b5cf6;">
+                    <h3>142</h3>
+                    <p>Active Brand Links</p>
                 </div>
             </div>
         </div>
+
+        <!-- User Management Panel -->
+        <div id="users" class="card">
+            <h2>User & Account Management Panel</h2>
+            <p style="margin-bottom: 15px; font-size: 14px; color: #64748b;">As CEO, you have full control to activate, deactivate, or block platform accounts.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#USR-9011</td>
+                        <td>Alex Morgan</td>
+                        <td>alex@example.com</td>
+                        <td><span style="color: #10b981; font-weight: bold;">Active</span></td>
+                        <td><button class="btn btn-block" onclick="alert('Account Deactivated Successfully')">Deactivate</button></td>
+                    </tr>
+                    <tr>
+                        <td>#USR-9012</td>
+                        <td>Sarah Connor</td>
+                        <td>sarah@example.com</td>
+                        <td><span style="color: #ef4444; font-weight: bold;">Blocked</span></td>
+                        <td><button class="btn btn-active" onclick="alert('Account Activated Successfully')">Activate</button></td>
+                    </tr>
+                    <tr>
+                        <td>#USR-9013</td>
+                        <td>John Doe</td>
+                        <td>john@example.com</td>
+                        <td><span style="color: #10b981; font-weight: bold;">Active</span></td>
+                        <td><button class="btn btn-block" onclick="alert('Account Blocked Successfully')">Block</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Terms and Conditions -->
+        <div id="terms" class="card">
+            <h2>Terms & Conditions</h2>
+            <p style="font-size: 14px; line-height: 1.6; color: #475569;">
+                Welcome to Creators Hub. By accessing and using our website, you agree to comply with and be bound by the following terms and conditions. All promotional content, deal links, and digital services provided through this platform are managed under strict compliance guidelines. Unauthorized use or violation of platform policies will result in immediate account suspension or termination by the administration.
+            </p>
+        </div>
+
+        <!-- Privacy Policy -->
+        <div id="privacy" class="card">
+            <h2>Privacy Policy</h2>
+            <p style="font-size: 14px; line-height: 1.6; color: #475569;">
+                At Creators Hub, we respect your privacy and are committed to protecting your personal data. This privacy policy outlines how we collect, use, and safeguard your information when you visit our website or interact with our digital marketing and deal networks. We do not share your confidential data with third parties without explicit consent.
+            </p>
+        </div>
+
     </div>
 
-    <script>
-        // Check active session on load
-        window.onload = function() {
-            const activeEmail = localStorage.getItem('creators_hub_session');
-            if (activeEmail) {
-                loadUserData(activeEmail);
-                showMainApp();
-            }
-        };
+    <footer>
+        &copy; 2026 Creators Hub. All Rights Reserved. Managed by CEO Office.
+    </footer>
 
-        function switchAuthView(viewId) {
-            document.getElementById('signupView').classList.add('hidden');
-            document.getElementById('loginView').classList.add('hidden');
-            hideAlerts();
-            document.getElementById(viewId).classList.remove('hidden');
-        }
-
-        function hideAlerts() {
-            document.getElementById('errorAlert').style.display = 'none';
-            document.getElementById('successAlert').style.display = 'none';
-        }
-
-        function showError(msg) {
-            const err = document.getElementById('errorAlert');
-            err.innerText = msg;
-            err.style.display = 'block';
-            document.getElementById('successAlert').style.display = 'none';
-        }
-
-        function showSuccess(msg) {
-            const suc = document.getElementById('successAlert');
-            suc.innerText = msg;
-            suc.style.display = 'block';
-            document.getElementById('errorAlert').style.display = 'none';
-        }
-
-        // Signup Logic
-        function handleSignup() {
-            const name = document.getElementById('signupName').value.trim();
-            const email = document.getElementById('signupEmail').value.trim();
-            const password = document.getElementById('signupPassword').value.trim();
-
-            if (!name || !email || !password) {
-                showError('Please fill in all fields.');
-                return;
-            }
-
-            if (localStorage.getItem('creators_user_' + email)) {
-                showError('Email already registered! Please login.');
-                return;
-            }
-
-            const userData = { name, email, password, paypal: '', currency: 'USD' };
-            localStorage.setItem('creators_user_' + email, JSON.stringify(userData));
-
-            showSuccess('Account created successfully! Please login.');
-            setTimeout(() => switchAuthView('loginView'), 1200);
-        }
-
-        // Login Logic
-        function handleLogin() {
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value.trim();
-
-            if (!email || !password) {
-                showError('Please enter email and password.');
-                return;
-            }
-
-            const userStr = localStorage.getItem('creators_user_' + email);
-            if (!userStr) {
-                showError('Account not found. Please sign up first.');
-                return;
-            }
-
-            const user = JSON.parse(userStr);
-            if (user.password !== password) {
-                showError('Incorrect password.');
-                return;
-            }
-
-            localStorage.setItem('creators_hub_session', email);
-            loadUserData(email);
-            showMainApp();
-        }
-
-        function showMainApp() {
-            document.getElementById('signupView').classList.add('hidden');
-            document.getElementById('loginView').classList.add('hidden');
-            hideAlerts();
-            document.getElementById('mainAppView').classList.remove('hidden');
-        }
-
-        function loadUserData(email) {
-            const userStr = localStorage.getItem('creators_user_' + email);
-            if (userStr) {
-                const user = JSON.parse(userStr);
-                document.getElementById('welcomeUser').innerText = 'Hi, ' + user.name;
-                document.getElementById('settingName').value = user.name;
-                document.getElementById('settingEmail').value = user.email;
-                document.getElementById('settingPaypal').value = user.paypal || '';
-                document.getElementById('settingCurrency').value = user.currency || 'USD';
-            }
-        }
-
-        // Logout Logic
-        function handleLogout() {
-            localStorage.removeItem('creators_hub_session');
-            document.getElementById('mainAppView').classList.add('hidden');
-            switchAuthView('loginView');
-            showSuccess('Logged out successfully.');
-        }
-
-        // Navigation Tabs Switcher
-        function switchTab(tabId, btn) {
-            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.add('hidden'));
-            document.querySelectorAll('.nav-btn').forEach(nb => nb.classList.remove('active'));
-            
-            document.getElementById(tabId).classList.remove('hidden');
-            btn.classList.add('active');
-            hideAlerts();
-        }
-
-        // Save Settings
-        function saveSettings() {
-            const email = localStorage.getItem('creators_hub_session');
-            const userStr = localStorage.getItem('creators_user_' + email);
-            if (!userStr) return;
-
-            let user = JSON.parse(userStr);
-            user.name = document.getElementById('settingName').value.trim();
-            user.paypal = document.getElementById('settingPaypal').value.trim();
-            user.currency = document.getElementById('settingCurrency').value;
-
-            localStorage.setItem('creators_user_' + email, JSON.stringify(user));
-            document.getElementById('welcomeUser').innerText = 'Hi, ' + user.name;
-            showSuccess('Settings updated successfully!');
-        }
-
-        // Filter buttons toggle
-        function setActiveFilter(btn) {
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        }
-
-        // Link Generator
-        function makeLink() {
-            const url = document.getElementById('targetLink').value.trim();
-            const res = document.getElementById('resultContainer');
-            if(!url) {
-                alert('Please enter a link first!');
-                return;
-            }
-            const code = Math.random().toString(36).substring(2, 8);
-            const final = `https://creatorshub.site/ref?id=${code}`;
-            res.style.display = 'block';
-            res.innerHTML = `Your Link: <a href="${final}" target="_blank">${final}</a>`;
-        }
-    </script>
 </body>
 </html>
