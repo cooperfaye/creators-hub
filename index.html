@@ -1,116 +1,192 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Affiliate & Payout Dashboard Pro</title>
+    <title>Creator Affiliate Dashboard</title>
     <style>
         body { font-family: Arial, sans-serif; background: #0b0f19; color: #f8fafc; margin: 0; padding: 20px; }
-        .container { max-width: 550px; margin: 0 auto; background: #1e293b; padding: 25px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
+        .container { max-width: 600px; margin: 0 auto; background: #1e293b; padding: 25px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
         h2 { color: #38bdf8; margin-top: 0; text-align: center; }
-        .tab-menu { display: flex; justify-content: center; margin-bottom: 20px; border-bottom: 1px solid #334155; padding-bottom: 10px; flex-wrap: wrap; gap: 5px; }
-        .tab-btn { background: #334155; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; }
-        .tab-btn.active { background: #2563eb; }
-        .form-section { display: none; }
-        .form-section.active { display: block; }
+        .hidden { display: none !important; }
         label { display: block; margin-top: 15px; font-weight: bold; font-size: 13px; color: #cbd5e1; }
         input[type="text"], input[type="email"], input[type="password"] { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #475569; background: #0f172a; color: white; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
         .action-btn { background: #2563eb; color: white; border: none; padding: 12px 20px; width: 100%; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 12px rgba(37,99,235,0.4); }
         .action-btn:hover { background: #1d4ed8; }
-        .result-box { margin-top: 15px; background: #0f172a; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 13px; color: #4ade80; border: 1px solid #334155; word-break: break-all; }
-        .card { background: #0f172a; padding: 15px; border-radius: 8px; margin-top: 10px; border: 1px solid #334155; text-align: center; }
-        .balance { font-size: 24px; color: #38bdf8; font-weight: bold; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
+        .stat-card { background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155; text-align: center; }
+        .stat-value { font-size: 18px; font-weight: bold; color: #38bdf8; margin-top: 5px; }
+        .link-box { background: #0f172a; padding: 12px; border-radius: 6px; margin-top: 10px; border: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; font-size: 13px; word-break: break-all; }
+        .copy-btn { background: #059669; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; white-space: nowrap; margin-left: 10px; }
+        .copy-btn:hover { background: #047857; }
+        .logout-btn { background: #ef4444; float: right; padding: 6px 12px; font-size: 12px; margin-top: -10px; width: auto; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>🚀 Affiliate & Payout Hub</h2>
-    
-    <!-- Tab Navigation -->
-    <div class="tab-menu">
-        <button class="tab-btn active" onclick="switchTab('authTab', this)">Account</button>
-        <button class="tab-btn" onclick="switchTab('linkTab', this)">Link Creator</button>
-        <button class="tab-btn" onclick="switchTab('payoutTab', this)">Payouts</button>
-    </div>
+    <h2>🚀 Creator Affiliate Portal</h2>
 
-    <!-- Section 1: Sign Up / Login -->
-    <div id="authTab" class="form-section active">
-        <label>Your Name / Username:</label>
-        <input type="text" id="userName" value="Prem Chand" placeholder="Enter your name...">
+    <!-- LOGIN / SIGNUP SCREEN -->
+    <div id="loginScreen">
+        <p style="text-align: center; color: #94a3b8; font-size: 14px;">Enter your email and password to access your dashboard</p>
+        
+        <label>Your Name:</label>
+        <input type="text" id="loginName" placeholder="Enter your full name...">
 
         <label>Email Address:</label>
-        <input type="email" id="userEmail" value="premchand601@gmail.com" placeholder="Enter your email...">
+        <input type="email" id="loginEmail" placeholder="Enter your email...">
 
         <label>Password:</label>
-        <input type="password" id="userPass" value="********" placeholder="Create a password...">
+        <input type="password" id="loginPass" placeholder="Enter your password...">
 
-        <button class="action-btn" onclick="handleAccountAction()">Save & Login</button>
-        <div class="result-box" id="authResult" style="display:none;"></div>
+        <button class="action-btn" onclick="handleLogin()">Login / Register Dashboard</button>
     </div>
 
-    <!-- Section 2: Link Creator -->
-    <div id="linkTab" class="form-section">
-        <label>Original Long URL (Product/Deal Link):</label>
-        <input type="text" id="longUrl" placeholder="https://www.walmart.com/ip/example">
+    <!-- MAIN CREATOR DASHBOARD -->
+    <div id="dashboardScreen" class="hidden">
+        <button class="action-btn logout-btn" onclick="handleLogout()">Logout</button>
+        <h3 id="welcomeUser" style="color: #4ade80; margin-bottom: 5px;">Welcome, Creator</h3>
+        <p id="userEmailDisplay" style="color: #94a3b8; font-size: 12px; margin-top: 0;"></p>
 
-        <label>Custom Link Alias (Optional):</label>
-        <input type="text" id="customAlias" placeholder="walmart-deal">
-
-        <button class="action-btn" onclick="generateShortLink()">Generate Short Link</button>
-        <div class="result-box" id="linkResult" style="display:none;"></div>
-    </div>
-
-    <!-- Section 3: Payout System -->
-    <div id="payoutTab" class="form-section">
-        <div class="card">
-            <div style="font-size: 13px; color: #94a3b8;">Available Balance</div>
-            <div class="balance" id="walletBalance">$1,250.00</div>
+        <!-- Performance Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div style="font-size: 11px; color: #94a3b8;">Total Clicks</div>
+                <div class="stat-value" id="statClicks">0</div>
+            </div>
+            <div class="stat-card">
+                <div style="font-size: 11px; color: #94a3b8;">Total Sales</div>
+                <div class="stat-value" id="statSales">0</div>
+            </div>
+            <div class="stat-card">
+                <div style="font-size: 11px; color: #94a3b8;">Earnings ($)</div>
+                <div class="stat-value" id="statEarnings">$0.00</div>
+            </div>
         </div>
 
-        <label>Select Payout Method:</label>
-        <input type="text" value="PayPal / Bank Transfer" readonly>
+        <!-- Link Creator Section -->
+        <label>Create Affiliate / Deal Link:</label>
+        <input type="text" id="targetUrl" placeholder="Paste product link (e.g., Walmart, Amazon)...">
+        <button class="action-btn" onclick="createAffiliateLink()">Generate & Get Link</button>
 
-        <button class="action-btn" style="background: #059669;" onclick="requestPayout()">Request Payout</button>
-        <div class="result-box" id="payoutResult" style="display:none;"></div>
+        <label style="margin-top: 20px;">Your Generated Links & Copy Hub:</label>
+        <div id="linksContainer" style="max-height: 150px; overflow-y: auto; margin-top: 5px;">
+            <p style="color: #64748b; font-size: 13px; text-align: center;">No links created yet.</p>
+        </div>
+
+        <!-- PayPal Settings -->
+        <label style="margin-top: 20px;">Payout Settings (PayPal Email):</label>
+        <input type="text" id="paypalEmail" placeholder="Enter your PayPal email for payouts...">
+        <button class="action-btn" style="background: #059669;" onclick="savePaypal()">Save PayPal Details</button>
     </div>
 </div>
 
 <script>
-    function switchTab(tabId, btn) {
-        document.querySelectorAll('.form-section').forEach(sec => sec.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        
-        document.getElementById(tabId).classList.add('active');
-        btn.classList.add('active');
-    }
+    let currentUser = null;
 
-    function handleAccountAction() {
-        const name = document.getElementById('userName').value.trim();
-        const resultBox = document.getElementById('authResult');
-        resultBox.style.display = 'block';
-        resultBox.innerHTML = `[Success]: Welcome back, <b>${name}</b>! Session active.`;
-    }
+    function handleLogin() {
+        const name = document.getElementById('loginName').value.trim();
+        const email = document.getElementById('loginEmail').value.trim();
+        const pass = document.getElementById('loginPass').value.trim();
 
-    function generateShortLink() {
-        const longUrl = document.getElementById('longUrl').value.trim();
-        const alias = document.getElementById('customAlias').value.trim() || 'deal-' + Math.floor(Math.random()*1000);
-        const resultBox = document.getElementById('linkResult');
-
-        if(!longUrl) {
-            alert('Please enter a URL first!');
+        if(!name || !email || !pass) {
+            alert('Please fill in all fields (Name, Email, Password)!');
             return;
         }
 
-        resultBox.style.display = 'block';
-        resultBox.innerHTML = `[Generated]:<br><span style="color: #38bdf8;">https://deal-hub.ly/${alias}</span>`;
+        currentUser = email;
+        localStorage.setItem('active_creator', email);
+        
+        // Save user profile data if not exists
+        let userData = JSON.parse(localStorage.getItem('user_' + email)) || {
+            name: name,
+            email: email,
+            clicks: Math.floor(Math.random() * 150 + 20),
+            sales: Math.floor(Math.random() * 15 + 2),
+            earnings: (Math.random() * 300 + 50).toFixed(2),
+            links: [],
+            paypal: ''
+        };
+        localStorage.setItem('user_' + email, JSON.stringify(userData));
+
+        loadDashboardData(userData);
     }
 
-    function requestPayout() {
-        const resultBox = document.getElementById('payoutResult');
-        resultBox.style.display = 'block';
-        resultBox.innerHTML = `[Processing]: Payout request of $1,250.00 submitted successfully!`;
+    function loadDashboardData(data) {
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('dashboardScreen').classList.remove('hidden');
+
+        document.getElementById('welcomeUser').innerText = `Welcome, ${data.name}`;
+        document.getElementById('userEmailDisplay').innerText = `Email: ${data.email}`;
+        document.getElementById('statClicks').innerText = data.clicks;
+        document.getElementById('statSales').innerText = data.sales;
+        document.getElementById('statEarnings').innerText = `$${data.earnings}`;
+        document.getElementById('paypalEmail').value = data.paypal || '';
+
+        renderUserLinks(data.links);
+    }
+
+    function createAffiliateLink() {
+        const urlInput = document.getElementById('targetUrl');
+        const longUrl = urlInput.value.trim();
+
+        if(!longUrl) {
+            alert('Please paste a product URL first!');
+            return;
+        }
+
+        let userData = JSON.parse(localStorage.getItem('user_' + currentUser));
+        const uniqueCode = 'deal-' + Math.floor(Math.random() * 90000 + 10000);
+        const shortLink = `https://deal-hub.ly/${uniqueCode}`;
+
+        userData.links.push({ short: shortLink, original: longUrl });
+        localStorage.setItem('user_' + currentUser, JSON.stringify(userData));
+
+        urlInput.value = '';
+        renderUserLinks(userData.links);
+    }
+
+    function renderUserLinks(links) {
+        const container = document.getElementById('linksContainer');
+        if(links.length === 0) {
+            container.innerHTML = `<p style="color: #64748b; font-size: 13px; text-align: center;">No links created yet.</p>`;
+            return;
+        }
+
+        container.innerHTML = '';
+        links.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'link-box';
+            div.innerHTML = `
+                <span style="color: #38bdf8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 350px;">${item.short}</span>
+                <button class="copy-btn" onclick="copyToClipboard('${item.short}')">Copy Link</button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert('Link copied to clipboard successfully!');
+        }).catch(err => {
+            alert('Failed to copy link.');
+        });
+    }
+
+    function savePaypal() {
+        const paypal = document.getElementById('paypalEmail').value.trim();
+        let userData = JSON.parse(localStorage.getItem('user_' + currentUser));
+        userData.paypal = paypal;
+        localStorage.setItem('user_' + currentUser, JSON.stringify(userData));
+        alert('PayPal payout email saved successfully!');
+    }
+
+    function handleLogout() {
+        localStorage.removeItem('active_creator');
+        currentUser = null;
+        document.getElementById('dashboardScreen').classList.add('hidden');
+        document.getElementById('loginScreen').classList.remove('hidden');
     }
 </script>
 
