@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creators Hub - Complete App</title>
+    <title>Creators Hub - Complete Dashboard & Settings</title>
     <style>
         * {
             margin: 0;
@@ -29,7 +29,7 @@
             display: none !important;
         }
 
-        /* Auth Cards (Login / Signup) */
+        /* Auth Cards */
         .auth-card {
             background: #ffffff;
             border-radius: 16px;
@@ -61,14 +61,15 @@
             font-weight: 600;
             color: #334155;
         }
-        .form-group input {
+        .form-group input, .form-group select {
             width: 100%;
             padding: 12px 14px;
             border: 1px solid #cbd5e1;
             border-radius: 8px;
             font-size: 14px;
+            background: #fff;
         }
-        .form-group input:focus {
+        .form-group input:focus, .form-group select:focus {
             outline: none;
             border-color: #4f46e5;
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
@@ -112,39 +113,67 @@
         }
         .auth-footer a:hover { text-decoration: underline; }
 
-        /* Dashboard Styles */
-        .dashboard-header {
+        /* Dashboard & App Navigation Header */
+        .app-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: #ffffff;
-            padding: 16px 20px;
+            padding: 14px 20px;
             border-radius: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             border: 1px solid #e2e8f0;
         }
-        .dashboard-header h3 {
-            font-size: 16px;
+        .app-header h3 {
+            font-size: 15px;
             color: #0f172a;
+        }
+        .nav-tabs {
+            display: flex;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 6px;
+            margin-bottom: 16px;
+            border: 1px solid #e2e8f0;
+            gap: 6px;
+        }
+        .nav-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .nav-btn.active {
+            background: #4f46e5;
+            color: #ffffff;
+            box-shadow: 0 2px 6px rgba(79, 70, 229, 0.2);
         }
         .logout-btn {
             background: #fee2e2;
             color: #991b1b;
             border: none;
-            padding: 6px 12px;
+            padding: 6px 10px;
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
         }
 
+        /* Quick Stats Card */
         .quick-stats-card {
             background: #ffffff;
             border-radius: 16px;
             padding: 24px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             border: 1px solid #e2e8f0;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         .card-header {
             display: flex;
@@ -153,7 +182,7 @@
             margin-bottom: 20px;
         }
         .card-header h2 {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
             color: #0f172a;
         }
@@ -166,8 +195,8 @@
         .filter-btn {
             background: transparent;
             border: none;
-            padding: 5px 9px;
-            font-size: 12px;
+            padding: 4px 8px;
+            font-size: 11px;
             font-weight: 600;
             color: #64748b;
             cursor: pointer;
@@ -181,88 +210,126 @@
         .stats-grid-2x2 {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
+            gap: 12px;
         }
         .stat-sub-box {
             background: #ffffff;
             border: 1px solid #e2e8f0;
             border-radius: 12px;
-            padding: 16px;
+            padding: 14px;
         }
         .stat-label-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         .stat-sub-box .label {
-            font-size: 14px;
+            font-size: 13px;
             color: #64748b;
             font-weight: 500;
         }
         .stat-sub-box .value {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
             color: #0f172a;
         }
         .help-icon {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             background: #0f172a;
             color: #ffffff;
             border-radius: 50%;
             display: inline-flex;
             justify-content: center;
             align-items: center;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
         }
 
+        /* Link Generator Box */
         .generator-section {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+        .generator-section h3 {
+            font-size: 15px;
+            margin-bottom: 10px;
+            color: #0f172a;
+        }
+        .input-group {
+            display: flex;
+            gap: 8px;
+        }
+        .input-group input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+        .gen-btn {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 0 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        #resultContainer {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #334155;
+            word-break: break-all;
+            display: none;
+            background: #f8fafc;
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        /* Settings & Payout Section Container */
+        .content-card {
             background: #ffffff;
             border-radius: 16px;
             padding: 24px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             border: 1px solid #e2e8f0;
         }
-        .generator-section h3 {
-            font-size: 16px;
-            margin-bottom: 12px;
+        .content-card h2 {
+            font-size: 18px;
+            font-weight: 700;
             color: #0f172a;
+            margin-bottom: 16px;
         }
-        .input-group {
-            display: flex;
-            gap: 10px;
-        }
-        .input-group input {
-            flex: 1;
-            padding: 10px 14px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-        .input-group input:focus {
-            outline: none;
-            border-color: #4f46e5;
-        }
-        .gen-btn {
-            background: #4f46e5;
-            color: white;
-            border: none;
-            padding: 0 16px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        #resultContainer {
-            margin-top: 12px;
+        
+        /* Payout Table */
+        .payout-table {
+            width: 100%;
+            border-collapse: collapse;
             font-size: 13px;
-            color: #334155;
-            word-break: break-all;
-            display: none;
+        }
+        .payout-table th, .payout-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .payout-table th {
+            color: #64748b;
+            font-weight: 600;
             background: #f8fafc;
-            padding: 10px;
+        }
+        .status-paid {
+            color: #166534;
+            background: #dcfce7;
+            padding: 3px 8px;
             border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -288,12 +355,12 @@
                 <input type="email" id="signupEmail" placeholder="name@example.com">
             </div>
             <div class="form-group">
-                <label>Password (Any password allowed)</label>
+                <label>Password</label>
                 <input type="password" id="signupPassword" placeholder="Enter password">
             </div>
             <button class="btn-primary" onclick="handleSignup()">Create Account</button>
             <div class="auth-footer">
-                Already have an account? <a href="#" onclick="switchView('loginView')">Login here</a>
+                Already have an account? <a href="#" onclick="switchAuthView('loginView')">Login here</a>
             </div>
         </div>
 
@@ -313,82 +380,156 @@
             </div>
             <button class="btn-primary" onclick="handleLogin()">Login</button>
             <div class="auth-footer">
-                Don't have an account? <a href="#" onclick="switchView('signupView')">Create Account</a>
+                Don't have an account? <a href="#" onclick="switchAuthView('signupView')">Create Account</a>
             </div>
         </div>
 
-        <!-- 3. DASHBOARD VIEW (Quick Stats as requested) -->
-        <div id="dashboardView" class="hidden">
-            <div class="dashboard-header">
-                <h3 id="welcomeUser">Welcome, User</h3>
+        <!-- 3. MAIN DASHBOARD & TABS VIEW -->
+        <div id="mainAppView" class="hidden">
+            <!-- App Header -->
+            <div class="app-header">
+                <h3 id="welcomeUser">Welcome</h3>
                 <button class="logout-btn" onclick="handleLogout()">Logout</button>
             </div>
 
-            <!-- Quick Stats Card -->
-            <div class="quick-stats-card">
-                <div class="card-header">
-                    <h2>Quick Stats</h2>
-                    <div class="time-filters">
-                        <button class="filter-btn" onclick="setActiveFilter(this)">1d</button>
-                        <button class="filter-btn" onclick="setActiveFilter(this)">1w</button>
-                        <button class="filter-btn" onclick="setActiveFilter(this)">1m</button>
-                        <button class="filter-btn active" onclick="setActiveFilter(this)">MTD</button>
+            <!-- Navigation Tabs -->
+            <div class="nav-tabs">
+                <button class="nav-btn active" onclick="switchTab('dashboardTab', this)">Dashboard</button>
+                <button class="nav-btn" onclick="switchTab('payoutsTab', this)">Payout History</button>
+                <button class="nav-btn" onclick="switchTab('settingsTab', this)">Settings</button>
+            </div>
+
+            <!-- TAB 1: DASHBOARD -->
+            <div id="dashboardTab" class="tab-content">
+                <!-- Quick Stats Card -->
+                <div class="quick-stats-card">
+                    <div class="card-header">
+                        <h2>Quick Stats</h2>
+                        <div class="time-filters">
+                            <button class="filter-btn" onclick="setActiveFilter(this)">1d</button>
+                            <button class="filter-btn" onclick="setActiveFilter(this)">1w</button>
+                            <button class="filter-btn" onclick="setActiveFilter(this)">1m</button>
+                            <button class="filter-btn active" onclick="setActiveFilter(this)">MTD</button>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid-2x2">
+                        <div class="stat-sub-box">
+                            <div class="label">Sales</div>
+                            <div class="value">$753.80</div>
+                        </div>
+                        <div class="stat-sub-box">
+                            <div class="label">Commission</div>
+                            <div class="value">$21.45</div>
+                        </div>
+                        <div class="stat-sub-box">
+                            <div class="stat-label-row">
+                                <span class="label">Clicks</span>
+                                <span class="help-icon" title="Total referral link clicks">?</span>
+                            </div>
+                            <div class="value">233</div>
+                        </div>
+                        <div class="stat-sub-box">
+                            <div class="label">Conversion</div>
+                            <div class="value">3.00%</div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="stats-grid-2x2">
-                    <div class="stat-sub-box">
-                        <div class="label">Sales</div>
-                        <div class="value">$753.80</div>
+                <!-- Link Generator Box -->
+                <div class="generator-section">
+                    <h3>Quick Link Generator</h3>
+                    <div class="input-group">
+                        <input type="text" id="targetLink" placeholder="Paste product link...">
+                        <button class="gen-btn" onclick="makeLink()">Generate</button>
                     </div>
-                    <div class="stat-sub-box">
-                        <div class="label">Commission</div>
-                        <div class="value">$21.45</div>
-                    </div>
-                    <div class="stat-sub-box">
-                        <div class="stat-label-row">
-                            <span class="label">Clicks</span>
-                            <span class="help-icon" title="Total referral link clicks">?</span>
-                        </div>
-                        <div class="value">233</div>
-                    </div>
-                    <div class="stat-sub-box">
-                        <div class="label">Conversion</div>
-                        <div class="value">3.00%</div>
-                    </div>
+                    <div id="resultContainer"></div>
                 </div>
             </div>
 
-            <!-- Link Generator Box -->
-            <div class="generator-section">
-                <h3>Quick Link Generator</h3>
-                <div class="input-group">
-                    <input type="text" id="targetLink" placeholder="Paste product link...">
-                    <button class="gen-btn" onclick="makeLink()">Generate</button>
+            <!-- TAB 2: PAYOUT HISTORY -->
+            <div id="payoutsTab" class="tab-content hidden">
+                <div class="content-card">
+                    <h2>Payout History</h2>
+                    <table class="payout-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                da  <td>15 Sep 2026</td>
+                                <td>$142.50</td>
+                                <td><span class="status-paid">Paid</span></td>
+                            </tr>
+                            <tr>
+                                <td>01 Sep 2026</td>
+                                <td>$89.20</td>
+                                <td><span class="status-paid">Paid</span></td>
+                            </tr>
+                            <tr>
+                                <td>15 Aug 2026</td>
+                                <td>$215.00</td>
+                                <td><span class="status-paid">Paid</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div id="resultContainer"></div>
+            </div>
+
+            <!-- TAB 3: SETTINGS (PayPal & Profile) -->
+            <div id="settingsTab" class="tab-content hidden">
+                <div class="content-card">
+                    <h2>Account Settings</h2>
+                    <div class="form-group">
+                        <label>Display Name</label>
+                        <input type="text" id="settingName">
+                    </div>
+                    <div class="form-group">
+                        <label>Account Email</label>
+                        <input type="email" id="settingEmail" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>PayPal Email (for Payouts)</label>
+                        <input type="email" id="settingPaypal" placeholder="your-paypal@domain.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Default Currency</label>
+                        <select id="settingCurrency">
+                            <option value="USD">USD ($)</option>
+                            <option value="EUR">EUR (€)</option>
+                            <option value="INR">INR (₹)</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Check session on page load
+        // Check active session on load
         window.onload = function() {
-            const activeSession = localStorage.getItem('creators_hub_session');
-            if (activeSession) {
-                showDashboard(activeSession);
+            const activeEmail = localStorage.getItem('creators_hub_session');
+            if (activeEmail) {
+                loadUserData(activeEmail);
+                showMainApp();
             }
         };
 
-        function switchView(viewId) {
+        function switchAuthView(viewId) {
             document.getElementById('signupView').classList.add('hidden');
             document.getElementById('loginView').classList.add('hidden');
-            document.getElementById('dashboardView').classList.add('hidden');
-            
+            hideAlerts();
+            document.getElementById(viewId).classList.remove('hidden');
+        }
+
+        function hideAlerts() {
             document.getElementById('errorAlert').style.display = 'none';
             document.getElementById('successAlert').style.display = 'none';
-
-            document.getElementById(viewId).classList.remove('hidden');
         }
 
         function showError(msg) {
@@ -416,19 +557,16 @@
                 return;
             }
 
-            const existing = localStorage.getItem('creators_user_' + email);
-            if (existing) {
+            if (localStorage.getItem('creators_user_' + email)) {
                 showError('Email already registered! Please login.');
                 return;
             }
 
-            const userData = { name, email, password };
+            const userData = { name, email, password, paypal: '', currency: 'USD' };
             localStorage.setItem('creators_user_' + email, JSON.stringify(userData));
 
             showSuccess('Account created successfully! Please login.');
-            setTimeout(() => {
-                switchView('loginView');
-            }, 1200);
+            setTimeout(() => switchAuthView('loginView'), 1200);
         }
 
         // Login Logic
@@ -454,28 +592,61 @@
             }
 
             localStorage.setItem('creators_hub_session', email);
-            showDashboard(email);
+            loadUserData(email);
+            showMainApp();
         }
 
-        // Show Dashboard
-        function showDashboard(email) {
+        function showMainApp() {
+            document.getElementById('signupView').classList.add('hidden');
+            document.getElementById('loginView').classList.add('hidden');
+            hideAlerts();
+            document.getElementById('mainAppView').classList.remove('hidden');
+        }
+
+        function loadUserData(email) {
             const userStr = localStorage.getItem('creators_user_' + email);
             if (userStr) {
                 const user = JSON.parse(userStr);
-                document.getElementById('welcomeUser').innerText = 'Welcome, ' + user.name;
+                document.getElementById('welcomeUser').innerText = 'Hi, ' + user.name;
+                document.getElementById('settingName').value = user.name;
+                document.getElementById('settingEmail').value = user.email;
+                document.getElementById('settingPaypal').value = user.paypal || '';
+                document.getElementById('settingCurrency').value = user.currency || 'USD';
             }
-            document.getElementById('signupView').classList.add('hidden');
-            document.getElementById('loginView').classList.add('hidden');
-            document.getElementById('errorAlert').style.display = 'none';
-            document.getElementById('successAlert').style.display = 'none';
-            document.getElementById('dashboardView').classList.remove('hidden');
         }
 
         // Logout Logic
         function handleLogout() {
             localStorage.removeItem('creators_hub_session');
-            switchView('loginView');
+            document.getElementById('mainAppView').classList.add('hidden');
+            switchAuthView('loginView');
             showSuccess('Logged out successfully.');
+        }
+
+        // Navigation Tabs Switcher
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(nb => nb.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.remove('hidden');
+            btn.classList.add('active');
+            hideAlerts();
+        }
+
+        // Save Settings
+        function saveSettings() {
+            const email = localStorage.getItem('creators_hub_session');
+            const userStr = localStorage.getItem('creators_user_' + email);
+            if (!userStr) return;
+
+            let user = JSON.parse(userStr);
+            user.name = document.getElementById('settingName').value.trim();
+            user.paypal = document.getElementById('settingPaypal').value.trim();
+            user.currency = document.getElementById('settingCurrency').value;
+
+            localStorage.setItem('creators_user_' + email, JSON.stringify(user));
+            document.getElementById('welcomeUser').innerText = 'Hi, ' + user.name;
+            showSuccess('Settings updated successfully!');
         }
 
         // Filter buttons toggle
