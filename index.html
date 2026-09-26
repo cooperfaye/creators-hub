@@ -1,421 +1,555 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Walmart Creator & Affiliate Portal</title>
+    <title>Creators Hub - Signup / Login</title>
     <style>
-        :root { --bg: #0f172a; --panel: #1e293b; --text: #ffffff; --primary: #0071dc; --border: #334155; --success: #10b981; --danger: #ef4444; --accent: #ffc220; }
-        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        .box { max-width: 850px; margin: 30px auto; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .hidden { display: none !important; }
-        input, select, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid var(--border); background: #0f172a; color: white; font-size: 14px; box-sizing: border-box; }
-        input:focus, select:focus { border-color: var(--primary); outline: none; }
-        button { background: var(--primary); border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        button:hover { opacity: 0.9; }
-        .btn-red { background: var(--danger); }
-        .btn-green { background: var(--success); }
-        .card { background: #0f172a; border: 1px solid var(--border); padding: 20px; border-radius: 8px; margin-top: 15px; }
-        .flex { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
-        .stat-box { background: #0f172a; border: 1px solid var(--border); padding: 15px; border-radius: 8px; text-align: center; }
-        .stat-box h4 { margin: 0 0 5px 0; font-size: 12px; color: #94a3b8; text-transform: uppercase; }
-        .stat-box p { margin: 0; font-size: 20px; font-weight: bold; color: var(--primary); }
-        .brand-badge { background: rgba(255, 194, 32, 0.15); border: 1px solid var(--accent); color: var(--accent); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; margin-bottom: 15px; }
-        .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-        .nav-tabs button { width: auto; margin: 0; background: transparent; border: 1px solid var(--border); }
-        .nav-tabs button.active { background: var(--primary); border-color: var(--primary); }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .auth-container {
+            background: #ffffff;
+            width: 100%;
+            max-width: 420px;
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        .logo-area {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .logo-area h1 {
+            font-size: 26px;
+            color: #1e293b;
+            font-weight: 700;
+        }
+        .logo-area p {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 5px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #4f46e5;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .btn:hover {
+            background: #4338ca;
+        }
+        .error-msg {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+        .success-msg {
+            background: #dcfce7;
+            color: #166534;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+        .auth-footer {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 14px;
+            color: #64748b;
+        }
+        .auth-footer a {
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+        .forgot-link {
+            text-align: right;
+            margin-top: -12px;
+            margin-bottom: 20px;
+        }
+        .forgot-link a {
+            font-size: 13px;
+            color: #64748b;
+            text-decoration: none;
+        }
+        .forgot-link a:hover {
+            color: #4f46e5;
+            text-decoration: underline;
+        }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
 
-<div class="box" id="app">
-    <!-- AUTH VIEW -->
-    <div id="authView">
-        <div style="text-align: center; margin-bottom: 25px;">
-            <h1 style="color: var(--primary); margin: 0; font-size: 32px;">Walmart</h1>
-            <div class="brand-badge">⚡ Creator & Affiliate Network • 7% Commission</div>
-            <h3 id="authTitle" style="margin: 0; color: #fff;">Sign In to Your Portal</h3>
-            <p style="color: #94a3b8; font-size: 13px;">Payouts processed securely on the 1st and 15th of every month.</p>
-        </div>
-        
-        <form onsubmit="handleAuth(event)">
-            <input type="text" id="authName" placeholder="Full Name (For New Registration)" class="hidden">
-            <input type="email" id="authEmail" placeholder="Email Address (e.g. admin@walmart.com for CEO)" required>
-            <input type="password" id="authPassword" placeholder="Password (admin123 for CEO)" required>
-            <button type="submit" id="authBtn">Sign In</button>
-        </form>
-        <p style="text-align: center; cursor: pointer; color: var(--primary); font-size: 13px;" onclick="toggleAuthMode()">
-            <span id="authSwitchText">New creator? Register an account</span>
-        </p>
-    </div>
-
-    <!-- PARTNER DASHBOARD -->
-    <div id="partnerView" class="hidden">
-        <div class="flex" style="border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px;">
-            <div>
-                <span class="brand-badge">Walmart Verified Partner</span>
-                <h2 id="pWelcome" style="margin: 5px 0 0 0; color: var(--primary);"></h2>
-                <small id="pEmailText" style="color: #94a3b8;"></small>
-            </div>
-            <button onclick="logout()" class="btn-red" style="width: auto; padding: 8px 16px; margin:0;">Sign Out</button>
+    <div class="auth-container">
+        <!-- Logo & Title Section -->
+        <div class="logo-area">
+            <h1>🚀 Creators Hub</h1>
+            <p>Manage your affiliate links & track earnings</p>
         </div>
 
-        <div class="nav-tabs">
-            <button class="active" onclick="switchTab('dashboard', event)">Dashboard</button>
-            <button onclick="switchTab('settings', event)">Account & PayPal</button>
-            <button onclick="switchTab('team', event)">Team / Sub-Access</button>
-            <button onclick="switchTab('history', event)">Payment History</button>
-        </div>
+        <!-- Global Alert Boxes -->
+        <div id="errorAlert" class="error-msg"></div>
+        <div id="successAlert" class="success-msg"></div>
 
-        <!-- Tab 1: Dashboard -->
-        <div id="tab-dashboard">
-            <div class="grid-3">
-                <div class="stat-box"><h4>Today's Earnings</h4><p id="eToday">$0.00</p></div>
-                <div class="stat-box"><h4>This Month (7%)</h4><p id="eMonth">$0.00</p></div>
-                <div class="stat-box"><h4>Total Balance</h4><p id="eTotal">$0.00</p></div>
+        <!-- 1. SIGNUP FORM (Default View) -->
+        <div id="signupView">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="signupName" placeholder="Premchand / Your Name">
             </div>
-
-            <div class="card">
-                <h3 style="margin-top:0;">🔗 Smart Affiliate Link Generator</h3>
-                <p style="font-size: 13px; color: #94a3b8;">Paste any Walmart product link. It will instantly route through your tracking ID with 7% commission.</p>
-                <input type="text" id="targetUrl" placeholder="https://www.walmart.com/ip/...">
-                <button onclick="generateLink()" class="btn-green">Create & Get Smart Link</button>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="signupEmail" placeholder="name@example.com">
             </div>
-
-            <div class="card">
-                <h3 style="margin-top:0;">Your Generated Links</h3>
-                <div id="partnerLinksList">No links created yet.</div>
+            <div class="form-group">
+                <label>Create Password</label>
+                <input type="password" id="signupPassword" placeholder="Enter your password">
+            </div>
+            <button class="btn" onclick="handleSignup()">Create Account</button>
+            <div class="auth-footer">
+                Already have an account? <a href="#" onclick="switchView('loginView')">Login here</a>
             </div>
         </div>
 
-        <!-- Tab 2: Settings -->
-        <div id="tab-settings" class="hidden">
-            <div class="card">
-                <h3 style="margin-top:0;">Account Profile & Payout Settings</h3>
-                <label style="font-size: 12px; color: #94a3b8;">Full Name</label>
-                <input type="text" id="setFullName">
-                <label style="font-size: 12px; color: #94a3b8;">PayPal Email for Payouts</label>
-                <input type="email" id="setPaypal" placeholder="your-paypal@email.com">
-                <button onclick="saveSettings()">Save Changes</button>
+        <!-- 2. LOGIN FORM -->
+        <div id="loginView" class="hidden">
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="loginEmail" placeholder="name@example.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter your password">
+            </div>
+            <div class="forgot-link">
+                <a href="#" onclick="switchView('forgotView')">Forgot Password?</a>
+            </div>
+            <button class="btn" onclick="handleLogin()">Login to Dashboard</button>
+            <div class="auth-footer">
+                Don't have an account? <a href="#" onclick="switchView('signupView')">Create Account</a>
             </div>
         </div>
 
-        <!-- Tab 3: Team Access -->
-        <div id="tab-team" class="hidden">
-            <div class="card">
-                <h3 style="margin-top:0;">Delegate Limited Link Creator Access</h3>
-                <p style="font-size: 13px; color: #94a3b8;">Give team members permission to generate links without exposing earnings or settings.</p>
-                <input type="text" id="teamName" placeholder="Sub-User / Team Member Name">
-                <input type="email" id="teamEmail" placeholder="Sub-User Email">
-                <button onclick="createTeamMember()" class="btn-green">Generate Sub-Account</button>
+        <!-- 3. FORGOT PASSWORD FORM -->
+        <div id="forgotView" class="hidden">
+            <div class="form-group">
+                <label>Enter your registered email</label>
+                <input type="email" id="forgotEmail" placeholder="name@example.com">
             </div>
-            <div class="card">
-                <h3 style="margin-top:0;">Active Sub-Accounts</h3>
-                <div id="teamList">No team members added.</div>
-            </div>
-        </div>
-
-        <!-- Tab 4: Payment History -->
-        <div id="tab-history" class="hidden">
-            <div class="card">
-                <h3 style="margin-top:0;">Payout Ledger (1st & 15th Cycle)</h3>
-                <div id="payoutHistoryList">No payouts processed yet. Next payout scheduled for upcoming cycle.</div>
+            <button class="btn" onclick="handleForgotPassword()">Reset Password</button>
+            <div class="auth-footer">
+                Remember your password? <a href="#" onclick="switchView('loginView')">Back to Login</a>
             </div>
         </div>
     </div>
 
-    <!-- CEO ADMIN VIEW -->
-    <div id="adminView" class="hidden">
-        <div class="flex" style="border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px;">
-            <div>
-                <span class="brand-badge" style="border-color: var(--danger); color: var(--danger);">👑 CEO Master Control</span>
-                <h2 style="margin: 5px 0 0 0; color: var(--primary);">Walmart Global Admin Panel</h2>
-            </div>
-            <button onclick="logout()" class="btn-red" style="width: auto; padding: 8px 16px; margin:0;">Sign Out</button>
-        </div>
-
-        <div class="card" style="border-color: var(--primary);">
-            <h3 style="margin-top:0; color: var(--primary);">Master API Key Configuration</h3>
-            <p style="font-size: 13px; color: #94a3b8;">Enter official Walmart Affiliate API Master Key to sync live commissions.</p>
-            <input type="text" id="masterApiKey" placeholder="wm_master_live_key_xxxxxxxx">
-            <button onclick="saveMasterKey()">Update Master Key</button>
-        </div>
-
-        <div class="card">
-            <h3 style="margin-top:0;">All Registered Creators & Sub-Accounts</h3>
-            <div id="adminUsersList">Loading users...</div>
-        </div>
-    </div>
-</div>
-
-<script>
-    const ADMIN_EMAIL = "admin@walmart.com";
-    const ADMIN_PASS = "admin123";
-    let isReg = false;
-
-    function getDB() {
-        let db = JSON.parse(localStorage.getItem('walmart_ultimate_db_v2'));
-        if (!db) {
-            db = {
-                users: [
-                    { name: "CEO Admin", email: ADMIN_EMAIL, pass: ADMIN_PASS, role: "admin", paypal: "", links: [], team: [], history: [], balance: 0 }
-                ],
-                masterKey: ""
-            };
-            localStorage.setItem('walmart_ultimate_db_v2', JSON.stringify(db));
-        }
-        return db;
-    }
-
-    function saveDB(db) {
-        localStorage.setItem('walmart_ultimate_db_v2', JSON.stringify(db));
-    }
-
-    // Direct Redirection Handler
-    (function() {
-        const params = new URLSearchParams(window.location.search);
-        const code = params.get('track');
-        if (code) {
-            let db = getDB();
-            let targetUrl = "https://www.walmart.com";
-            db.users.forEach(u => {
-                if (u.links) {
-                    let found = u.links.find(l => l.code === code);
-                    if (found && u.active !== false) {
-                        targetUrl = found.url;
-                        u.balance = (parseFloat(u.balance || 0) + 0.35).toFixed(2);
-                        saveDB(db);
-                    }
-                }
-            });
-            window.location.replace(targetUrl);
-        }
-    })();
-
-    function toggleAuthMode() {
-        isReg = !isReg;
-        document.getElementById('authTitle').innerText = isReg ? "Register Creator Account" : "Sign In to Your Portal";
-        document.getElementById('authBtn').innerText = isReg ? "Register Now" : "Sign In";
-        document.getElementById('authSwitchText').innerText = isReg ? "Already have an account? Sign in" : "New creator? Register an account";
-        document.getElementById('authName').classList.toggle('hidden', !isReg);
-    }
-
-    function handleAuth(e) {
-        e.preventDefault();
-        let email = document.getElementById('authEmail').value.trim().toLowerCase();
-        let pass = document.getElementById('authPassword').value.trim();
-        let name = document.getElementById('authName').value.trim();
-        let db = getDB();
-
-        if (isReg) {
-            if (!name) { alert('Please enter your name'); return; }
-            if (email === ADMIN_EMAIL) { alert('Reserved email'); return; }
-            if (db.users.find(u => u.email === email)) { alert('Account already exists!'); return; }
-
-            db.users.push({ name, email, pass, role: "partner", paypal: "", links: [], team: [], history: [], balance: 0, active: true });
-            saveDB(db);
-            alert('Registered successfully! Please sign in.');
-            toggleAuthMode();
-        } else {
-            let user = db.users.find(u => u.email === email && u.pass === pass);
-            if (user) {
-                if (user.active === false) { alert('Account is blocked.'); return; }
-                localStorage.setItem('walmart_session', JSON.stringify(user));
-                loadApp();
-            } else {
-                alert('Invalid Email or Password.');
-            }
-        }
-    }
-
-    function loadApp() {
-        let session = JSON.parse(localStorage.getItem('walmart_session'));
-        if (!session) {
-            document.getElementById('authView').classList.remove('hidden');
-            document.getElementById('partnerView').classList.add('hidden');
-            document.getElementById('adminView').classList.add('hidden');
-            return;
-        }
-
-        document.getElementById('authView').classList.add('hidden');
-        let db = getDB();
-        let user = db.users.find(u => u.email === session.email);
-
-        if (!user) {
-            logout();
-            return;
-        }
-
-        if (user.role === 'admin') {
-            document.getElementById('adminView').classList.remove('hidden');
-            document.getElementById('partnerView').classList.add('hidden');
-            document.getElementById('masterApiKey').value = db.masterKey || '';
-            renderAdmin();
-        } else {
-            document.getElementById('adminView').classList.add('hidden');
-            document.getElementById('partnerView').classList.remove('hidden');
-            document.getElementById('pWelcome').innerText = "Welcome back, " + user.name;
-            document.getElementById('pEmailText').innerText = user.email;
-            document.getElementById('setFullName').value = user.name;
-            document.getElementById('setPaypal').value = user.paypal || '';
+    <script>
+        function switchView(viewId) {
+            document.getElementById('loginView').classList.add('hidden');
+            document.getElementById('signupView').classList.add('hidden');
+            document.getElementById('forgotView').classList.add('hidden');
             
-            let bal = parseFloat(user.balance || 0);
-            document.getElementById('eToday').innerText = '$' + (bal * 0.2).toFixed(2);
-            document.getElementById('eMonth').innerText = '$' + bal.toFixed(2);
-            document.getElementById('eTotal').innerText = '$' + bal.toFixed(2);
+            document.getElementById('errorAlert').style.display = 'none';
+            document.getElementById('successAlert').style.display = 'none';
 
-            renderLinks(user);
-            renderTeam(user);
-        }
-    }
-
-    function logout() {
-        localStorage.removeItem('walmart_session');
-        loadApp();
-    }
-
-    function switchTab(tab, event) {
-        ['dashboard', 'settings', 'team', 'history'].forEach(t => {
-            document.getElementById('tab-' + t).classList.add('hidden');
-        });
-        document.getElementById('tab-' + tab).classList.remove('hidden');
-        document.querySelectorAll('.nav-tabs button').forEach(b => b.classList.remove('active'));
-        if(event && event.target) event.target.classList.add('active');
-    }
-
-    function generateLink() {
-        let url = document.getElementById('targetUrl').value.trim();
-        if (!url) { alert('Enter valid Walmart product URL'); return; }
-        if (!url.startsWith('http')) url = 'https://' + url;
-
-        let session = JSON.parse(localStorage.getItem('walmart_session'));
-        let db = getDB();
-        let user = db.users.find(u => u.email === session.email);
-
-        let code = Math.random().toString(36).substring(2, 8);
-        let base = window.location.origin + window.location.pathname.replace('index.html', '');
-        if (!base.endsWith('/')) base += '/';
-        let tracking = base + "?track=" + code;
-
-        if (!user.links) user.links = [];
-        user.links.push({ url, tracking, code });
-
-        saveDB(db);
-        localStorage.setItem('walmart_session', JSON.stringify(user));
-        document.getElementById('targetUrl').value = '';
-        loadApp();
-        alert('Smart Affiliate Link Generated Successfully!');
-    }
-
-    function renderLinks(user) {
-        let container = document.getElementById('partnerLinksList');
-        if (!user.links || user.links.length === 0) {
-            container.innerHTML = "No links created yet.";
-            return;
-        }
-        container.innerHTML = user.links.map(l => `
-            <div class="card" style="margin-top:10px;">
-                <small style="color:#94a3b8;">Target: ${l.url}</small><br>
-                <b style="color:var(--primary); word-break:break-all;">${l.tracking}</b><br>
-                <button onclick="navigator.clipboard.writeText('${l.tracking}'); alert('Link Copied to Clipboard!');" style="margin-top:8px; width:auto; padding:6px 12px;" class="btn-green">Copy Link</button>
-            </div>
-        `).join('');
-    }
-
-    function saveSettings() {
-        let name = document.getElementById('setFullName').value.trim();
-        let paypal = document.getElementById('setPaypal').value.trim();
-        if (!name) { alert('Name cannot be empty'); return; }
-
-        let session = JSON.parse(localStorage.getItem('walmart_session'));
-        let db = getDB();
-        let user = db.users.find(u => u.email === session.email);
-        user.name = name;
-        user.paypal = paypal;
-
-        saveDB(db);
-        localStorage.setItem('walmart_session', JSON.stringify(user));
-        alert('Settings updated successfully!');
-        loadApp();
-    }
-
-    function createTeamMember() {
-        let name = document.getElementById('teamName').value.trim();
-        let email = document.getElementById('teamEmail').value.trim().toLowerCase();
-        if (!name || !email) { alert('Enter team member details'); return; }
-
-        let session = JSON.parse(localStorage.getItem('walmart_session'));
-        let db = getDB();
-        let user = db.users.find(u => u.email === session.email);
-
-        if (!user.team) user.team = [];
-        user.team.push({ name, email });
-
-        saveDB(db);
-        document.getElementById('teamName').value = '';
-        document.getElementById('teamEmail').value = '';
-        loadApp();
-        alert('Sub-account created successfully!');
-    }
-
-    function renderTeam(user) {
-        let container = document.getElementById('teamList');
-        if (!user.team || user.team.length === 0) {
-            container.innerHTML = "No team members added.";
-            return;
-        }
-        container.innerHTML = user.team.map(t => `
-            <div class="card" style="margin-top:8px;">
-                <b>${t.name}</b> (${t.email}) <span style="color:var(--success); font-size:12px;">[Limited Link Creator Access]</span>
-            </div>
-        `).join('');
-    }
-
-    function saveMasterKey() {
-        let key = document.getElementById('masterApiKey').value.trim();
-        let db = getDB();
-        db.masterKey = key;
-        saveDB(db);
-        alert('Master API Key Saved & Synced with Walmart Network!');
-    }
-
-    function renderAdmin() {
-        let db = getDB();
-        let container = document.getElementById('adminUsersList');
-        let creators = db.users.filter(u => u.role !== 'admin');
-
-        if (creators.length === 0) {
-            container.innerHTML = "No creators registered yet.";
-            return;
+            document.getElementById(viewId).classList.remove('hidden');
         }
 
-        container.innerHTML = creators.map(u => `
-            <div class="card flex">
-                <div>
-                    <b>${u.name}</b> (${u.email})<br>
-                    <small style="color:#94a3b8;">Balance: $${u.balance || 0} | PayPal: ${u.paypal || 'Not Set'} | Links: ${u.links ? u.links.length : 0}</small>
+        function showError(message) {
+            const errBox = document.getElementById('errorAlert');
+            errBox.innerText = message;
+            errBox.style.display = 'block';
+            document.getElementById('successAlert').style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            const succBox = document.getElementById('successAlert');
+            succBox.innerText = message;
+            succBox.style.display = 'block';
+            document.getElementById('errorAlert').style.display = 'none';
+        }
+
+        // Handle Sign Up Logic
+        function handleSignup() {
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value.trim();
+
+            if (!name || !email || !password) {
+                showError('Please fill in all fields.');
+                return;
+            }
+
+            const existingUser = localStorage.getItem('creators_hub_user_' + email);
+            if (existingUser) {
+                showError('Email is already registered. Please login.');
+                return;
+            }
+
+            const userData = { name, email, password };
+            localStorage.setItem('creators_hub_user_' + email, JSON.stringify(userData));
+            
+            showSuccess('Account created successfully! Please login.');
+            setTimeout(() => {
+                switchView('loginView');
+            }, 1500);
+        }
+
+        // Handle Login Logic
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+
+            if (!email || !password) {
+                showError('Please enter both email and password.');
+                return;
+            }
+
+            const storedUserStr = localStorage.getItem('creators_hub_user_' + email);
+            if (!storedUserStr) {
+                showError('Account not found. Please sign up first.');
+                return;
+            }
+
+            const storedUser = JSON.parse(storedUserStr);
+            if (storedUser.password !== password) {
+                showError('Incorrect password. Please try again.');
+                return;
+            }
+
+            localStorage.setItem('creators_hub_session', email);
+            
+            showSuccess('Login successful! Welcome to Creators Hub...');
+            setTimeout(() => {
+                alert('Welcome back, ' + storedUser.name + '!');
+            }, 1000);
+        }
+
+        // Handle Forgot Password Logic
+        function handleForgotPassword() {
+            const email = document.getElementById('forgotEmail').value.trim();
+
+            if (!email) {
+                showError('Please enter your email address.');
+                return;
+            }
+
+            const storedUserStr = localStorage.getItem('creators_hub_user_' + email);
+            if (!storedUserStr) {
+                showError('This email is not registered with us.');
+                return;
+            }
+
+            const user = JSON.parse(storedUserStr);
+            showSuccess(`Password reset instructions sent to ${user.email} (Hint: Your password is ${user.password})`);
+        }
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creators Hub - Quick Stats Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        body {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .dashboard-wrapper {
+            width: 100%;
+            max-width: 480px;
+        }
+        
+        /* Quick Stats Card Container */
+        .quick-stats-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Card Header */
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .card-header h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        /* Time Filter Buttons (1d, 1w, 1m, MTD) */
+        .time-filters {
+            display: flex;
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 3px;
+        }
+        .filter-btn {
+            background: transparent;
+            border: none;
+            padding: 6px 10px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        .filter-btn.active {
+            background: #ffffff;
+            color: #4f46e5;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 2x2 Stats Grid */
+        .stats-grid-2x2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        /* Individual Stat Sub-Box */
+        .stat-sub-box {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            position: relative;
+            transition: border-color 0.2s;
+        }
+        .stat-sub-box:hover {
+            border-color: #cbd5e1;
+        }
+        
+        .stat-label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .stat-sub-box .label {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .stat-sub-box .value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        /* Question Mark Icon styling */
+        .help-icon {
+            width: 18px;
+            height: 18px;
+            background: #0f172a;
+            color: #ffffff;
+            border-radius: 50%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Link Generator Section below */
+        .generator-section {
+            margin-top: 20px;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+        .generator-section h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #0f172a;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+        .input-group input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #4f46e5;
+        }
+        .gen-btn {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 0 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        #resultContainer {
+            margin-top: 12px;
+            font-size: 13px;
+            color: #334155;
+            word-break: break-all;
+            display: none;
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-wrapper">
+        <!-- Quick Stats Card matching your image -->
+        <div class="quick-stats-card">
+            <div class="card-header">
+                <h2>Quick Stats</h2>
+                <div class="time-filters">
+                    <button class="filter-btn" onclick="setActiveFilter(this)">1d</button>
+                    <button class="filter-btn" onclick="setActiveFilter(this)">1w</button>
+                    <button class="filter-btn" onclick="setActiveFilter(this)">1m</button>
+                    <button class="filter-btn active" onclick="setActiveFilter(this)">MTD</button>
                 </div>
-                <div style="display:flex; gap:6px;">
-                    <button onclick="toggleBlock('${u.email}')" class="${u.active!==false?'btn-red':'btn-green'}" style="width:auto; padding:6px 10px; margin:0;">${u.active!==false?'Block':'Unblock'}</button>
-                    <button onclick="deleteAccount('${u.email}')" class="btn-red" style="width:auto; padding:6px 10px; margin:0;">Delete</button>
+            </div>
+
+            <div class="stats-grid-2x2">
+                <!-- Box 1: Sales -->
+                <div class="stat-sub-box">
+                    <div class="label">Sales</div>
+                    <div class="value">$753.80</div>
+                </div>
+
+                <!-- Box 2: Commission -->
+                <div class="stat-sub-box">
+                    <div class="label">Commission</div>
+                    <div class="value">$21.45</div>
+                </div>
+
+                <!-- Box 3: Clicks with Question Mark -->
+                <div class="stat-sub-box">
+                    <div class="stat-label-row">
+                        <span class="label">Clicks</span>
+                        <span class="help-icon" title="Total referral link clicks">?</span>
+                    </div>
+                    <div class="value">233</div>
+                </div>
+
+                <!-- Box 4: Conversion -->
+                <div class="stat-sub-box">
+                    <div class="label">Conversion</div>
+                    <div class="value">3.00%</div>
                 </div>
             </div>
-        `).join('');
-    }
+        </div>
 
-    function toggleBlock(email) {
-        let db = getDB();
-        let u = db.users.find(x => x.email === email);
-        if (u) {
-            u.active = u.active === false ? true : false;
-            saveDB(db);
-            renderAdmin();
+        <!-- Link Generator Box -->
+        <div class="generator-section">
+            <h3>Quick Link Generator</h3>
+            <div class="input-group">
+                <input type="text" id="targetLink" placeholder="Paste product link...">
+                <button class="gen-btn" onclick="makeLink()">Generate</button>
+            </div>
+            <div id="resultContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        function setActiveFilter(btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
         }
-    }
 
-    function deleteAccount(email) {
-        if (confirm('Delete this creator account permanently?')) {
-            let db = getDB();
-            db.users = db.users.filter(x => x.email !== email);
-       
+        function makeLink() {
+            const url = document.getElementById('targetLink').value.trim();
+            const res = document.getElementById('resultContainer');
+            if(!url) {
+                alert('Please enter a link');
+                return;
+            }
+            const code = Math.random().toString(36).substring(2, 8);
+            const final = `https://creatorshub.site/ref?id=${code}`;
+            res.style.display = 'block';
+            res.innerHTML = `Link: <a href="${final}" target="_blank">${final}</a>`;
+        }
+    </script>
+</body>
+</html>
