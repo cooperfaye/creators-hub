@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,8 +25,8 @@
         .stat-card { background: #0f172a; padding: 15px; border-radius: 10px; border: 1px solid #334155; text-align: center; }
         .stat-value { font-size: 20px; font-weight: bold; color: #38bdf8; margin-top: 8px; }
         
-        .link-box { background: #0f172a; padding: 12px; border-radius: 8px; margin-top: 10px; border: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
-        .copy-btn { background: #059669; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
+        .link-box { background: #0f172a; padding: 12px; border-radius: 8px; margin-top: 10px; border: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; font-size: 13px; gap: 10px; }
+        .copy-btn { background: #059669; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; white-space: nowrap; }
         .copy-btn:hover { background: #047857; }
         
         .tab-menu { display: flex; gap: 8px; margin-bottom: 20px; }
@@ -97,7 +98,7 @@
 
             <label style="margin-top: 20px;">Create Walmart / Product Deal Link:</label>
             <input type="text" id="targetUrl" placeholder="https://www.walmart.com/ip/your-product...">
-            <button class="action-btn" onclick="createAffiliateLink()">Generate Direct Redirect Link</button>
+            <button class="action-btn" onclick="createAffiliateLink()">Generate Short Link</button>
 
             <label style="margin-top: 20px;">Your Generated Links & Copy Hub:</label>
             <div id="linksContainer" style="max-height: 180px; overflow-y: auto; margin-top: 5px;">
@@ -153,7 +154,6 @@
 </div>
 
 <script>
-    // Secret CEO Email check (प्रेमचंद भाई, आप इस ईमेल से लॉग इन करेंगे तो CEO पैनल खुलेगा)
     const CEO_SECRET_EMAIL = "ceo@creatorgithub.com";
     const CEO_SECRET_PASS = "ceo12345";
 
@@ -167,14 +167,12 @@
             return;
         }
 
-        // CEO Login Check
         if(email === CEO_SECRET_EMAIL && pass === CEO_SECRET_PASS) {
             localStorage.setItem('active_session', JSON.stringify({role: 'ceo', email: email}));
             loadCeoDashboard();
             return;
         }
 
-        // Regular Creator Login / Registration
         let users = JSON.parse(localStorage.getItem('creator_github_users')) || {};
         
         if(!users[email]) {
@@ -186,7 +184,7 @@
                 sales: Math.floor(Math.random() * 12 + 2),
                 earnings: (Math.random() * 250 + 30).toFixed(2),
                 paypal: '',
-                status: 'Active', // Active, Blocked, Deactivated
+                status: 'Active',
                 links: []
             };
         } else {
@@ -226,7 +224,6 @@
         document.getElementById('creatorDashboard').classList.add('hidden');
         document.getElementById('ceoDashboard').classList.remove('hidden');
 
-        // Load saved API key if any
         let savedApiKey = localStorage.getItem('walmart_api_key') || '';
         document.getElementById('walmartApiKey').value = savedApiKey;
 
@@ -277,7 +274,7 @@
     function saveApiKey() {
         let key = document.getElementById('walmartApiKey').value.trim();
         localStorage.setItem('walmart_api_key', key);
-        alert('Walmart API Key saved successfully! Real data tracking enabled.');
+        alert('Walmart API Key saved successfully!');
     }
 
     function createAffiliateLink() {
@@ -285,7 +282,7 @@
         const longUrl = urlInput.value.trim();
 
         if(!longUrl || !longUrl.startsWith('http')) {
-            alert('Please enter a valid Walmart or product URL!');
+            alert('Please enter a valid Walmart product URL!');
             return;
         }
 
@@ -296,6 +293,7 @@
         const uniqueCode = 'deal-' + Math.floor(Math.random() * 90000 + 10000);
         const shortLink = `https://creator-github.io/${uniqueCode}`;
 
+        // हम शॉर्ट लिंक के साथ ओरिजिनल वॉल्मार्ट लिंक को भी सेव कर रहे हैं
         user.links.push({ short: shortLink, original: longUrl });
         localStorage.setItem('creator_github_users', JSON.stringify(users));
 
@@ -315,20 +313,21 @@
             let div = document.createElement('div');
             div.className = 'link-box';
             div.innerHTML = `
-                <span style="color: #38bdf8; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:280px;">
-                    <a href="${item.original}" target="_blank" style="color: #38bdf8; text-decoration:none;">${item.short}</a>
-                </span>
-                <button class="copy-btn" onclick="copyLink('${item.original}')">Copy Link</button>
+                <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 320px;">
+                    <a href="${item.original}" target="_blank" style="color: #38bdf8; text-decoration: none; font-weight: bold;">${item.short}</a>
+                </div>
+                <button class="copy-btn" onclick="copyShortLink('${item.short}')">Copy Link</button>
             `;
             container.appendChild(div);
         });
     }
 
-    function copyLink(originalUrl) {
-        navigator.clipboard.writeText(originalUrl).then(() => {
-            alert('Direct Walmart link copied successfully!');
+    // यहाँ केवल शॉर्ट लिंक ही कॉपी होगा, वॉल्मार्ट का लंबा यूआरएल नहीं
+    function copyShortLink(shortText) {
+        navigator.clipboard.writeText(shortText).then(() => {
+            alert('Short Link copied successfully: ' + shortText);
         }).catch(() => {
-            alert('Failed to copy.');
+            alert('Failed to copy link.');
         });
     }
 
@@ -361,4 +360,3 @@
 
 </body>
 </html>
-
