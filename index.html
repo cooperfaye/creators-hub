@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creator Affiliate Hub - Earn & Grow</title>
+    <title>CreatorHub - Login / Sign Up</title>
     <style>
         * {
             margin: 0;
@@ -13,213 +13,116 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         body {
-            background-color: #f8f9fa;
-            color: #333;
-        }
-        /* Navbar */
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 8%;
-            background: #ffffff;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #6c5ce7;
-        }
-        .nav-links {
-            list-style: none;
-            display: flex;
-            gap: 30px;
-        }
-        .nav-links a {
-            text-decoration: none;
-            color: #555;
-            font-weight: 500;
-            transition: 0.3s;
-        }
-        .nav-links a:hover {
-            color: #6c5ce7;
-        }
-        .btn-nav {
-            background: #6c5ce7;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-        .btn-nav:hover {
-            background: #5b47d6;
-        }
-
-        /* Hero Section */
-        .hero {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 80px 8%;
             background: linear-gradient(135deg, #f5f3ff 0%, #ffffff 100%);
-        }
-        .hero-content {
-            max-width: 600px;
-        }
-        .hero-content h1 {
-            font-size: 48px;
-            line-height: 1.2;
-            color: #1e1e1e;
-            margin-bottom: 20px;
-        }
-        .hero-content h1 span {
-            color: #6c5ce7;
-        }
-        .hero-content p {
-            font-size: 18px;
-            color: #666;
-            margin-bottom: 30px;
-        }
-        .hero-buttons {
+            height: 100vh;
             display: flex;
-            gap: 15px;
+            justify-content: center;
+            align-items: center;
         }
-        .btn-primary {
-            background: #6c5ce7;
-            color: white;
-            padding: 14px 28px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 16px;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
-            transition: 0.3s;
-        }
-        .btn-primary:hover {
-            background: #5b47d6;
-            transform: translateY(-2px);
-        }
-        .btn-secondary {
+        .auth-container {
             background: #ffffff;
-            color: #6c5ce7;
-            border: 2px solid #6c5ce7;
-            padding: 14px 28px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 16px;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-        .btn-secondary:hover {
-            background: #f3f0ff;
-        }
-
-        /* Features Section */
-        .features {
-            padding: 80px 8%;
-            background: #ffffff;
-            text-align: center;
-        }
-        .features h2 {
-            font-size: 36px;
-            margin-bottom: 50px;
-            color: #1e1e1e;
-        }
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-        .feature-card {
-            background: #f8f9fa;
-            padding: 40px 30px;
-            border-radius: 12px;
-            transition: 0.3s;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 400px;
             border: 1px solid #eee;
         }
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            border-color: #6c5ce7;
-        }
-        .feature-card h3 {
-            font-size: 22px;
-            margin-bottom: 15px;
-            color: #1e1e1e;
-        }
-        .feature-card p {
-            color: #666;
-            font-size: 15px;
-            line-height: 1.5;
-        }
-
-        /* Footer */
-        footer {
+        .auth-container h2 {
             text-align: center;
-            padding: 30px;
-            background: #1e1e1e;
-            color: #aaa;
+            margin-bottom: 25px;
+            color: #1e1e1e;
+            font-size: 26px;
+        }
+        .auth-container h2 span {
+            color: #6c5ce7;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
             font-size: 14px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            transition: 0.3s;
+        }
+        .form-group input:focus {
+            border-color: #6c5ce7;
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+        }
+        .btn-submit {
+            width: 100%;
+            background: #6c5ce7;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+        }
+        .btn-submit:hover {
+            background: #5b47d6;
+        }
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        .auth-footer a {
+            color: #6c5ce7;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+        .back-home {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 13px;
+            color: #888;
+            text-decoration: none;
+        }
+        .back-home:hover {
+            color: #333;
         }
     </style>
 </head>
 <body>
 
-    <!-- Navigation Bar -->
-    <nav>
-        <div class="logo">CreatorHub</div>
-        <ul class="nav-links">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Features</a></li>
-            <li><a href="#">Creators</a></li>
-            <li><a href="#">Contact</a></li>
-        </ul>
-        <a href="#" class="btn-nav">Creator Login</a>
-    </nav>
-
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>Scale Your Earnings With <span>Smart Affiliate Links</span></h1>
-            <p>Generate clean tracking links, monitor clicks in real-time, and scale your creator business effortlessly, just like top platforms.</p>
-            <div class="hero-buttons">
-                <a href="#" class="btn-primary">Get Started Free</a>
-                <a href="#" class="btn-secondary">Explore Features</a>
+    <div class="auth-container">
+        <h2>Creator<span>Hub</span></h2>
+        <form action="#" method="POST">
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" placeholder="Enter your email" required>
             </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn-submit">Login to Dashboard</button>
+        </form>
+        <div class="auth-footer">
+            Don't have an account? <a href="#">Sign Up</a>
         </div>
-        <div class="hero-image" style="font-size: 120px;">
-            📊🚀
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="features">
-        <h2>Why Top Creators Choose Us</h2>
-        <div class="feature-grid">
-            <div class="feature-card">
-                <h3>🔗 Instant Link Gen</h3>
-                <p>Convert your product recommendations into high-converting trackable affiliate links within seconds.</p>
-            </div>
-            <div class="feature-card">
-                <h3>📈 Real-time Analytics</h3>
-                <p>Track every click, conversion, and commission amount with our high-speed analytics dashboard.</p>
-            </div>
-            <div class="feature-card">
-                <h3>💰 Fast Payouts</h3>
-                <p>Enjoy secure and automated commission payouts directly to your preferred payment accounts.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2026 CreatorHub Platform. All rights reserved.</p>
-    </footer>
+        <a href="index.html" class="back-home">&larr; Back to Home</a>
+    </div>
 
 </body>
 </html>
